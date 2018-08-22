@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title></title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<link rel="stylesheet" href="./../../lib/mint-ui/style.css">
+	<link rel="stylesheet" href="./../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../common/css/jas-main.css">
+</head>
+<style>
+</style>
+
+<body>
+	<div class="_outer-wrapper ">
+
+		<jas-header title="中线桩信息"></jas-header>
+
+		<!-- tab-container -->
+		<div v-setheight style="overflow: auto;">
+
+			<jas-group title="基础信息">
+				<jas-detail-field-group :fields="fields" :fields-config="fieldsConfig" :form="form"></jas-detail-field-group>
+			</jas-group>
+			<jas-group title="位置信息">
+				<jas-detail-field-group :fields="fields2" :fields-config="fieldsConfig" :form="form"></jas-detail-field-group>
+			</jas-group>
+			<jas-group title="其他信息">
+				<jas-detail-field-group :fields="fields3" :fields-config="fieldsConfig" :form="form"></jas-detail-field-group>
+			</jas-group>
+		</div>
+
+		<jas-button-footer :is-return="true" :buttons="['编辑','审核']" @click="clickbtn"></jas-button-footer>
+	</div>
+</body>
+<script src="./../../appcan/js/appcan.js"></script>
+<script src="./../../lib/vue/vue.js"></script>
+<script src="./../../lib/mint-ui/index.js"></script>
+<script src="./../../common/js/jas-tools.js"></script>
+<script src="./../../common/components/jas-components.js"></script>
+<script>
+	window.vm = new Vue({
+		el: '._outer-wrapper',
+		data: function () {
+			return {
+				form: {},
+				fields: ['projectName', 'pipelineName', 'medianStakeCode'],
+				fields2: ['mileage', 'pointz', 'pointx', 'pointy'],
+				fields3: ['remarks'],
+				fieldsConfig: {
+					medianStakeCode: {
+						label: '中线桩编号',
+					},
+					mileage: {
+						label: '里程',
+					},
+					pipelineName: {
+						label: '管线名称',
+					},
+					pipelineOid: {
+						label: '管线名称',
+					},
+					pointx: {
+						label: 'X坐标',
+					},
+					pointy: {
+						label: 'Y坐标',
+					},
+					pointz: {
+						label: '高程',
+					},
+					projectName: {
+						label: '项目名称',
+					},
+					projectOid: {
+						label: '项目名称',
+					},
+					remarks: {
+						label: '备注',
+					},
+				}
+			}
+		},
+		created: function () {
+
+		},
+		mounted: function () {
+			var that = this;
+			appcan.ready(function () {
+				var params = jasTools.base.getParamsInUrl();
+				that.oid = params.oid;
+				that.requestDetail(params.oid);
+			});
+		},
+		methods: {
+			clickbtn: function (index) {
+				if (index == 0) {
+					appcan.window.open('add', '../add/add.html?oid=' + this.oid, 10, 16, 0, 0, 0);
+				}
+				this.$toast('您点击了第' + index + '个按钮')
+			},
+			requestDetail: function (oid) {
+				var that = this;
+				that.$indicator.open({
+					spinnerType: 'fading-circle'
+				});
+				var url = '/daq/medianStake/get.do';
+				jasTools.ajax.get(url, {
+					oid: oid
+				}, function (data) {
+					that.$indicator.close();
+					that.form = data.data;
+				});
+			}
+
+		},
+	});
+</script>
+
+</html>

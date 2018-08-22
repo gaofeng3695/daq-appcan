@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title></title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<link rel="stylesheet" href="./lib/mint-ui/style.css">
+	<link rel="stylesheet" href="./appcan/css/ui-box.css">
+	<link rel="stylesheet" href="./lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./common/css/jas-main.css">
+</head>
+<style>
+	.edit-title {
+		padding: 4px 10px;
+	}
+
+	.footer {
+		color: #666;
+		height: 55px;
+		position: relative;
+	}
+</style>
+
+<body>
+	<div class="_outer-wrapper" v-cloak>
+
+		<jas-header title="施工数据采集" :is-return="false" right-icon="fa fa-map" @clickright="gotonavbar"></jas-header>
+
+		<div id="content" v-setheight>
+			<!-- <mt-tab-container v-model="selected">
+				<mt-tab-container-item id="tab1" style="overflow: hidden;">
+					<jas-scroll-list-box ref="loadmore" v-model="listData" url="/jdbc/commonData/medianStake/getPage.do" :params="params">
+						<mt-cell v-for="item in listData" @click.native="gotoDetail(item.oid)" :title="item.medianStakeCode" :label="item.projectName+item.pipelineName"
+						  is-link/>
+					</jas-scroll-list-box>
+				</mt-tab-container-item>
+				<mt-tab-container-item id="tab2">
+					<mt-cell v-for="n in 5" title="tab-container 2"></mt-cell>
+				</mt-tab-container-item>
+				<mt-tab-container-item id="tab3">
+					<mt-cell v-for="n in 7" title="tab-container 3"></mt-cell>
+				</mt-tab-container-item>
+				<mt-tab-container-item id="tab4">
+					<mt-cell v-for="n in 19" title="tab-container 4"></mt-cell>
+				</mt-tab-container-item>
+
+
+			</mt-tab-container> -->
+		</div>
+		<div style="" class="footer">
+			<mt-tabbar v-model="selected">
+				<mt-tab-item id="tab1">
+					<!-- <img slot="icon" src="../assets/100x100.png"> -->
+					<i style="font-size:24px;" slot="icon" class="fa fa-home" aria-hidden="true"></i>
+					<span>首页</span>
+				</mt-tab-item>
+				<mt-tab-item id="tab2">
+					<i style="font-size:24px;" slot="icon" class="fa fa-pencil-square" aria-hidden="true"></i>
+					<span>数据录入</span>
+				</mt-tab-item>
+				<mt-tab-item id="tab3">
+					<i style="font-size:24px;" slot="icon" class="fa fa-lock" aria-hidden="true"></i>
+					<span>数据审核</span>
+				</mt-tab-item>
+				<mt-tab-item id="tab4">
+					<i style="font-size:24px;" slot="icon" class="fa fa-globe" aria-hidden="true"></i>
+					<span>地图展示</span>
+				</mt-tab-item>
+				<mt-tab-item id="tab5">
+					<i style="font-size:24px;" slot="icon" class="fa fa-user" aria-hidden="true"></i>
+					<span>个人中心</span>
+				</mt-tab-item>
+			</mt-tabbar>
+		</div>
+	</div>
+</body>
+
+<script src="./appcan/js/appcan.js"></script>
+<script src="./lib/vue/vue.js"></script>
+<script src="./lib/mint-ui/index.js"></script>
+<script src="./common/js/jas-tools.js"></script>
+<script src="./common/components/jas-components.js"></script>
+
+<script>
+	var vm = new Vue({
+		el: '._outer-wrapper',
+		data: function () {
+			return {
+				params: {
+					medianStakeCode: "",
+					pipelineOid: "",
+					projectOid: "",
+				},
+				listData: [],
+				selected: 'tab1',
+				form: {
+					username: 'admin',
+					password: '111111',
+				}
+			}
+		},
+		watch: {
+			selected: function (val) {
+				var valMap = {
+					tab1: 'pages/data-config/data-config.html',
+					tab2: 'pages/detail/detail.html',
+					tab3: 'pages/add/add.html',
+					tab4: '',
+				};
+				this.openPopOver(valMap[val]);
+			}
+		},
+		created: function () {},
+		mounted: function () {
+			var that = this;
+			appcan.ready(function () {
+				// that.$refs.loadmore.refresh();
+				that.openPopOver('pages/data-config/data-config.html');
+			});
+		},
+		methods: {
+			gotonavbar: function () {
+				appcan.window.open('data-config', 'pages/data-config/data-config.html', 10, 16, 0, 0, 0);
+			},
+			gotoDetail: function (oid) {
+				appcan.window.open('data-config', 'pages/detail/detail.html?oid=' + oid, 10, 16, 0, 0, 0);
+			},
+			openPopOver: function (src) {
+				var top = Math.floor($('#content').offset().top * (window.devicePixelRatio || 1));
+				var height = Math.floor($('#content').height() * (window.devicePixelRatio || 1));
+				var width = Math.floor($('#content').width() * (window.devicePixelRatio || 1));
+				if (this[src]) {
+					appcan.window.bringPopoverToFront(src);
+				} else {
+					this[src] = true;
+					appcan.window.openPopover({
+						name: src,
+						dataType: 0,
+						url: src,
+						left: 0,
+						top: top,
+						width: width,
+						height: height,
+					});
+				}
+			}
+		},
+	});
+</script>
+
+</html>

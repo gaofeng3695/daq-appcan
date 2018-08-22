@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title></title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<link rel="stylesheet" href="./../../lib/mint-ui/style.css">
+	<link rel="stylesheet" href="./../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../common/css/jas-main.css">
+</head>
+<style>
+</style>
+
+<body>
+	<div class="_outer-wrapper " v-cloak>
+
+		<!-- <jas-header title="tab示例"></jas-header> -->
+		<div style="padding-bottom:10px;">
+			<mt-navbar v-model="selected">
+				<mt-tab-item id="first">数据同步</mt-tab-item>
+				<mt-tab-item id="second">图层下载</mt-tab-item>
+			</mt-navbar>
+		</div>
+
+		<!-- tab-container -->
+		<div v-setheight>
+			<mt-tab-container v-model="selected" :swipeable="true">
+				<mt-tab-container-item id="first">
+					<jas-scroll-list-box ref="loadmore" v-model="listData" url="/jdbc/commonData/medianStake/getPage.do" :params="params">
+						<mt-cell v-for="item in listData" :title="item.medianStakeCode" :label="item.projectName+item.pipelineName" />
+					</jas-scroll-list-box>
+				</mt-tab-container-item>
+				<mt-tab-container-item id="second">
+					<mt-cell v-for="n in 4" :title="'测试 ' + n" />
+				</mt-tab-container-item>
+
+			</mt-tab-container>
+
+
+		</div>
+
+
+
+	</div>
+</body>
+
+<script src="./../../appcan/js/appcan.js"></script>
+<script src="./../../lib/vue/vue.js"></script>
+<script src="./../../lib/mint-ui/index.js"></script>
+<script src="./../../common/js/jas-tools.js"></script>
+<script src="./../../common/components/jas-components.js"></script>
+<script>
+	window.vm = new Vue({
+		el: '._outer-wrapper',
+		data: function () {
+			return {
+				params: {
+					medianStakeCode: "",
+					pipelineOid: "",
+					projectOid: "",
+				},
+				listData: [],
+				selected: 'first',
+			}
+		},
+		created: function () {
+
+		},
+		mounted: function () {
+			var that = this;
+
+			appcan.ready(function () {
+				that.$refs.loadmore.refresh();
+			});
+		},
+		methods: {
+
+
+		},
+	});
+</script>
+
+</html>

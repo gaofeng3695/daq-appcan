@@ -1,0 +1,14 @@
+/.git/
+/.settings/
+/bin/
+/target/
+/.classpath
+/.project
+/.vscode
+/.externalToolBuilders/
+bs-config.js
+package.json
+node_modules
+.springBeans
+npm-debug.log
+.svn

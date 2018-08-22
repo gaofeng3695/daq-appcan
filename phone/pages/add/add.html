@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title></title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<link rel="stylesheet" href="./../../lib/mint-ui/style.css">
+	<link rel="stylesheet" href="./../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../common/css/jas-main.css">
+</head>
+<style>
+</style>
+
+<body>
+	<div class="_outer-wrapper " v-cloak>
+
+		<jas-header title="中线桩信息"></jas-header>
+
+		<!-- tab-container -->
+		<div v-setheight style="overflow: auto;">
+
+			<jas-group :title="title">
+				<jas-select-field label="名称" v-model="form.name" :options="options"></jas-select-field>
+				<jas-select-field label="名称" v-model="form.name2" :is-multi="true" :options="options"></jas-select-field>
+				<mt-field label="密码" placeholder="请输入密码" type="password" v-model="form.password"></mt-field>
+				<mt-field label="手机号" placeholder="请输入手机号" type="tel" v-model="form.phone"></mt-field>
+				<mt-field label="网站" placeholder="请输入网址" type="url" v-model="form.website"></mt-field>
+				<mt-field label="数字" placeholder="请输入数字" type="number" v-model="form.number"></mt-field>
+				<mt-field label="生日" placeholder="请输入生日" type="date" v-model="form.birthday"></mt-field>
+				<mt-field label="自我介绍" placeholder="自我介绍" type="textarea" rows="4" v-model="form.introduction"></mt-field>
+			</jas-group>
+
+		</div>
+
+		<jas-button-footer :is-return="true" :buttons="['确认','审核']" @click="clickbtn"></jas-button-footer>
+	</div>
+</body>
+<script src="./../../appcan/js/appcan.js"></script>
+<script src="./../../lib/vue/vue.js"></script>
+<script src="./../../lib/mint-ui/index.js"></script>
+<script src="./../../common/js/jas-tools.js"></script>
+<script src="./../../common/components/jas-components.js"></script>
+<script>
+	window.vm = new Vue({
+		el: '._outer-wrapper',
+		data: function () {
+			return {
+				title: '基础信息',
+				value: '',
+				details: [ //
+					{
+						label: '姓名',
+						value: '张无忌',
+					}, {
+						label: '姓名',
+						value: '张无忌',
+					}, {
+						label: '姓名',
+						value: '张无忌',
+					}, {
+						label: '姓名',
+						value: '张无忌',
+					},
+				],
+				popupVisible: false,
+				options: [{
+						label: '被禁用',
+						value: '值F',
+					},
+					{
+						label: '选中禁用',
+						value: '选中禁用的值',
+					},
+					{
+						label: '选项A',
+						value: '值A'
+					},
+					{
+						label: '选项B',
+						value: '值B'
+					}
+				],
+				form: {
+					name: '值A',
+					name2: '',
+					username: '',
+					email: '',
+					password: '',
+					phone: '',
+					website: '',
+					number: '',
+					birthday: '',
+					introduction: '',
+				}
+			}
+		},
+		created: function () {
+
+		},
+		mounted: function () {
+			var that = this;
+
+		},
+		methods: {
+			clickbtn: function (index) {
+				this.$toast('您点击了第' + index + '个按钮')
+			}
+
+		},
+	});
+</script>
+
+</html>

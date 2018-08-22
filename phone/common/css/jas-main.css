@@ -1,0 +1,241 @@
+@charset "utf-8";
+/* reset 样式--开始 */
+
+* {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+/* //禁止文本缩放 字体设置  取消touch高亮效果 */
+
+html {
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+    -webkit-text-size-adjust: 100%;
+    font-family: -apple-system, "PingFang SC", "Helvetica Neue", Helvetica, STHeiTi, sans-serif;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    font-size: 14px;
+    background: #EEEEEE;
+    color: #333;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    -webkit-overflow-scrolling: touch;
+}
+
+div {
+    box-sizing: border-box;
+}
+
+body,
+div,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+code,
+form,
+fieldset,
+legend,
+input,
+textarea,
+p,
+blockquote,
+th,
+td,
+hr,
+button,
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section,
+sumary {
+    margin: 0;
+    padding: 0;
+}
+
+/* //清除输入框内阴影 */
+
+input,
+select,
+textarea {
+    border: 0;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+ol,
+ul {
+    list-style: none;
+}
+
+/* //禁止选中文本内容 */
+
+*:not(input, select, textArea) {
+    -webkit-user-select: none;
+}
+
+/* //禁用长按页面时的弹出菜单(iOS下有效) ,img和a标签都要加 */
+
+img,
+a {
+    -webkit-touch-callout: none;
+}
+
+a,
+a:active,
+a:hover {
+    text-decoration: none;
+}
+
+/* //去掉点击链接和文本框对象时默认的灰色半透明覆盖层(iOS)或者虚框(Android) */
+
+a,
+button,
+input,
+textarea {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+/* reset 样式--结束 */
+
+/* 页面通用样式--开始 */
+
+[v-cloak] {
+    display: none;
+}
+
+._outer-wrapper {
+    height: 100%;
+}
+
+._outer-wrapper .content-wrapper {
+    padding: 10px;
+    overflow: auto;
+}
+
+/* 页面通用样式--结束 */
+
+/* mint-ui修复--开始 */
+
+.fa {
+    font-size: 16px;
+}
+
+.mint-tab-container,
+.mint-tab-container-wrap {
+    overflow: auto;
+    height: 100%;
+    max-height: 100%;
+}
+
+.mint-tab-container-item {
+    height: 100%;
+    overflow: auto;
+}
+
+/* mint-ui修复--结束 */
+
+/* 弹性盒子相关--开始 */
+
+.jas-flex-box {
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -ms-flex-preferred-size: auto;
+    flex-basis: auto;
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+.jas-flex-box.is-vertical {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    height: 100%;
+}
+
+.jas-flex-box.is-horizontal {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: row;
+    flex-direction: row;
+}
+
+.jas-flex-box.is-vertical .is-grown {
+    min-height: 0;
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    -ms-flex-preferred-size: auto;
+    flex-basis: auto;
+    overflow: auto;
+    height: 0;
+    position: relative;
+}
+
+.jas-flex-box.is-horizontal .is-grown {
+    min-width: 0;
+    width: 0%;
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    -ms-flex-preferred-size: auto;
+    flex-basis: auto;
+    overflow: auto;
+}
+
+/* 弹性盒子相关--结束 */
+
+/* 组件--jas-button-footer--开始 */
+
+.jas-button-footer {
+    background-image: -webkit-linear-gradient(top, #d9d9d9, #d9d9d9 50%, transparent 50%);
+    background-image: linear-gradient(180deg, #d9d9d9, #d9d9d9 50%, transparent 50%);
+    background-size: 100% 1px;
+    background-repeat: no-repeat;
+    background-position: top left;
+    background-color: #fafafa;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    text-align: center;
+    padding: 0 4px;
+}
+
+.jas-button-footer .jas-footer-item {
+    display: block;
+    padding: 7px 4px;
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    text-decoration: none;
+}
+
+/* 组件--jas-button-footer--结束 */
