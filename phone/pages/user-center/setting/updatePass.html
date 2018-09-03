@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title></title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<link rel="stylesheet" href="./../../../lib/mint-ui/style.css">
+	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../common/css/jas-main.css">
+</head>
+<style>
+	/*.mint-cell {
+		margin-bottom: 10px;
+	}*/
+
+	.btn {
+		padding: 10px;
+		overflow: hidden;
+	}
+</style>
+
+<body>
+	<div class="_outer-wrapper " v-cloak>
+		<jas-header title="修改密码"></jas-header>
+		<mt-field v-for="item in passwordList" :label="item.label" :placeholder="item.placeholder" type="password" v-model="passwordForm[item.value]"></mt-field>
+		<div class="btn">
+			<mt-button size="large" type="primary" @click.native="submit">确认</mt-button>
+		</div>
+	</div>
+</body>
+<script src="./../../../appcan/js/appcan.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/mint-ui/index.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script>
+	var vm = new Vue({
+		el: '._outer-wrapper',
+		data: function () {
+			return {
+				passwordForm: {
+					oldPassword: "",
+					newPassword: "",
+					againPassword: ""
+				},
+				passwordList: [{
+					label: "原密码",
+					placeholder: "请输入旧密码",
+					value: "oldPassword"
+				}, {
+					label: "新密码",
+					placeholder: "请输入新密码",
+					value: "newPassword"
+				}, {
+					label: "确认密码",
+					placeholder: "请再输入一次新密码",
+					value: "againPassword"
+				}]
+			}
+		},
+		created: function () {
+
+		},
+		mounted: function () {
+			var that = this;
+
+		},
+		methods: {
+			submit: function () {
+				var that = this;
+				if (that.passwordForm.newPassword != that.passwordForm.againPassword) {
+					that.$toast("两次密码输入不一致");
+					return;
+				}
+				//进行ajax请求进行密码的修改
+				var url = "/jasframework/privilege/user/editPassword.do";
+				jasTools.ajax.post(url, {
+					"oldPwd": that.passwordForm.oldPassword,
+					"newPwd": that.passwordForm.againPassword,
+				}, function (data) {
+					if (data.status == 1) {
+						appcan.window.open('login', '../../../login.html', 10, 16, 0, 0, 0);
+                       for(var key in that.passwordForm){
+                          that.passwordForm[key]="";
+                        }
+					} else {
+						that.$toast(data);
+					}
+				});
+			}
+		},
+	});
+</script>
+
+</html>

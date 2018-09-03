@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <link rel="stylesheet" href="./../../../lib/mint-ui/style.css">
+  <link rel="stylesheet" href="./../../../appcan/css/ui-box.css">
+  <link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="./../../../common/css/jas-main.css">
+</head>
+<style>
+  * {
+    padding: 0px;
+    margin: 0px;
+  }
+
+  .ulim100 {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .fl {
+    float: left;
+  }
+
+  .fr {
+    float: right;
+  }
+
+  ul li {
+    margin-top: 10px;
+    padding: 5px 10px;
+    list-style: none;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0px 0px 12px #ececec;
+  }
+
+  .checkbox {
+    width: 20px;
+    height: 50px;
+    margin-right: 10px;
+  }
+
+  .checkImg {
+    background-size: 16px 16px;
+    width: 16px;
+    height: 16px;
+    margin: 17px 0px;
+  }
+
+  .checked {
+    background: url("../../../common/images/checked_h.png") no-repeat center center;
+  }
+
+  .check {
+    background: url("../../../common/images/checked.png") no-repeat center center;
+  }
+
+  ul li .item {
+    height: 25px;
+    line-height: 25px;
+  }
+
+  .txt-r {
+    text-align: right;
+  }
+
+  .allcheck {
+    background-size: 16px 16px;
+    width: 50px;
+    height: 16px;
+    margin: 10px 0px;
+    line-height: 16px;
+    padding-left: 20px;
+
+  }
+
+  .allcheckImg {
+    background: url("../../../common/images/checked.png") no-repeat 0 center;
+  }
+
+  .allcheckedImg {
+    background: url("../../../common/images/checked_h.png") no-repeat 0 center;
+  }
+
+  .w35 {
+    width: 35vw;
+  }
+
+  .jas-button-footer {
+    padding: 0px 10px;
+    line-height: 38px;
+  }
+
+  .mint-button {
+    height: 25px;
+    line-height: 25px;
+  }
+/*.passMask{
+    position: relative;
+}
+.passMask:after{
+    content : '';
+    height : 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background:  url("../../../common/images/pass.png") no-repeat right 20px bottom 10px;
+    background-size:70px 30px;
+}*/
+</style>
+
+<body>
+  <div class="_outer-wrapper " v-cloak>
+    <mt-navbar v-model="selected">
+      <mt-tab-item id="1">未审核数据</mt-tab-item>
+      <mt-tab-item id="2">已审核数据</mt-tab-item>
+    </mt-navbar>
+    <div v-setheight style="overflow: auto;">
+      <mt-tab-container v-model="selected">
+        <mt-tab-container-item id="1">
+          <ul>
+            <li class="ub passMask " v-for="item in checkList">
+              <div class="checkbox">
+                <div class="checkImg" :class="item.checked?'checked':'check'" @click="clickItem(item)">
+                </div>
+              </div>
+              <div class="ub-f1  ">
+                <div class="item ub ub-ac">
+                  <div class="ub-f1 ulim100">管线：{{item.pipeName}}</div>
+                  <div class="ub-f1 txt-r ulim100">标段：{{item.biaoName}}</div>
+                </div>
+                <div class="item ub ub-ac">
+                  <div class="ub-f1 ulim100 w35">采集人：{{item.createName}}</div>
+                  <div class="ub-f1 txt-r ulim100 w35">编号：{{item.code}}</div>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </mt-tab-container-item>
+        <mt-tab-container-item id="2">
+          <ul>
+            <li class="ub " v-for="item in checkList">
+              <div class="ub-f1  ">
+                <div class="item ub ub-ac">
+                  <div class="ub-f1 ulim100">管线：{{item.pipeName}}</div>
+                  <div class="ub-f1 txt-r ulim100">标段：{{item.biaoName}}</div>
+                </div>
+                <div class="item ub ub-ac">
+                  <div class="ub-f1 ulim100 w35">采集人：{{item.createName}}</div>
+                  <div class="ub-f1 txt-r ulim100 w35">编号：{{item.code}}</div>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </mt-tab-container-item>
+      </mt-tab-container>
+    </div>
+    <div class="jas-button-footer ub " v-if="selected=='1'">
+      <div class=" allcheck  " :class="allchecked?'allcheckedImg':'allcheckImg'" @click="chooseAll">
+        <label for="">全选</label>
+      </div>
+      <div class="txt-r ub-f1">
+        <mt-button type="primary" size="small">通过</mt-button>
+        <mt-button type="primary" size="small">驳回</mt-button>
+      </div>
+    </div>
+  </div>
+</body>
+<script src="./../../../appcan/js/appcan.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/mint-ui/index.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script>
+  var vm = new Vue({
+    el: '._outer-wrapper',
+    data: function () {
+      return {
+        selected: "1",
+        allchecked: false,
+        checkList: [{
+          checked: false,
+          pipeName: "干线",
+          biaoName: "一标段",
+          createName: "王思",
+          code: "98"
+        }, {
+          checked: false,
+          pipeName: "干线",
+          biaoName: "一标段",
+          createName: "王思",
+          code: "ERTGHIOLKNBVBNM<"
+        }, {
+          checked: false,
+          pipeName: "干线",
+          biaoName: "一标段",
+          createName: "王思",
+          code: "q1qaz2wsx3edc4rfv5tgv6yhn7ujik,"
+        }, {
+          checked: false,
+          pipeName: "干线",
+          biaoName: "一标段",
+          createName: "王思",
+          code: "ertyui"
+        }, {
+          checked: false,
+          pipeName: "干线",
+          biaoName: "一标段",
+          createName: "王思",
+          code: "ghjklddsoiu09889"
+        }]
+      }
+    },
+    created: function () {
+
+    },
+    mounted: function () {
+      var that = this;
+      appcan.ready(function () {
+        var params = jasTools.base.getParamsInUrl();
+        appcan.logs(params.obj);
+      });
+    },
+    methods: {
+      chooseAll: function () {
+        var that = this;
+        if (!that.allchecked) {
+          that.allchecked = true;
+          that.checkList.forEach(function (item) {
+            item.checked = true;
+          });
+        } else {
+          that.allchecked = false;
+          that.checkList.forEach(function (item) {
+            item.checked = false;
+          });
+        }
+      },
+      clickItem: function (item) {
+        var that = this;
+        item.checked = !item.checked;
+        if (item.checked) {
+          var num = 0;
+          that.checkList.forEach(function (item) {
+            if (!item.checked) {
+              num++;
+              return;
+            }
+          });
+          if (num > 0) {
+            that.allchecked = false;
+          } else {
+            that.allchecked = true;
+          }
+        } else {
+          that.allchecked = false;
+        }
+      }
+    },
+  });
+</script>
+
+</html>

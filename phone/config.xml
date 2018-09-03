@@ -1,16 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<widget widgetId="" pid="" appId="aaaot10004" channelCode="0000" version="00.00.0000" viewmode="application" width="320" height="480" sreensize="4.5">
-  <name>施工数据采集</name>
-  <description>施工数据采集产品APP项目</description>
-  <author email=""/>
-  <icon src="appcan/icon.png"/>
-  <license href=""/>
-  <content src="login.html" encoding="utf-8"/>
-  <updateurl/>
-  <logserverip/>
-  <showmyspace>false</showmyspace>
-  <obfuscation>true</obfuscation>
-  <bgcolor>#fefefe</bgcolor>
-  <orientation>15</orientation>
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<widget appId="aaaot10004" channelCode="0000" height="480" pid="" sreensize="4.5" version="00.00.0000" viewmode="application" widgetId="" width="320">
+    <name>施工数据采集</name>
+    <description>施工数据采集产品APP项目</description>
+    <author email=""/>
+    <icon src="appcan/icon.png"/>
+    <license href=""/>
+    <content encoding="utf-8" src="init.html"/>
+    <updateurl/>
+    <logserverip/>
+    <showmyspace>false</showmyspace>
+    <obfuscation>true</obfuscation>
+    <bgcolor>#fefefe</bgcolor>
+    <orientation>1</orientation>
+    <error/>
+    <removeloading/>
+    <debug/>
+    <partobfuscation/>
+    <webapp>false</webapp>
 </widget>

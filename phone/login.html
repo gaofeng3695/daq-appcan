@@ -39,13 +39,8 @@
 				}
 			}
 		},
-		created: function () {
-
-		},
-		mounted: function () {
-
-
-		},
+		created: function () {},
+		mounted: function () {},
 		methods: {
 			login: function () {
 				var that = this;
@@ -68,7 +63,9 @@
 					localStorage.setItem("calculateType", 1); //1-显示桩和偏移量  2显示坐标
 
 					appcan.window.open('index', 'index.html', 10, 16, 0, 0, 0);
-
+					setTimeout(function () {
+						// appcan.window.close(0);
+					}, 800);
 				});
 			}
 		},

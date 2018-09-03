@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title></title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<link rel="stylesheet" href="./../../lib/mint-ui/style.css">
+	<link rel="stylesheet" href="./../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../common/css/jas-main.css">
+</head>
+<style>
+	.top {
+		padding: 0px 10px;
+		overflow: hidden;
+		background: url("../../common/images/userCenterBg.png");
+	}
+
+	.top_img,
+	.top_info {
+		float: left;
+	}
+
+	.top_img {
+		padding: 10px 10px 10px 0px;
+
+	}
+
+	img {
+		width: 20vw;
+		height: 20vw;
+	}
+
+	.top_info {
+		border-left: 1px solid #fff;
+		margin: 10px 0px;
+		padding: 0px 10px;
+		width: 67vw;
+	}
+
+	.top_info .item {
+		color: #fff;
+		height: 10vw;
+		line-height: 10vw;
+
+	}
+
+	.ulim100 {
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+	}
+
+	.bottom {
+		margin-top: 10px;
+	}
+
+	/*.mint-cell {
+		margin-bottom: 10px;
+	}*/
+
+	.mint-cell-text {
+		padding-left: 10px;
+	}
+
+	.btn {
+		padding: 10px;
+		overflow: hidden;
+	}
+</style>
+
+<body>
+	<div class="_outer-wrapper " v-cloak>
+		<div v-setheight style="overflow: auto;">
+			<div class="top">
+				<div class="top_img">
+					<img src="../../common/images/girl.png" alt="">
+				</div>
+				<div class="top_info">
+					<div class="item ulim100">
+						{{userBo.userName}}
+					</div>
+					<div class="item ulim100">
+						{{userBo.unitName}}
+					</div>
+				</div>
+			</div>
+			<div class="bottom">
+				<mt-cell v-for="item in personList" :title="item.name" @click.native="goto(item.link)" is-link>
+					<img slot="icon" :src="item.icon" style="width:24px;height:24px;">
+				</mt-cell>
+			</div>
+			<div class="btn">
+				<mt-button size="large" type="primary" @click.native="logOut">退出登录</mt-button>
+			</div>
+		</div>
+	</div>
+</body>
+<script src="./../../appcan/js/appcan.js"></script>
+<script src="./../../lib/vue/vue.js"></script>
+<script src="./../../lib/mint-ui/index.js"></script>
+<script src="./../../common/js/jas-tools.js"></script>
+<script src="./../../common/components/jas-components.js"></script>
+<script>
+var vm = new Vue({
+		el: '._outer-wrapper',
+		data: function () {
+			return {
+			    userBo:JSON.parse(localStorage.getItem("user")),
+				personList: [ //
+					{
+						name: '个人设置',
+						link: 'setting/setting.html',
+						icon: "../../common/images/personSet.png"
+					}, {
+						name: '基础数据同步',
+						link: 'scroll/scroll.html',
+						icon: "../../common/images/async.png"
+					}, {
+						name: '版本更新',
+						link: 'detail/detail.html',
+						icon: "../../common/images/updateversion.png"
+					}, {
+						name: '帮助',
+						link: 'detail/detail.html',
+						icon: "../../common/images/help.png"
+					}
+				]
+			}
+		},
+		created: function () {
+
+		},
+		mounted: function () {
+			var that = this;
+			that.userBo.unitName=that.userBo.unitName.split("-->")[that.userBo.unitName.split("-->").length-1]
+		},
+		methods: {
+			goto: function (link) {
+				appcan.window.open('link', link, 10, 16, 0, 0, 0);
+			},
+			logOut: function () { //退出登录
+				appcan.window.open('login','../../login.html',10, 16, 0, 0, 0);
+			}
+		},
+	});
+</script>
+
+</html>

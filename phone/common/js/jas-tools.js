@@ -64,6 +64,8 @@
 			}
 			return target;
 		};
+
+
 		/**
 		 * @description   获取url的
 		 * @param target  要被继承的对象
@@ -97,6 +99,8 @@
 			}
 			return obj || {};
 		};
+
+
 		/**
 		 * @description  	向url上添加 key:value
 		 * @param url  locoation.href
@@ -117,11 +121,6 @@
 			}
 			return url;
 		};
-
-
-
-
-
 
 
 		/**
@@ -169,6 +168,42 @@
 			});
 		}
 
+		var eventBus = function (eventObj, fn) {
+			function EvnentBus(eventObj, fn) {
+				this.nameList = [];
+				this.fnList = [];
+				this.fn = fn;
+				this.init(eventObj, fn);
+			}
+			EvnentBus.prototype = {
+				constructor: EvnentBus,
+				init: function (eventObj, fn) {
+					for (var key in eventObj) {
+						if (eventObj.hasOwnProperty(key)) {
+							this.nameList.push(key);
+							this.fnList.push(eventObj[key]);
+						}
+					}
+					this.go(0);
+				},
+				go: function (index) {
+					if (index > this.fnList.length - 1) {
+						this.fn && this.fn();
+					} else {
+						this.index = index;
+						this.currentFnName = this.nameList[this.index];
+						this.fnList[index] && this.fnList[index].call();
+					}
+				},
+				next: function () {
+					this.index++;
+					this.go(this.index);
+				}
+			};
+			return new EvnentBus(eventObj, fn);
+		};
+
+
 		return {
 			createuuid: createuuid,
 			extend: extend,
@@ -176,10 +211,11 @@
 			setParamsToUrl: setParamsToUrl,
 			getIdArrFromTree: getIdArrFromTree,
 			switchToCamelCase: switchToCamelCase,
+			eventBus: eventBus,
 		};
 	})();
 
-	// DAQProoject
+	//
 	var ajax = (function (appcan) {
 		var protocolConfig = appcan.locStorage.getVal('serverProtocol') || 'http://'; //协议
 		var host = appcan.locStorage.getVal('serverIP') || '192.168.100.43'; //主机
@@ -347,9 +383,127 @@
 		};
 	})(appcan);
 
+	var database = (function () {
+		var dbName = "ZYXXWSDB_001"; //数据库名称
+		var isDBCreted = false;
+		var initDB = function (fn) {
+			if (isDBCreted) {
+				fn && fn();
+			} else {
+				appcan.database.create(dbName, function (err, data, db, dataType, optId) {
+					alert('创建数据库data:' + data);
+					if (!isDBCreted) {
+						uexDataBaseMgr.open(dbName);
+					}
+					isDBCreted = true;
+					fn && fn();
+				});
+			}
+			//初始化数据库
+		};
+		// //数据库查询的方法
+		// var dbSelect = function (sql, callback) {
+		// 	initDB(function () {
+		// 		appcan.database.select(dbName, sql, function (err, data, dataType, optId) {
+		// 			var result = "";
+		// 			if (!err) {
+		// 				result = JSON.parse(data);
+		// 			}
+		// 			if (appcan.isFunction(callback)) {
+		// 				callback(err, result);
+		// 			}
+		// 			//uexDataBaseMgr.close(dbName);
+
+		// 		});
+		// 	});
+		// };
+		// //数据库创建Table的方法
+		// var dbCreateTable = function (sql, callback) {
+		// 	initDB(function (db) {
+		// 		// db.exec(sql, function (err, data, dataType, optId) {
+		// 		// 	callback(err, data);
+		// 		// });
+		// 		appcan.database.exec(dbName, sql, function (err, data, dataType, optId) {
+		// 			alert('创建表data:' + data)
+		// 			if (appcan.isFunction(callback)) {
+		// 				callback(err, data);
+		// 			}
+		// 			//uexDataBaseMgr.close(dbName);
+
+		// 		});
+
+		// 	});
+		// };
+		// //数据库执行的方法（insert、update、delete）
+		// var dbExec = function (sql, callback) {
+		// 	initDB(function () {
+		// 		appcan.database.exec(dbName, sql, function (err, data, dataType, optId) {
+		// 			if (appcan.isFunction(callback)) {
+		// 				callback(err, data);
+		// 			}
+		// 		});
+		// 		//uexDataBaseMgr.close(dbName);
+
+		// 	});
+		// }
+
+		//数据库创建Table的方法
+		var dbCreateTable = function (sql, callback) {
+			db = uexDataBaseMgr.open(dbName);
+			uexDataBaseMgr.sql(db, sql, function (err) {
+				alert('创建表err:' + err)
+				if (err) {
+					alert('createTable failed')
+				}
+				if (appcan.isFunction(callback)) {
+					callback();
+				}
+			});
+		};
+		//数据库查询的方法
+		var dbSelect = function (sql, callback) {
+
+
+			initDB(function () {
+				appcan.database.select(dbName, sql, function (err, data, dataType, optId) {
+					var result = "";
+					if (!err) {
+						result = JSON.parse(data);
+					}
+					if (appcan.isFunction(callback)) {
+						callback(err, result);
+					}
+					//uexDataBaseMgr.close(dbName);
+
+				});
+			});
+		};
+
+		//数据库执行的方法（insert、update、delete）
+		var dbExec = function (sql, callback) {
+			initDB(function () {
+				appcan.database.exec(dbName, sql, function (err, data, dataType, optId) {
+					if (appcan.isFunction(callback)) {
+						callback(err, data);
+					}
+				});
+				//uexDataBaseMgr.close(dbName);
+
+			});
+		}
+
+		return {
+			createTable: dbCreateTable,
+			select: dbSelect,
+			exec: dbExec,
+		};
+	})();
+
+
 
 	window.jasTools = {
 		base: tools,
-		ajax: ajax
+		ajax: ajax,
+		db: database
 	};
 })(window);

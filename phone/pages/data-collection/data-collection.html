@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title></title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<link rel="stylesheet" href="./../../lib/mint-ui/style.css">
+	<link rel="stylesheet" href="./../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../common/css/jas-main.css">
+</head>
+<style>
+	.modulewrapper {
+		overflow: hidden;
+		padding: 10px 0px;
+		background: #fff;
+		margin-bottom: 10px;
+		color: #666;
+		/* border-bottom: 1px solid #e1e1e1; */
+	}
+
+	.module {
+		width: 25vw;
+		height: 25vw;
+		float: left;
+	}
+
+	.moduleicon {
+		/* background: #f90; */
+		width: 16vw;
+		height: 16vw;
+		margin: 0 auto;
+		margin-top: 10px;
+	}
+
+	.moduletitle {
+		text-align: center;
+	}
+
+
+
+	.numwrap {
+		width: 29vw;
+		margin: 1.5vw 1vw;
+		float: left;
+		background: #fff;
+		/* border: 1px #e1e1e1 solid; */
+		border-radius: 4px;
+		box-shadow: 0px 1px 5px 0px #cccccc;
+	}
+
+	.numbox {
+		width: 50%;
+		padding: 2.5vw 0;
+		float: left;
+		text-align: center;
+		position: relative;
+	}
+
+	.numtip {
+		font-size: 12px;
+		color: #999;
+	}
+
+	.num {
+		color: #26a2ff;
+		font-size: 16px;
+	}
+</style>
+
+<body>
+	<div class="_outer-wrapper" style="overflow: hidden;" v-cloak>
+		<div class="modulewrapper">
+			<div class="module" v-for="item in modules" @click="gotoForm(item)">
+				<div class="moduleicon" :style="backgroundForModule(item.icon)"></div>
+				<div class="moduletitle">{{item.name}}</div>
+			</div>
+		</div>
+		<div v-setheight class="listwrapper">
+
+			<jas-group title="施工数据采集详情">
+				<div style="padding: 0 3.5vw 2vw;overflow: hidden;">
+					<div v-for="item in modules" :key="item.id" class="numwrap">
+						<div class="bottomLine " style="padding:2vw 0;">
+							<div style="height:7vw;" :style="backgroundForStatistics(item.icon)"></div>
+							<div class="moduletitle">{{item.name}}</div>
+						</div>
+						<div style="width: 100%;overflow: hidden;">
+							<div @click="gotoList(item.id,'0')" class="numbox bottomLine ">
+								<div style="width:10px;height:100%;position: absolute;top:0;right:0;" class="rightLine"></div>
+								<div class="num ">{{statistics[item.id].entered}}</div>
+								<div class="numtip ">已录入</div>
+							</div>
+
+							<div @click="gotoList(item.id,'1')" class="numbox bottomLine ">
+								<div class="num ">{{statistics[item.id].local}}</div>
+								<div class="numtip ">待上传</div>
+							</div>
+							<div @click="gotoList(item.id,'2')" class="numbox ">
+								<div style="width:10px;height:100%;position: absolute;top:0;right:0;" class="rightLine"></div>
+
+								<div class="num ">{{statistics[item.id].toBeApplyed}}</div>
+								<div class="numtip ">待上报</div>
+							</div>
+							<div @click="gotoList(item.id,'3')" class="numbox  ">
+								<div class="num ">{{statistics[item.id].rejected}}</div>
+								<div class="numtip ">被驳回</div>
+							</div>
+
+						</div>
+
+					</div>
+				</div>
+
+			</jas-group>
+
+		</div>
+	</div>
+</body>
+<script src="./../../appcan/js/appcan.js "></script>
+<script src="./../../lib/vue/vue.js "></script>
+<script src="./../../lib/mint-ui/index.js "></script>
+<script src="./../../common/js/jas-tools.js "></script>
+<script src="./../../common/components/jas-components.js "></script>
+<script>
+	window.vm = new Vue({
+		el: '._outer-wrapper',
+		data: {
+			modules: [ //
+				{
+					id: 'antiseptic',
+					name: '防腐管检查',
+					icon: 'm1',
+				}, {
+					id: 'hotBend',
+					name: '热煨弯管检查',
+					icon: 'm2',
+				}, {
+					id: 'coldBend',
+					name: '冷弯管检查',
+					icon: 'm3',
+				}, {
+					id: 'weldRecord',
+					name: '焊口记录',
+					icon: 'm4',
+				}, {
+					id: 'weldRework',
+					name: '焊口返修',
+					icon: 'm5',
+				}, {
+					id: 'weldMeasure',
+					name: '焊口测量',
+					icon: 'm6',
+				}, {
+					id: 'patchRecord',
+					name: '补口记录',
+					icon: 'm7',
+				},
+			],
+			statistics: {
+				antiseptic: {
+					entered: 99241,
+					local: 9923,
+					toBeApplyed: 99965,
+					rejected: 99199
+				},
+				hotBend: {
+					entered: 2491,
+					local: 9923,
+					toBeApplyed: 65,
+					rejected: 19
+				},
+				coldBend: {
+					entered: 241,
+					local: 23,
+					toBeApplyed: 6995,
+					rejected: 19
+				},
+				weldRecord: {
+					entered: 241,
+					local: 23,
+					toBeApplyed: 65,
+					rejected: 19
+				},
+				weldRework: {
+					entered: 241,
+					local: 23,
+					toBeApplyed: 65,
+					rejected: 19
+				},
+				weldMeasure: {
+					entered: 241,
+					local: 23,
+					toBeApplyed: 65,
+					rejected: 19
+				},
+				patchRecord: {
+					entered: 241,
+					local: 23,
+					toBeApplyed: 65,
+					rejected: 19
+				},
+			},
+		},
+		created: function () {
+
+		},
+		mounted: function () {
+			var that = this;
+
+		},
+		methods: {
+			backgroundForModule: function (icon) {
+				return {
+					background: '#fff url(../../common/images/' + icon + '.png) no-repeat center center',
+					backgroundSize: '14vw',
+				}
+			},
+			backgroundForStatistics: function (icon) {
+				return {
+					background: '#fff url(../../common/images/' + icon + 's.png) no-repeat center center',
+					backgroundSize: '9vw',
+				}
+			},
+			gotoForm: function (item) {
+				appcan.window.open('form', 'form/form.html?title=' + item.name, 10, 16, 0, 0, 0);
+			},
+			gotoList: function (id, type) {
+				var url = jasTools.base.setParamsToUrl('list/list.html', {
+					id: id,
+					type: type
+				});
+				appcan.window.open('form', url, 10, 16, 0, 0, 0);
+			}
+
+		},
+	});
+</script>
+
+</html>

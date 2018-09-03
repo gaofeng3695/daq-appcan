@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title></title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<link rel="stylesheet" href="./../../../lib/mint-ui/style.css">
+	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../common/css/jas-main.css">
+</head>
+<style>
+</style>
+
+<body>
+	<div class="_outer-wrapper " v-cloak>
+
+		<jas-header :title="title"></jas-header>
+
+		<!-- tab-container -->
+		<div v-setheight style="overflow: auto;">
+
+			<jas-form-items-group ref="mainForm" :fields-group="fieldsGroup" :fields-config="fieldsConfig" :form="form"></jas-form-items-group>
+
+		</div>
+		<jas-button-footer :is-return="true" :buttons="['保存']" @click="clickbtn"></jas-button-footer>
+	</div>
+</body>
+<script src="./../../../appcan/js/appcan.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/mint-ui/index.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script>
+	window.vm = new Vue({
+		el: '._outer-wrapper',
+		data: function () {
+			return {
+				title: '数据录入',
+				value: '',
+				options: [{
+						label: '被禁用',
+						value: '值F',
+					},
+					{
+						label: '选中禁用',
+						value: '选中禁用的值',
+					},
+					{
+						label: '选项A',
+						value: '值A'
+					},
+					{
+						label: '选项B',
+						value: '值B'
+					}
+				],
+				fieldsGroup: [ //
+					{
+						groupName: '检查信息',
+						fields: [
+							'project_oid',
+							'tenders_oid',
+							'pipe_code',
+							'construct_unit',
+							'groove_check',
+							'pipe_end_proring_check',
+							'coating_io_face_check',
+							'diameter_check',
+							'coating_io_ends_check',
+							'excess_weld_metal',
+							'ovality',
+							'checked_by',
+							'checked_date',
+						],
+					}, {
+						groupName: '其他信息',
+						fields: [
+							'remarks',
+						]
+					}
+				],
+				fieldsConfig: {
+					'project_oid': {
+						name: '项目名称',
+						type: 'select',
+						required: true,
+						options: [],
+						// domainName: 'across_type_domain',
+						optionUrl: '/daq/privilege/getProjectList.do',
+						childSelect: ['tenders_oid', 'construct_unit'],
+						childUrl: ['/daq/privilege/getTendersList.do', '/daq/privilege/getCurrentUnitId.do'],
+						// requestParams: {
+						// 	crossWay: 'cross_way_code01'
+						// },
+					},
+					'tenders_oid': {
+						name: '标段名称',
+						type: 'select',
+						required: true,
+						options: []
+					},
+					'pipe_code': {
+						name: '钢管编号',
+						type: 'select',
+						required: true,
+						options: []
+					},
+					'construct_unit': {
+						name: '施工单位',
+						type: 'select',
+						required: true,
+						options: []
+					},
+					'groove_check': {
+						name: '坡口检查',
+						type: 'select',
+						options: [ //
+							{
+								label: '合格',
+								value: '合格',
+							},
+							{
+								label: '不合格',
+								value: '不合格',
+							},
+						]
+					},
+					'pipe_end_proring_check': {
+						name: '管端保护圈',
+						type: 'select',
+						options: [ //
+							{
+								label: '合格',
+								value: '合格',
+							},
+							{
+								label: '不合格',
+								value: '不合格',
+							},
+						]
+					},
+					'coating_io_face_check': {
+						name: '防腐层内外表面质量',
+						type: 'select',
+						options: [ //
+							{
+								label: '合格',
+								value: '合格',
+							},
+							{
+								label: '不合格',
+								value: '不合格',
+							},
+						]
+					},
+					'diameter_check': {
+						name: '管径偏差+0.2mm至-0.5mm',
+						type: 'select',
+						options: [ //
+							{
+								label: '合格',
+								value: '合格',
+							},
+							{
+								label: '不合格',
+								value: '不合格',
+							},
+						]
+					},
+					'coating_io_ends_check': {
+						name: '防腐层端部内外涂层',
+						type: 'select',
+						options: [ //
+							{
+								label: '合格',
+								value: '合格',
+							},
+							{
+								label: '不合格',
+								value: '不合格',
+							},
+						]
+					},
+					'excess_weld_metal': {
+						name: '管端焊缝余高（0mm）',
+						type: 'select',
+						options: [ //
+							{
+								label: '合格',
+								value: '合格',
+							},
+							{
+								label: '不合格',
+								value: '不合格',
+							},
+						]
+					},
+					'ovality': {
+						name: '椭圆度<0.6%D',
+						type: 'select',
+						options: [ //
+							{
+								label: '合格',
+								value: '合格',
+							},
+							{
+								label: '不合格',
+								value: '不合格',
+							},
+						]
+					},
+					'checked_by': {
+						name: '检查人',
+						type: 'text',
+					},
+					'checked_date': {
+						name: '检查日期',
+						type: 'date',
+					},
+					'remarks': {
+						name: '备注',
+						type: 'textarea',
+					},
+				},
+				form: {
+					oid: '',
+					checked_by: '',
+					checked_date: '',
+					coating_io_ends_check: '',
+					coating_io_face_check: '',
+					construct_unit: '',
+					diameter_check: '',
+					excess_weld_metal: '',
+					groove_check: '',
+					ovality: '',
+					pipe_code: '',
+					pipe_end_proring_check: '',
+					project_name: '',
+					project_oid: '',
+					tenders_name: '',
+					tenders_oid: '',
+					unit_name: '',
+					remarks: '',
+				}
+			}
+		},
+		created: function () {
+			var that = this;
+			appcan.ready(function () {
+				var params = jasTools.base.getParamsInUrl();
+				that.title = params.title;
+				that.getDetailByObjectId('dfe088c3-de1d-454e-85f3-6b131681d65b');
+			});
+		},
+		mounted: function () {
+			var that = this;
+
+		},
+		methods: {
+			clickbtn: function (index) {
+				this.$toast('您点击了第' + index + '个按钮')
+			},
+			getDetailByObjectId: function (oid) {
+				var that = this;
+				var url = '/map/commonData/F000030/get.do';
+				jasTools.ajax.post(url, {
+					oid: oid
+				}, function (data) {
+					that.form = data.data;
+					that.$refs['mainForm'].triggerFatherSelectsChange();
+				});
+			},
+
+		},
+	});
+</script>
+
+</html>

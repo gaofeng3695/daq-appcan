@@ -6,15 +6,10 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 	<link rel="stylesheet" href="./lib/mint-ui/style.css">
-	<link rel="stylesheet" href="./appcan/css/ui-box.css">
 	<link rel="stylesheet" href="./lib/font-awesome-4.7.0/css/font-awesome.min.css">
 	<link rel="stylesheet" href="./common/css/jas-main.css">
 </head>
 <style>
-	.edit-title {
-		padding: 4px 10px;
-	}
-
 	.footer {
 		color: #666;
 		height: 55px;
@@ -25,51 +20,15 @@
 <body>
 	<div class="_outer-wrapper" v-cloak>
 
-		<jas-header title="施工数据采集" :is-return="false" right-icon="fa fa-map" @clickright="gotonavbar"></jas-header>
+		<jas-header title="施工数据采集" :is-return="false"></jas-header>
 
-		<div id="content" v-setheight>
-			<!-- <mt-tab-container v-model="selected">
-				<mt-tab-container-item id="tab1" style="overflow: hidden;">
-					<jas-scroll-list-box ref="loadmore" v-model="listData" url="/jdbc/commonData/medianStake/getPage.do" :params="params">
-						<mt-cell v-for="item in listData" @click.native="gotoDetail(item.oid)" :title="item.medianStakeCode" :label="item.projectName+item.pipelineName"
-						  is-link/>
-					</jas-scroll-list-box>
-				</mt-tab-container-item>
-				<mt-tab-container-item id="tab2">
-					<mt-cell v-for="n in 5" title="tab-container 2"></mt-cell>
-				</mt-tab-container-item>
-				<mt-tab-container-item id="tab3">
-					<mt-cell v-for="n in 7" title="tab-container 3"></mt-cell>
-				</mt-tab-container-item>
-				<mt-tab-container-item id="tab4">
-					<mt-cell v-for="n in 19" title="tab-container 4"></mt-cell>
-				</mt-tab-container-item>
+		<div id="content" v-setheight></div>
 
-
-			</mt-tab-container> -->
-		</div>
-		<div style="" class="footer">
-			<mt-tabbar v-model="selected">
-				<mt-tab-item id="tab1">
-					<!-- <img slot="icon" src="../assets/100x100.png"> -->
-					<i style="font-size:24px;" slot="icon" class="fa fa-home" aria-hidden="true"></i>
-					<span>首页</span>
-				</mt-tab-item>
-				<mt-tab-item id="tab2">
-					<i style="font-size:24px;" slot="icon" class="fa fa-pencil-square" aria-hidden="true"></i>
-					<span>数据录入</span>
-				</mt-tab-item>
-				<mt-tab-item id="tab3">
-					<i style="font-size:24px;" slot="icon" class="fa fa-lock" aria-hidden="true"></i>
-					<span>数据审核</span>
-				</mt-tab-item>
-				<mt-tab-item id="tab4">
-					<i style="font-size:24px;" slot="icon" class="fa fa-globe" aria-hidden="true"></i>
-					<span>地图展示</span>
-				</mt-tab-item>
-				<mt-tab-item id="tab5">
-					<i style="font-size:24px;" slot="icon" class="fa fa-user" aria-hidden="true"></i>
-					<span>个人中心</span>
+		<div class="footer">
+			<mt-tabbar v-model="selectedTab">
+				<mt-tab-item :id="tab.name" v-for="tab in tabs">
+					<i style="font-size:24px;" slot="icon" :class="tab.icon" aria-hidden="true"></i>
+					<span>{{tab.name}}</span>
 				</mt-tab-item>
 			</mt-tabbar>
 		</div>
@@ -87,46 +46,59 @@
 		el: '._outer-wrapper',
 		data: function () {
 			return {
-				params: {
-					medianStakeCode: "",
-					pipelineOid: "",
-					projectOid: "",
-				},
-				listData: [],
-				selected: 'tab1',
-				form: {
-					username: 'admin',
-					password: '111111',
-				}
+				selectedTab: '数据录入',
+				tabs: [ //
+					{
+						name: '代码例子',
+						icon: 'fa fa-home',
+						url: 'pages/_demo/_demo.html',
+					},
+					{
+						name: '数据统计',
+						icon: 'fa fa-home',
+						url: '',
+					}, {
+						name: '数据录入',
+						icon: 'fa fa-pencil-square',
+						url: 'pages/data-collection/data-collection.html',
+					}, {
+						name: '数据审核',
+						icon: 'fa fa-lock',
+						url: 'pages/data-review/index.html',
+					}, {
+						name: '地图展示',
+						icon: 'fa fa-globe',
+						url: '',
+					}, {
+						name: '个人中心',
+						icon: 'fa fa-user',
+						url: 'pages/user-center/index.html',
+					},
+				],
 			}
 		},
 		watch: {
-			selected: function (val) {
-				var valMap = {
-					tab1: 'pages/data-config/data-config.html',
-					tab2: 'pages/detail/detail.html',
-					tab3: 'pages/add/add.html',
-					tab4: '',
-				};
-				this.openPopOver(valMap[val]);
+			selectedTab: function () {
+				this.openCurrentPage();
 			}
 		},
 		created: function () {},
 		mounted: function () {
 			var that = this;
 			appcan.ready(function () {
-				// that.$refs.loadmore.refresh();
-				that.openPopOver('pages/data-config/data-config.html');
+				that.openCurrentPage();
 			});
 		},
 		methods: {
-			gotonavbar: function () {
-				appcan.window.open('data-config', 'pages/data-config/data-config.html', 10, 16, 0, 0, 0);
-			},
-			gotoDetail: function (oid) {
-				appcan.window.open('data-config', 'pages/detail/detail.html?oid=' + oid, 10, 16, 0, 0, 0);
-			},
-			openPopOver: function (src) {
+			openCurrentPage: function () {
+				var that = this;
+				var src = '';
+				this.tabs.forEach(function (item) {
+					if (item.name === that.selectedTab) {
+						src = item.url;
+					}
+				});
+
 				var top = Math.floor($('#content').offset().top * (window.devicePixelRatio || 1));
 				var height = Math.floor($('#content').height() * (window.devicePixelRatio || 1));
 				var width = Math.floor($('#content').width() * (window.devicePixelRatio || 1));
@@ -144,7 +116,7 @@
 						height: height,
 					});
 				}
-			}
+			},
 		},
 	});
 </script>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title></title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<link rel="stylesheet" href="./../../../lib/mint-ui/style.css">
+	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../common/css/jas-main.css">
+</head>
+<style>
+	/*.mint-cell {
+		margin-bottom: 10px;
+	}*/
+</style>
+
+<body>
+	<div class="_outer-wrapper " v-cloak>
+		<jas-header title="个人设置"></jas-header>
+		<div v-setheight style="overflow: auto;">
+			<mt-cell v-for="item in setList" :title="item.name" :is-link="item.isLink" @click.native="goto(item.link)">
+				<span v-show="item.value">{{item.value}}</span>
+				<img :src="item.icon" v-show="item.icon" style="height:12vw;width:12vw">
+			</mt-cell>
+		</div>
+	</div>
+</body>
+<script src="./../../../appcan/js/appcan.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/mint-ui/index.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script>
+	var vm = new Vue({
+		el: '._outer-wrapper',
+		data: function () {
+			return {
+		
+				setList: [{
+					name: '头像',
+					isLink: true,
+					icon: "../../../common/images/girl.png"
+				}, {
+					name: '账号',
+					isLink: false,
+					value: JSON.parse(localStorage.getItem("user")).userName
+				}, {
+					name: '单位',
+					isLink: false,
+					value: JSON.parse(localStorage.getItem("user")).unitName.split("->")[JSON.parse(localStorage.getItem("user")).unitName.split("->").length-1]
+				}, {
+					name: '密码修改',
+					isLink: true,
+					link:"updatePass.html"
+				}]
+			}
+		},
+		created: function () {
+
+		},
+		mounted: function () {
+			var that = this;
+
+		},
+		methods: {
+			goto: function (link) {
+				appcan.window.open("config", link, 10, 16, 0, 0, 0);
+			}
+		},
+	});
+</script>
+
+</html>

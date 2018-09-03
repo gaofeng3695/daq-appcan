@@ -154,6 +154,37 @@ textarea {
     overflow: auto;
 }
 
+.mint-field .mint-cell-title {
+    width: 28vw;
+    font-size: 14px;
+}
+
+.mint-cell-wrapper {
+    overflow: hidden;
+}
+
+.mint-field.is-textarea .mint-cell-value {
+    padding: 0px 0 0 10px;
+    margin: 6px 0;
+}
+
+.mint-field .mint-cell-value {
+    padding-left: 10px;
+    /* background-image: -webkit-linear-gradient(right, #d9d9d9, #d9d9d9 50%, transparent 50%);
+    background-image: linear-gradient(270deg, #d9d9d9, #d9d9d9 50%, transparent 50%);
+    background-size: 1px 120%;
+    background-repeat: no-repeat;
+    background-position: left center; */
+}
+
+input[type=date] {
+    background-color: transparent;
+}
+
+.mint-toast {
+    z-index: 9999;
+}
+
 /* mint-ui修复--结束 */
 
 /* 弹性盒子相关--开始 */
@@ -239,3 +270,39 @@ textarea {
 }
 
 /* 组件--jas-button-footer--结束 */
+
+/* 真实1px边界线--开始 */
+
+.topLine {
+    background-image: -webkit-linear-gradient(top, #d9d9d9, #d9d9d9 50%, transparent 50%);
+    background-image: linear-gradient(180deg, #d9d9d9, #d9d9d9 50%, transparent 50%);
+    background-size: 120% 1px;
+    background-repeat: no-repeat;
+    background-position: top left;
+}
+
+.bottomLine {
+    background-image: -webkit-linear-gradient(top, #d9d9d9, #d9d9d9 50%, transparent 50%);
+    background-image: linear-gradient(180deg, #d9d9d9, #d9d9d9 50%, transparent 50%);
+    background-size: 120% 1px;
+    background-repeat: no-repeat;
+    background-position: bottom left;
+}
+
+.leftLine {
+    background-image: -webkit-linear-gradient(right, #d9d9d9, #d9d9d9 50%, transparent 50%);
+    background-image: linear-gradient(270deg, #d9d9d9, #d9d9d9 50%, transparent 50%);
+    background-size: 1px 120%;
+    background-repeat: no-repeat;
+    background-position: left center;
+}
+
+.rightLine {
+    background-image: -webkit-linear-gradient(right, #d9d9d9, #d9d9d9 50%, transparent 50%);
+    background-image: linear-gradient(270deg, #d9d9d9, #d9d9d9 50%, transparent 50%);
+    background-size: 1px 120%;
+    background-repeat: no-repeat;
+    background-position: right center;
+}
+
+/* 真实1px边界线--结束 */

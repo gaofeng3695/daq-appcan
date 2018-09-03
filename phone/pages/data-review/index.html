@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title></title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<link rel="stylesheet" href="./../../lib/mint-ui/style.css">
+	<link rel="stylesheet" href="./../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../common/css/jas-main.css">
+</head>
+<style>
+	* {
+		padding: 0px;
+		margin: 0px;
+	}
+
+	.ulim100 {
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+	}
+
+	.fl {
+		float: left;
+	}
+
+	.fr {
+		float: right;
+	}
+
+	.w45 {
+		width: 40vw;
+	}
+
+	.txt-c {
+		text-align: center;
+	}
+
+	.item {
+		padding: 0px 10px;
+		margin: 10px;
+		overflow: hidden;
+		background: #fff;
+		border-radius: 5px;
+		box-shadow: 0px 0px 12px #ececec;
+	}
+
+	.title {
+		height: 40px;
+		overflow: hidden;
+		border-bottom: 1px solid #ececec;
+		line-height: 40px;
+	}
+
+	.unit {
+		width: 50vw;
+		font-size: 12px;
+		color: #666;
+		text-align: right;
+	}
+
+	.content {
+		padding: 10px 0px;
+		overflow: hidden;
+	}
+
+	.content .top {
+		font-size: 25px;
+	}
+
+	.clrb {
+		color: #4ca7ca;
+	}
+
+	.clrr {
+		color: #e68178;
+	}
+
+	.child ul li {
+		list-style: none;
+		border-top: 1px solid #ececec;
+		height: 40px;
+		line-height: 40px;
+	}
+
+	.w50 {
+		width: 50vw;
+		text-align: center;
+	}
+
+	.w15 {
+		width: 15vw;
+		text-align: center
+	}
+</style>
+
+<body>
+	<div class="_outer-wrapper " v-cloak>
+		<!--<div class="search">
+			<mt-cell>
+
+			</mt-cell>
+		</div>-->
+		<div v-setheight style="overflow: auto;">
+			<div class="item" v-for="item in reviewList">
+				<div class="title">
+					<div class="fl">
+						<i style="font-size:12px;border-left:3px solid #26a2ff;padding-left: 4px;"></i> {{item.label}}
+					</div>
+					<div class="fr unit ulim100">
+						报审单位：{{item.unit}}
+					</div>
+				</div>
+				<div class="content" @click="item.isShow=!item.isShow">
+					<div class="fl w45 txt-c">
+						<div class="top clrb">
+							{{item.total}}
+						</div>
+						<div class="desc">
+							总条目
+						</div>
+					</div>
+					<div class="fr w45 txt-c">
+						<div class="top clrr">
+							{{item.noView}}
+						</div>
+						<div class="desc">
+							未审条目
+						</div>
+					</div>
+				</div>
+				<div class="child" v-show="item.isShow">
+					<ul>
+						<li v-for="childItem in item.child" @click="goToDetail(childItem)">
+							<div class="fl w50 ulim100">{{childItem.name}}</div>
+							<div class="fl w15">{{childItem.total}}</div>
+							<div class="fl w15 clrb">{{childItem.noView}}</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</body>
+<script src="./../../appcan/js/appcan.js"></script>
+<script src="./../../lib/vue/vue.js"></script>
+<script src="./../../lib/mint-ui/index.js"></script>
+<script src="./../../common/js/jas-tools.js"></script>
+<script src="./../../common/components/jas-components.js"></script>
+<script>
+	var vm = new Vue({
+		el: '._outer-wrapper',
+		data: function () {
+			return {
+				reviewList: [{
+					label: "管道焊接/补口",
+					unit: "中石化江汉油建工程有限公司",
+					total: "265",
+					noView: "98",
+					isShow: false, //表示点击是否显示子集
+					child: [{
+						name: "冷弯信息",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "焊口信息记录",
+						total: '110',
+						noView: '20'
+					}, {
+						name: "焊口返修信息记录",
+						total: '90',
+						noView: '10'
+					}, {
+						name: "焊口割口信息记录",
+						total: '210',
+						noView: '40'
+					}, {
+						name: "钢管切管信息记录",
+						total: '50',
+						noView: '10'
+					}, {
+						name: "防腐补口检查信息记录",
+						total: '110',
+						noView: '20'
+					}, {
+						name: "防腐补口剥离强度试验",
+						total: '110',
+						noView: '20'
+					}, {
+						name: "防腐补伤信息记录",
+						total: '110',
+						noView: '20'
+					}, {
+						name: "焊口测量成果信息记录",
+						total: '110',
+						noView: '20'
+					}]
+				}, {
+					label: "管道检测",
+					unit: "中石化江汉油建工程有限公司",
+					total: "25",
+					noView: "8",
+					isShow: false,
+					child: [{
+						name: "射线检测",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "超声波检测",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "磁粉检测",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "渗透检测",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "相控阵超声波检测",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "全自动超声波检测",
+						total: '100',
+						noView: '20'
+					}]
+				}, {
+					label: "管道敷设",
+					unit: "中石化江汉油建工程有限公司",
+					total: "65",
+					noView: "18",
+					isShow: false,
+					child: [{
+						name: "测量放线",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "管沟开挖",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "管沟回填",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "地貌恢复验收",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "保温",
+						total: '100',
+						noView: '20'
+					}]
+				}, {
+					label: "管道穿跨越",
+					unit: "中石化江汉油建工程有限公司",
+					total: "215",
+					noView: "198",
+					isShow: false,
+					child: [{
+						name: "开挖穿越",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "顶管穿越",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "箱涵穿越",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "定向钻穿越",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "钻爆隧道穿越",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "跨越",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "盾构隧道穿越",
+						total: '100',
+						noView: '20'
+					}]
+				}, {
+					label: "管道阴保",
+					unit: "中石化江汉油建工程有限公司",
+					total: "35",
+					noView: "28",
+					isShow: false,
+					child: [{
+						name: "绝缘件",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "阴极保护电缆",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "牺牲阳极",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "绝缘接头保护器",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "固态去耦合器",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "阴极保护测试桩",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "极性排流器",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "辅助阳极地床",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "牺牲阳极电参数测试信息记录",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "外加电流电参数测试信息记录",
+						total: '100',
+						noView: '20'
+					}]
+				}, {
+					label: "附属物",
+					unit: "中石化江汉油建工程有限公司",
+					total: "255",
+					noView: "9",
+					isShow: false,
+					child: [{
+						name: "标志桩安装检查信息记录",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "电子标签信息记录",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "通信光缆人（手）孔位置信息记录",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "管道沿线地下障碍物信息记录",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "管道沿线水工保护信息记录",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "伴行路",
+						total: '100',
+						noView: '20'
+					}, {
+						name: "套管",
+						total: '100',
+						noView: '20'
+					}]
+				}]
+			}
+		},
+		created: function () {
+
+		},
+		mounted: function () {
+			var that = this;
+
+		},
+		methods: {
+			goToDetail: function (obj) {
+				appcan.window.open('checkList','checkList/checkList.html?obj='+JSON.stringify(obj),10, 16, 0, 0, 0);
+			}
+		},
+	});
+</script>
+
+</html>

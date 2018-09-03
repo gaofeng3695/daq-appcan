@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title></title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<link rel="stylesheet" href="./../../../lib/mint-ui/style.css">
+	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../common/css/jas-main.css">
+</head>
+<style>
+</style>
+
+<body>
+	<div class="_outer-wrapper " v-cloak>
+
+		<jas-header title="数据采集列表"></jas-header>
+
+		<!-- tab-container -->
+		<div v-setheight style="overflow: auto;">
+			<div style="margin-bottom: 10px;overflow: hidden;background: #fff;">
+				<jas-select-top-field style="width:50vw;float:left;" tip="请选择数据分类" v-model="topSearchForm.module" :options="modules"></jas-select-top-field>
+				<jas-select-top-field style="width:50vw;float:left;" tip="请选择数据状态" v-model="topSearchForm.status" :options="statuses"></jas-select-top-field>
+			</div>
+		</div>
+		<jas-button-footer :is-return="true" :buttons="['上传','上报']" @click="clickbtn"></jas-button-footer>
+	</div>
+</body>
+<script src="./../../../appcan/js/appcan.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/mint-ui/index.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script>
+	window.vm = new Vue({
+		el: '._outer-wrapper',
+		data: function () {
+			return {
+				topSearchForm: {
+					module: '',
+					status: '0',
+				},
+				modules: [ //
+					{
+						value: '',
+						label: '不限'
+					}, {
+						value: 'antiseptic',
+						label: '防腐管检查'
+					}, {
+						value: 'hotBend',
+						label: '热煨弯管检查'
+					}, {
+						value: 'coldBend',
+						label: '冷弯管检查'
+					}, {
+						value: 'weldRecord',
+						label: '焊口记录'
+					}, {
+						value: 'weldRework',
+						label: '焊口返修'
+					}, {
+						value: 'weldMeasure',
+						label: '焊口测量'
+					}, {
+						value: 'patchRecord',
+						label: '补口记录'
+					},
+				],
+				statuses: [ //
+					{
+						value: '0',
+						label: '已录入'
+					}, {
+						value: '1',
+						label: '待上传'
+					}, {
+						value: '2',
+						label: '待上报'
+					}, {
+						value: '3',
+						label: '被驳回'
+					}
+				],
+			}
+		},
+		created: function () {
+			var that = this;
+			appcan.ready(function () {
+				var params = jasTools.base.getParamsInUrl();
+				that.topSearchForm.module = params.id;
+				that.topSearchForm.status = params.type;
+			});
+		},
+		mounted: function () {
+			var that = this;
+
+		},
+		methods: {
+			clickbtn: function (index) {
+				this.$toast('您点击了第' + index + '个按钮')
+			}
+
+		},
+	});
+</script>
+
+</html>
