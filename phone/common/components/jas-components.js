@@ -123,6 +123,12 @@ Vue.component('jas-button-footer', {
     buttons: {
       type: Array
     },
+    buttonsColor: {
+      type: Array,
+      default: function () {
+        return [];
+      }
+    },
   },
   data: function () {
     return {}
@@ -133,11 +139,16 @@ Vue.component('jas-button-footer', {
     '		<mt-button type="primary" @click.native="closePage" size="small" style="width:100%;">返回</mt-button>',
     '	</div>',
     '	<div class="jas-footer-item" v-for="item,index in buttons">',
-    '		<mt-button type="primary" @click.native="clickbtn(index)" size="small" style="width:100%;">{{item}}</mt-button>',
+    '		<mt-button type="primary" @click.native="clickbtn(index)" :style="bgStyle(buttonsColor[index])" size="small" style="width:100%;">{{item}}</mt-button>',
     '	</div>',
     '</div>',
   ].join(''),
   methods: {
+    bgStyle: function (clr) {
+      return clr ? {
+        backgroundColor: clr
+      } : {};
+    },
     clickbtn: function (index) {
       var that = this;
       this.$emit('click', index);
@@ -286,6 +297,7 @@ Vue.component('jas-select-field', {
     value: {},
     isMulti: {},
     options: {},
+    isSearch: {},
   },
   data: function () {
     return {
@@ -295,10 +307,19 @@ Vue.component('jas-select-field', {
   computed: {
     _value: {
       get: function () {
+        var that = this;
         if (this.isMulti) {
           return this.value ? this.value.split(',') : [];
         } else {
-          return this.value;
+          var val = this.value;
+          if (this.value === '' || this.value === 0) {
+            this.options && this.options.forEach(function (item) {
+              if (item.value === that.value) {
+                val = item;
+              }
+            });
+          }
+          return val;
         }
       },
       set: function (newval) {
@@ -308,9 +329,13 @@ Vue.component('jas-select-field', {
           this.$emit('change', arr);
         } else {
           this.popupVisible = false;
-          this.$emit('input', newval);
-          this.$emit('change', newval);
 
+          if ($.isPlainObject(newval)) {
+            this.$emit('input', 0)
+          } else {
+            this.$emit('input', newval)
+          }
+          this.$emit('change', newval);
         }
       }
     },
@@ -319,7 +344,7 @@ Vue.component('jas-select-field', {
       var _value = this._value;
       var that = this;
       if (this.isMulti) {
-        this.options.forEach(function (item) {
+        this.options && this.options.forEach(function (item) {
           _value.forEach(function (value) {
             if (item.value === value) {
               labelvalue += labelvalue ? ',' + item.label : item.label;
@@ -327,8 +352,8 @@ Vue.component('jas-select-field', {
           })
         });
       } else {
-        this.options.forEach(function (item) {
-          if (item.value === _value) {
+        this.options && this.options.forEach(function (item) {
+          if (item.value === _value || item == _value) {
             labelvalue = item.label;
           }
         });
@@ -338,7 +363,15 @@ Vue.component('jas-select-field', {
   },
   template: [
     '<div>',
-    '<a class="mint-cell mint-field" style="min-height: 40px;">',
+
+    '<div v-if="isSearch" style="width:100%;box-sizing:border-box;padding:0 10px 0 10px;">',
+    '	<div @click="popupVisible=!popupVisible" style="width:100%;text-align: center;line-height:40px;height:40px;">',
+    '		<span style="display:inline-block;max-width:calc(100% - 20px);word-break:keep-all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{labelvalue}}</span>',
+    '		<i style="line-height:40px;vertical-align: top;color:#999;" class="fa fa-caret-down" aria-hidden="true"></i>',
+    '	</div>',
+    '</div>',
+
+    '<a  v-else class="mint-cell mint-field" style="min-height: 40px;">',
     '  <div class="mint-cell-left"></div>',
     '  <div class="mint-cell-wrapper">',
     '    <div class="mint-cell-title" style="color:#333;padding:8px 0;">',
@@ -359,7 +392,7 @@ Vue.component('jas-select-field', {
     '  <div style="width:100vw;">',
     '    <div style="width:100vw;height:44px;text-align:center;line-height:44px;border-bottom: 1px solid #d9d9d9">',
     '      {{\'选择\'+ label}}',
-    '      <div style="float:right;font-size:12px;padding-right:10px;color:#26a2ff;" @click="clearValue">清空</div>   ',
+    '      <div v-if="!isSearch" style="float:right;font-size:12px;padding-right:10px;color:#26a2ff;" @click="clearValue">清空</div>   ',
     '    </div>',
     '    <div style="width:100vw;max-height: 40vh;overflow: auto;">',
     '      <mt-checklist v-if="isMulti" style="margin-top: -9px;" v-model="_value" :options="options">',
@@ -479,29 +512,48 @@ Vue.component('jas-form-items-group', {
     '  <jas-group v-for="group in fieldsGroup" :title="group.groupName">',
     '    <template v-for="field in group.fields">',
     '      <template v-if="fieldsConfig[field].type===\'select\'">',
-    '        <jas-select-field :ref="field" v-model="form[field]" v-required="fieldsConfig[field].required" :label="fieldsConfig[field].name" ',
+    '        <jas-select-field :ref="field" v-model="form[field]" :disabled="fieldsConfig[field].disabled"  v-required="fieldsConfig[field].required" :label="fieldsConfig[field].name" ',
     '          @optionshowed=optionshowed(field) @change=fatherSelectChanged(false,field) :options="fieldsConfig[field].options"></jas-select-field>',
     '      </template>',
     '      <template v-else-if="fieldsConfig[field].type===\'multiSelect\'">',
-    '        <jas-select-field :ref="field" v-model="form[field]" :is-multi="true" v-required="fieldsConfig[field].required" :label="fieldsConfig[field].name" ',
-    '          :options="fieldsConfig[field].options"></jas-select-field>',
+    '        <jas-select-field :ref="field" v-model="form[field]" :disabled="fieldsConfig[field].disabled"  :is-multi="true" v-required="fieldsConfig[field].required" :label="fieldsConfig[field].name" ',
+    '           @optionshowed=optionshowed(field) :options="fieldsConfig[field].options"></jas-select-field>',
     '      </template>',
     '      <template v-else>',
-    '        <mt-field v-model="form[field]" :type="fieldsConfig[field].type" v-required="fieldsConfig[field].required" :label="fieldsConfig[field].name" ',
+    '        <mt-field v-model="form[field]" :type="fieldsConfig[field].type" :disabled="fieldsConfig[field].disabled" v-required="fieldsConfig[field].required" :label="fieldsConfig[field].name" ',
     '          :placeholder="\'请输入\'+fieldsConfig[field].name" rows="4" v-fieldicon="fieldsConfig[field].type"></mt-field>',
     '      </template>',
     '    </template>',
     '  </jas-group>',
     '</div>',
   ].join(''),
+  watch: {
+    fieldsGroup: function (newval) {
+      var that = this;
+      var arr = [];
+      this.fieldsGroup.forEach(function (group) {
+        arr = arr.concat(group.fields);
+      });
+      this.allFields = arr;
+      if (arr.length > 0) {
+        appcan.ready(function () {
+          that.resetFieldsConfig(arr, that.fieldsConfig);
+        });
+      }
+    }
+  },
   mounted: function () {
     var that = this;
+    var arr = [];
     this.fieldsGroup.forEach(function (group) {
-      that.allFields = that.allFields.concat(group.fields);
+      arr = arr.concat(group.fields);
     });
-    appcan.ready(function () {
-      that.resetFieldsConfig(that.allFields, that.fieldsConfig);
-    });
+    this.allFields = arr;
+    if (arr.length > 0) {
+      appcan.ready(function () {
+        that.resetFieldsConfig(arr, that.fieldsConfig);
+      });
+    }
   },
   methods: {
     triggerFatherSelectsChange: function (fatherSelectList) {
@@ -509,7 +561,8 @@ Vue.component('jas-form-items-group', {
       var SelectList = fatherSelectList || that.fatherSelectList;
       setTimeout(function () {
         SelectList.forEach(function (item) {
-          that.$refs[item][0].$emit('change', true)
+          // that.$refs[item][0].$emit('change', true)
+          // that.fatherSelectChanged(true, item);
         });
       }, 0);
     },
@@ -518,8 +571,12 @@ Vue.component('jas-form-items-group', {
       var rulesObj = {};
       var fieldArr = [];
       var fieldNameArr = [];
+      this.isInited = true;
       fields.forEach(function (field) {
-        if (!fieldsConfig.hasOwnProperty(field)) return;
+        if (!fieldsConfig.hasOwnProperty(field)) {
+          console.log(field);
+          return;
+        }
         var config = fieldsConfig[field];
         /* 初始化赋值 */
         if (!config.options) {
@@ -577,12 +634,14 @@ Vue.component('jas-form-items-group', {
       var fieldConfig = this.fieldsConfig[fatherField];
       var form = this.form;
       var setChildOptionsAndValue = function (childField, options) { // 入参下拉选项
+        if (that.fieldsConfig[childField].options && that.fieldsConfig[childField].options.length > 0) {
+          form[childField] = ''
+        }
         that.fieldsConfig[childField].options = options;
-        !isInit && (form[childField] = '');
         if (options.length === 1) { //只有一个选项就自动复制
           form[childField] = options[0].value;
         }
-        that.$refs[childField][0].$emit('change', isInit);
+        // that.$refs[childField][0].$emit('change', isInit);
       };
 
       var getAndSet = function (fatherField, fatherValue, childField, requestUrl) {
@@ -615,11 +674,23 @@ Vue.component('jas-form-items-group', {
         var url = fieldConfig.childUrl[index] || fieldConfig.childUrl[0];
         getAndSet(fatherField, form[fatherField], childField, url);
       });
-      this.fieldChanged(fatherField)
-    },
-    fieldChanged: function (field) {
-      // console.log(this.$refs[field + 123][0].form)
-      this.$refs[field + 123][0].form.validateField(field);
+
+      fieldConfig.childText && fieldConfig.childText.forEach(function (childField, index) {
+        if (!fieldConfig.childTextFormat || fieldConfig.childTextFormat.length === 0) return;
+        var format = fieldConfig.childTextFormat[index] || fieldConfig.childUrl[0];
+        if (form[fatherField]) {
+          fieldConfig.options.forEach(function (item) {
+            if (item.value === form[fatherField]) {
+              form[childField] = format(item.label);
+            }
+          });
+        } else {
+          form[childField] = '';
+        }
+      });
+
+
+
     },
     requestDomainFromDomainTable: function (domainName, cb) {
       var that = this;
@@ -647,4 +718,339 @@ Vue.component('jas-form-items-group', {
     },
   },
 
+});
+
+
+
+/**
+ * @author gf 2018.09.07
+ * @description 附件的查看與編輯
+ */
+Vue.component('jas-file-group', {
+  props: {
+    isEdit: {}, //是否支持編輯
+    max: {
+      default: 5
+    }, //最大文件數
+  },
+  data: function () {
+    return {
+      files: [],
+    }
+  },
+  template: [
+    '<jas-group title="附件信息">',
+    '  <div>',
+    '    <div v-if="isEdit" class="topLine" style="padding:6px 10px;overflow: hidden;">',
+    '      <span style="line-height: 33px;font-size: 12px;color:#666;">最多上传{{max}}个附件</span>',
+    '      <div style="float:right;overflow: hidden;">',
+    '        <mt-button type="primary" size="small" :disabled="files.length>=max" @click.native="takePhoto">拍照</mt-button>',
+    '        <mt-button style="margin-left:5px;" type="primary" size="small" :disabled="files.length>=max" @click.native="selectPhoto">选择图片</mt-button>',
+    '      </div>',
+    '    </div>',
+    '    <div>',
+    '      <template v-for="item in files">',
+    '        <mt-cell-swipe v-if="isPhoto(item.fileName)"  :title="item.fileName" is-link @click.native="seeDetail(item)" ',
+    '          :right="isEdit && [{content: \'刪除\',style: {background: \'red\',color: \'#fff\'},handler: function () {deleteItem(item)}}]">',
+    '          <span>预览图片</span>',
+    '          <div slot="icon" style="margin:4px;height:40px;width:40px;display: inline-block;vertical-align: middle;" :style="styleBgImg(item)"></div>',
+    '        </mt-cell-swipe>',
+    '        <mt-cell-swipe v-else  is-link :title="item.fileName" @click.native="downloadFile(item)"',
+    '          :right="isEdit && [{content: \'刪除\',style: {background: \'red\',color: \'#fff\'},handler: function () {deleteItem(item)}}]">',
+    '          <span>下载附件</span>',
+    '          <div slot="icon" style="margin:4px;height:40px;width:40px;display: inline-block;vertical-align: middle;text-align: center;">',
+    '            <i class="fa fa-file-text-o" style="font-size:24px;color:#666;line-height: 40px;" aria-hidden="true"></i>',
+    '          </div>',
+    '        </mt-cell-swipe>',
+    '      </template>',
+    '      <div v-show="!files.length" style="padding:10px;"> 暂无附件 </div>',
+    '    </div>',
+    '  </div>',
+    '</jas-group>',
+
+  ].join(''),
+  methods: {
+    requestFile: function (bizId) {
+      var that = this;
+      var url = "/attachment/getInfo.do";
+      jasTools.ajax.get(url, {
+        businessType: 'file',
+        businessId: bizId || '1f4dea6c-0ae2-487c-8151-4e52bc7a20a7',
+      }, function (data) {
+        that.files = data.rows;
+        that.fileListlength = that.files.length;
+      });
+    },
+    deleteItem: function (item) {
+      if (item.oid) {
+        if (this.filesToBeDelete) {
+          this.filesToBeDelete.push(item.oid);
+        } else {
+          this.filesToBeDelete = [item.oid];
+        }
+      }
+      var index = this.files.indexOf(item);
+      this.files.splice(index, 1);
+    },
+    isPhoto: function (name) {
+      return /\.jpg|\.png|\.gif|\.jpeg|\.bmp/.test(name + '');
+    },
+    styleBgImg: function (item) {
+      var obj = {
+        backgroundImage: '', //url(' + sUrl + ')
+        backgroundSize: 'cover',
+        backgroundPosition: 'center center',
+      };
+      if (item.oid) {
+        var src = [
+          jasTools.ajax.serverURL,
+          // 'DAQProject/attachment/download.do?oid=',
+          'DAQProject/attachment/app/getImageBySize.do?oid=',
+          item.oid,
+          '&token=',
+          localStorage.getItem("token") || '44b4b165-838f-456c-b0fa-75be3bf8fc38'
+        ].join('');
+        item.src = src;
+        obj.backgroundImage = 'url(' + src + ')';
+      } else {
+        obj.backgroundImage = 'url(' + item.src + ')';
+      }
+      // sUrl = sUrl || '/storage/emulated/0/widgetone/apps/001/photo/scan20180906155703.jpg';
+      return obj;
+    },
+    seeDetail: function (item) {
+      var that = this;
+      var photos = this.files.filter(function (item) {
+        return that.isPhoto(item.fileName);
+      });
+      var aSrc = photos.map(function (item) {
+        return item.src
+      });
+      var index = aSrc.indexOf(item.src);
+      uexImage.openBrowser({
+        enableGrid: true,
+        displayActionButton: true,
+        startIndex: index,
+        enableGrid: false,
+        data: aSrc,
+      });
+    },
+    downloadFile: function (item) {
+      var src = "wgt://data/down/" + item.fileName;
+      try {
+
+        appcan.file.open({
+          filePath: src,
+          mode: 1,
+          callback: function (err, data, dataType, optId) {
+            alert(JSON.stringify(data, 4, 4))
+            if (err) {
+              //获取文件信息出错了
+              return;
+            }
+            if (data.isFile) {
+              //该路径是文件
+            }
+            if (data.isDirectory) {
+              //该路径是一个文件夹
+            }
+          }
+        });
+      } catch (e) {
+        alert(e)
+      }
+      return
+
+      var downloader = uexDownloaderMgr.create();
+      if (!downloader) {
+        alert("创建失败!");
+      }
+      var headJson = '{"Content-type":"application/json;charset=utf-8"}';
+      uexDownloaderMgr.setHeaders(downloader, headJson);
+      uexDownloaderMgr.download(downloader,
+        jasTools.ajax.completeURL + '/attachment/download.do?oid=' + item.oid + '&token=' + localStorage.getItem("token"),
+        "wgt://data/down/" + item.fileName,
+        0,
+        function (fileSize, percent, status) {
+          switch (status) {
+            case 0:
+              window.Vue && Vue.prototype.$toast("文件大小:" + fileSize + "字节<br>下载进度:" + percent);
+              return;
+              break;
+            case 1:
+              window.Vue && Vue.prototype.$toast("下载完成");
+              appcan.file.open("wgt://data/down/" + item.fileName, 1, function (err, data, dataType, optId) {
+                if (err) {
+                  //出错了
+                  alert(err);
+                  return;
+                }
+                if (data == 0) {
+                  //打开成功了
+                } else {
+                  //打开失败
+                }
+              });
+              // var file = uexFileMgr.open({
+              //   path: "wgt://data/down/" + item.fileName,
+              //   mode: 3
+              // });
+              // if (!file) {
+              //   alert("打开失败!");
+              // }
+
+              break;
+            case 2:
+              alert("下载失败");
+              break;
+          }
+        });
+    },
+    takePhoto: function () {
+      var that = this;
+      uexCamera.openInternal(0, 75, function (picPath) {
+        var arr = picPath.split('/');
+        that.files.push({
+          fileName: arr[arr.length - 1],
+          src: picPath,
+        });
+      });
+    },
+    selectPhoto: function () {
+      var that = this;
+      uexImage.openPicker({
+        min: 1,
+        max: that.max - that.files.length,
+        quality: 0.5,
+        detailedInfo: false
+      }, function (error, info) {
+        info.data.forEach(function (picPath) {
+          var arr = picPath.split('/');
+          that.files.push({
+            fileName: arr[arr.length - 1],
+            src: picPath,
+          });
+        });
+      });
+    },
+    _deleteFilesToServer: function (cb) {
+      var that = this;
+      if (!that.filesToBeDelete) {
+        cb && cb();
+        return;
+      }
+      jasTools.ajax.get("/attachment/delete.do", {
+        oids: that.filesToBeDelete.join(',')
+      }, function (data) {
+        cb && cb();
+      });
+    },
+    uploadFiles: function (sBizId) {
+      var that = this;
+      this._deleteFilesToServer(function () {
+        var afileToSubmit = that.files.filter(function (item) {
+          return !item.oid
+        }).map(function (item) {
+          return item.src
+        });
+        if (afileToSubmit.length > 0) {
+          jasTools.ajax.uploadFiles(sBizId, {
+            file: afileToSubmit
+          }, function () {
+            that.fileUploaded(1);
+          }, function () {
+            // winodw.Vue && Vue.prototype.$toast('网络连接失败，请检查您的网络');
+            that.fileUploaded(0);
+          });
+        } else {
+          that.fileUploaded(1);
+        }
+      });
+    },
+    fileUploaded: function (isSuccess) {
+      this.$emit('success', isSuccess)
+    }
+
+  }
+});
+
+
+
+
+
+
+
+
+
+
+/**
+ * @author dx 2018.08.28
+ * @description 复选框组件封装
+ */
+Vue.component('jas-checkbox', {
+  props: {
+    checked: {
+      type: [Boolean],
+      default: false,
+    },
+    itemdate: {
+      default: {},
+      type: [String, Object, Array]
+    },
+    isAll: {
+      default: false,
+      type: [Boolean]
+    }
+  },
+  data: function () {
+    return {
+
+    }
+  },
+  template: [
+    '<div class="ub" style="width:100%">',
+    '<label class="mint-checklist-label" style="padding:0px 10px 0px 0px ">',
+    '<span class="mint-checkbox" style="padding-top:15px;display:inline-block">',
+    '<input type="checkbox" class="mint-checkbox-input" :checked="checked" @click="clickItem">',
+    '<span class="mint-checkbox-core"></span> <span style="padding-left:5px;" v-if="isAll">全选</span>',
+    '</span>',
+    '</label>',
+    '<slot  name="options"> </slot>',
+    '</div>'
+  ].join(''),
+  methods: {
+    clickItem: function () {
+      if (JSON.stringify(this.itemdate) == "{}") {
+        this.$emit("clickitem", this.checked);
+      } else {
+        this.$emit("clickitem", this.itemdate);
+      }
+    }
+  }
+})
+
+/**
+ * @author dx 2018.08.13
+ * @description 项目字段详情组
+ */
+Vue.component('jas-check-detail-field-group', {
+  props: {
+    fields: {
+      type: Array
+    },
+    form: {
+      type: Object
+    },
+  },
+  data: function () {
+    return {}
+  },
+  template: [
+    '<div>',
+    '  <template v-for="item in fields" >',
+    '    <jas-detail-field :label="item.name" :value="form[item.field]" :key="item.name" ></jas-detail-field>',
+    '  </template>',
+    '</div>',
+  ].join(''),
+  methods: {}
 });

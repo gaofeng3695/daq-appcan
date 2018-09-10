@@ -123,13 +123,6 @@
 		};
 
 
-		/**
-		 * @description 某一dom节点上的事件，一段时间内只执行一次
-		 * @param btnDom  dom节点
-		 * @param ms  毫秒数
-		 * @param cb  执行的函数
-		 */
-
 		var getIdArrFromTree = function (treeData, nodeId, config) {
 
 			var pidArr = [nodeId];
@@ -203,6 +196,30 @@
 			return new EvnentBus(eventObj, fn);
 		};
 
+		var formatDate = function (oDate, sFormat) { // 入参：date对象，格式化格式
+			/*
+			 * 对Date的扩展，将 Date 转化为指定格式的String
+			 * 月(M)、日(d)、小时(h)、分(m)、秒(s)、季度(q) 可以用 1-2 个占位符，
+			 * 年(y)可以用 1-4 个占位符，毫秒(S)只能用 1 个占位符(是 1-3 位的数字)
+			 * 例子：
+			 * formatDate(new Date(),"yyyy-MM-dd HH:mm:ss.S") ==> 2006-07-02 08:09:04.423
+			 * formatDate(new Date(),"yyyy-M-d H:m:s.S")      ==> 2006-7-2 8:9:4.18
+			 * formatDate(new Date(),"yyyyMMddHHmmssS")      ==> 20060702080904423
+			 */
+			var o = {
+				"M+": oDate.getMonth() + 1, //月份
+				"d+": oDate.getDate(), //日
+				"H+": oDate.getHours(), //小时
+				"m+": oDate.getMinutes(), //分
+				"s+": oDate.getSeconds(), //秒
+				"q+": Math.floor((oDate.getMonth() + 3) / 3), //季度
+				"S": oDate.getMilliseconds() //毫秒
+			};
+			if (/(y+)/.test(sFormat)) sFormat = sFormat.replace(RegExp.$1, (oDate.getFullYear() + "").substr(4 - RegExp.$1.length));
+			for (var k in o)
+				if (new RegExp("(" + k + ")").test(sFormat)) sFormat = sFormat.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+			return sFormat;
+		};
 
 		return {
 			createuuid: createuuid,
@@ -212,6 +229,7 @@
 			getIdArrFromTree: getIdArrFromTree,
 			switchToCamelCase: switchToCamelCase,
 			eventBus: eventBus,
+			formatDate: formatDate,
 		};
 	})();
 
@@ -253,7 +271,7 @@
 				},
 				success: function (oData, status, requestCode, response, xhr) {
 					//baseOperation.closeToast();
-					if (oData.success == 1 || oData.status == 1) {
+					if (oData.success == 1 || oData.status == 1 || (!oData.success && !oData.status)) {
 						return fnSuccess && fnSuccess(oData, status, requestCode, response, xhr);
 					} else {
 						//baseOperation.alertToast('网络繁忙，请稍后再试');
@@ -272,6 +290,7 @@
 		};
 		return {
 			serverURL: serverURL,
+			completeURL: completeURL,
 			get: function (sUrl, oData, fnSuccess, fnFail) {
 				try {
 					ajax.call(this, 'GET', sUrl, oData, fnSuccess, fnFail);
@@ -310,19 +329,16 @@
 					},
 					success: function (oData, status, requestCode, response, xhr) {
 						//baseOperation.closeToast();
-						if (oData.success === 1) {
+						if (oData.success === 1 || oData.status === 1) {
 							return fnSuccess && fnSuccess(oData, status, requestCode, response, xhr);
 						} else {
 							//(!isHideTip) && baseOperation.alertToast('网络繁忙，请稍后再试');
 							return fnFail && fnFail();
 						}
 					},
-					progress: function (progress, xhr) {
-						//baseOperation.londingToast(progress,999999);
-					},
+					progress: function (progress, xhr) {},
 					error: function (xhr, erroType, error, msg) {
-						(!isHideTip) && baseOperation.closeToast();
-						//(!isHideTip) && baseOperation.alertToast('网络连接失败，请检查您的网络', 3333);
+						// Vue && Vue.prototype.$toast('网络连接失败，请检查您的网络');
 						return fnFail && fnFail();
 					}
 				});
@@ -345,12 +361,12 @@
 					}
 					return fnFail && fnFail(); //否则，算作失败
 				};
-
+				//http://192.168.100.43/DAQProject/attachment/upload.do?businessId=1f4dea6c-0ae2-487c-8151-4e52bc7a20a7&businessType=file
 				for (var item in oFiles) { //循环，异步上传附件，是否上传成功，会在回调中计算
 					if (oFiles.hasOwnProperty(item)) {
 						var bizType = item;
 						var aFiles = oFiles[item];
-						var sUrl = "cloudlink-core-file/attachment/save?businessId=" + sBizId + "&bizType=" + bizType;
+						var sUrl = "/attachment/upload.do?businessId=" + sBizId + "&businessType=" + bizType;
 						aFiles.forEach(function (src, index) {
 							nFileQtty++;
 							that.uploadFile(sUrl, src, function () {
@@ -383,127 +399,8 @@
 		};
 	})(appcan);
 
-	var database = (function () {
-		var dbName = "ZYXXWSDB_001"; //数据库名称
-		var isDBCreted = false;
-		var initDB = function (fn) {
-			if (isDBCreted) {
-				fn && fn();
-			} else {
-				appcan.database.create(dbName, function (err, data, db, dataType, optId) {
-					alert('创建数据库data:' + data);
-					if (!isDBCreted) {
-						uexDataBaseMgr.open(dbName);
-					}
-					isDBCreted = true;
-					fn && fn();
-				});
-			}
-			//初始化数据库
-		};
-		// //数据库查询的方法
-		// var dbSelect = function (sql, callback) {
-		// 	initDB(function () {
-		// 		appcan.database.select(dbName, sql, function (err, data, dataType, optId) {
-		// 			var result = "";
-		// 			if (!err) {
-		// 				result = JSON.parse(data);
-		// 			}
-		// 			if (appcan.isFunction(callback)) {
-		// 				callback(err, result);
-		// 			}
-		// 			//uexDataBaseMgr.close(dbName);
-
-		// 		});
-		// 	});
-		// };
-		// //数据库创建Table的方法
-		// var dbCreateTable = function (sql, callback) {
-		// 	initDB(function (db) {
-		// 		// db.exec(sql, function (err, data, dataType, optId) {
-		// 		// 	callback(err, data);
-		// 		// });
-		// 		appcan.database.exec(dbName, sql, function (err, data, dataType, optId) {
-		// 			alert('创建表data:' + data)
-		// 			if (appcan.isFunction(callback)) {
-		// 				callback(err, data);
-		// 			}
-		// 			//uexDataBaseMgr.close(dbName);
-
-		// 		});
-
-		// 	});
-		// };
-		// //数据库执行的方法（insert、update、delete）
-		// var dbExec = function (sql, callback) {
-		// 	initDB(function () {
-		// 		appcan.database.exec(dbName, sql, function (err, data, dataType, optId) {
-		// 			if (appcan.isFunction(callback)) {
-		// 				callback(err, data);
-		// 			}
-		// 		});
-		// 		//uexDataBaseMgr.close(dbName);
-
-		// 	});
-		// }
-
-		//数据库创建Table的方法
-		var dbCreateTable = function (sql, callback) {
-			db = uexDataBaseMgr.open(dbName);
-			uexDataBaseMgr.sql(db, sql, function (err) {
-				alert('创建表err:' + err)
-				if (err) {
-					alert('createTable failed')
-				}
-				if (appcan.isFunction(callback)) {
-					callback();
-				}
-			});
-		};
-		//数据库查询的方法
-		var dbSelect = function (sql, callback) {
-
-
-			initDB(function () {
-				appcan.database.select(dbName, sql, function (err, data, dataType, optId) {
-					var result = "";
-					if (!err) {
-						result = JSON.parse(data);
-					}
-					if (appcan.isFunction(callback)) {
-						callback(err, result);
-					}
-					//uexDataBaseMgr.close(dbName);
-
-				});
-			});
-		};
-
-		//数据库执行的方法（insert、update、delete）
-		var dbExec = function (sql, callback) {
-			initDB(function () {
-				appcan.database.exec(dbName, sql, function (err, data, dataType, optId) {
-					if (appcan.isFunction(callback)) {
-						callback(err, data);
-					}
-				});
-				//uexDataBaseMgr.close(dbName);
-
-			});
-		}
-
-		return {
-			createTable: dbCreateTable,
-			select: dbSelect,
-			exec: dbExec,
-		};
-	})();
-
-
-
 	window.jasTools = {
 		base: tools,
 		ajax: ajax,
-		db: database
 	};
 })(window);

@@ -11,25 +11,17 @@
 
 <body>
 	<div class="_outer-wrapper">
-
 	</div>
 </body>
 <script src="./appcan/js/appcan.js"></script>
-<!-- <script src="./lib/vue/vue.js"></script> -->
-<!-- <script src="./lib/mint-ui/index.js"></script> -->
-<!-- <script src="./lib/eventProxy.js"></script> -->
+<script src="./common/config/db-config.js"></script>
 <script src="./common/js/jas-tools.js"></script>
 <script src="./common/js/data-base-operation.js"></script>
 
 <script>
 	appcan.ready(function () {
-
-		var sqls = [
-			"create table if not exists IpConfig (id INTEGER PRIMARY KEY AUTOINCREMENT,protocol text,ip text,port text)",
-		];
-
 		var dbOperation = new DataBaseOperation();
-		dbOperation.dbTrans(sqls, function (err) {
+		dbOperation.dbTrans(init_sql, function (err) {
 			appcan.window.open('login', 'login.html', 0, 16, 0, 0, 0);
 			setTimeout(function () {
 				// appcan.window.close(0);

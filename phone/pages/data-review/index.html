@@ -37,20 +37,11 @@
 		text-align: center;
 	}
 
-	.item {
-		padding: 0px 10px;
-		margin: 10px;
-		overflow: hidden;
-		background: #fff;
-		border-radius: 5px;
-		box-shadow: 0px 0px 12px #ececec;
-	}
-
 	.title {
 		height: 40px;
 		overflow: hidden;
-		border-bottom: 1px solid #ececec;
 		line-height: 40px;
+		padding: 0px 10px;
 	}
 
 	.unit {
@@ -61,7 +52,7 @@
 	}
 
 	.content {
-		padding: 10px 0px;
+		padding: 10px;
 		overflow: hidden;
 	}
 
@@ -79,9 +70,9 @@
 
 	.child ul li {
 		list-style: none;
-		border-top: 1px solid #ececec;
 		height: 40px;
 		line-height: 40px;
+		padding: 0px 10px;
 	}
 
 	.w50 {
@@ -93,23 +84,68 @@
 		width: 15vw;
 		text-align: center
 	}
+
+	/*倒置三角样式*/
+
+	.item {
+		/*padding: 0px 10px;*/
+		margin: 10px;
+		overflow: hidden;
+		background: #fff;
+		border-radius: 5px;
+		/*border: 1px solid #39F;*/
+		background-color: #FFF;
+	}
+
+	/*提示窗口样式*/
+
+	.tooltipWindos {
+		border-top: 1px solid #39F;
+		background-color: #FFF;
+		position: relative;
+		height: 15px;
+		background: #eee;
+	}
+
+	/*倒置三角样式*/
+
+	.invertedTriangle {
+		width: 0;
+		height: 0;
+		overflow: hidden;
+		border-width: 10px;
+		border-style: solid;
+		position: absolute;
+		left: 41vw;
+	}
+
+	/*倒置三角中背景三角样式*/
+
+	.backgroundTriangle {
+		border-color: #FFF transparent transparent;
+		margin-top: -1px;
+	}
+
+	/*倒置三角中主三角样式*/
+
+	.mainTriangle {
+		border-color: #39F transparent transparent;
+	}
 </style>
 
 <body>
-	<div class="_outer-wrapper " v-cloak>
-		<!--<div class="search">
-			<mt-cell>
-
-			</mt-cell>
-		</div>-->
+	<div id="total" class="_outer-wrapper" v-cloak>
+		<div style="margin-bottom: 10px;overflow: hidden;background: #fff;">
+			<jas-select-top-field tip="请选择施工单位" v-model="searchObj.unit" :options="units"></jas-select-top-field>
+		</div>
 		<div v-setheight style="overflow: auto;">
 			<div class="item" v-for="item in reviewList">
-				<div class="title">
+				<div class="title bottomLine">
 					<div class="fl">
-						<i style="font-size:12px;border-left:3px solid #26a2ff;padding-left: 4px;"></i> {{item.label}}
+						<i style="font-size:12px;border-left:3px solid #26a2ff;padding-left: 4px;"></i> {{item.cnName}}
 					</div>
 					<div class="fr unit ulim100">
-						报审单位：{{item.unit}}
+						报审单位：{{unitName}}
 					</div>
 				</div>
 				<div class="content" @click="item.isShow=!item.isShow">
@@ -123,7 +159,7 @@
 					</div>
 					<div class="fr w45 txt-c">
 						<div class="top clrr">
-							{{item.noView}}
+							{{item.unaudited}}
 						</div>
 						<div class="desc">
 							未审条目
@@ -132,15 +168,21 @@
 				</div>
 				<div class="child" v-show="item.isShow">
 					<ul>
-						<li v-for="childItem in item.child" @click="goToDetail(childItem)">
-							<div class="fl w50 ulim100">{{childItem.name}}</div>
+						<li v-for="childItem in item.dataApproveSubBoList" @click="goToDetail(childItem)" class="topLine">
+							<div class="fl w50 ulim100">{{childItem.cnName}}</div>
 							<div class="fl w15">{{childItem.total}}</div>
-							<div class="fl w15 clrb">{{childItem.noView}}</div>
+							<div class="fl w15 clrb">{{childItem.unaudited}}</div>
 						</li>
 					</ul>
 				</div>
-			</div>
+				<div class="tooltipWindos" v-show="!item.isShow">
+					<div class="invertedTriangle mainTriangle"></div>
+					<div class="invertedTriangle backgroundTriangle"></div>
+				</div>
+				<!--<div class="fa  fa-angle-down fastyle" style="color:#26a3ff;font-size:16px;">
 
+				</div>-->
+			</div>
 		</div>
 	</div>
 </body>
@@ -154,237 +196,85 @@
 		el: '._outer-wrapper',
 		data: function () {
 			return {
+				searchObj: {
+					unit: ""
+				},
+				unitName: "",
+				units: [],
 				reviewList: [{
-					label: "管道焊接/补口",
-					unit: "中石化江汉油建工程有限公司",
-					total: "265",
-					noView: "98",
-					isShow: false, //表示点击是否显示子集
-					child: [{
-						name: "冷弯信息",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "焊口信息记录",
-						total: '110',
-						noView: '20'
-					}, {
-						name: "焊口返修信息记录",
-						total: '90',
-						noView: '10'
-					}, {
-						name: "焊口割口信息记录",
-						total: '210',
-						noView: '40'
-					}, {
-						name: "钢管切管信息记录",
-						total: '50',
-						noView: '10'
-					}, {
-						name: "防腐补口检查信息记录",
-						total: '110',
-						noView: '20'
-					}, {
-						name: "防腐补口剥离强度试验",
-						total: '110',
-						noView: '20'
-					}, {
-						name: "防腐补伤信息记录",
-						total: '110',
-						noView: '20'
-					}, {
-						name: "焊口测量成果信息记录",
-						total: '110',
-						noView: '20'
-					}]
+					cnName: "管道焊接/补口",
+					unit: "111111111111",
+					total: 100,
+					unaudited: 20,
+					childItem: {
+						cnName: "dfghj",
+						total: 100,
+						unaudited: 20,
+					}
 				}, {
-					label: "管道检测",
-					unit: "中石化江汉油建工程有限公司",
-					total: "25",
-					noView: "8",
-					isShow: false,
-					child: [{
-						name: "射线检测",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "超声波检测",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "磁粉检测",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "渗透检测",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "相控阵超声波检测",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "全自动超声波检测",
-						total: '100',
-						noView: '20'
-					}]
-				}, {
-					label: "管道敷设",
-					unit: "中石化江汉油建工程有限公司",
-					total: "65",
-					noView: "18",
-					isShow: false,
-					child: [{
-						name: "测量放线",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "管沟开挖",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "管沟回填",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "地貌恢复验收",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "保温",
-						total: '100',
-						noView: '20'
-					}]
-				}, {
-					label: "管道穿跨越",
-					unit: "中石化江汉油建工程有限公司",
-					total: "215",
-					noView: "198",
-					isShow: false,
-					child: [{
-						name: "开挖穿越",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "顶管穿越",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "箱涵穿越",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "定向钻穿越",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "钻爆隧道穿越",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "跨越",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "盾构隧道穿越",
-						total: '100',
-						noView: '20'
-					}]
-				}, {
-					label: "管道阴保",
-					unit: "中石化江汉油建工程有限公司",
-					total: "35",
-					noView: "28",
-					isShow: false,
-					child: [{
-						name: "绝缘件",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "阴极保护电缆",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "牺牲阳极",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "绝缘接头保护器",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "固态去耦合器",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "阴极保护测试桩",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "极性排流器",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "辅助阳极地床",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "牺牲阳极电参数测试信息记录",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "外加电流电参数测试信息记录",
-						total: '100',
-						noView: '20'
-					}]
-				}, {
-					label: "附属物",
-					unit: "中石化江汉油建工程有限公司",
-					total: "255",
-					noView: "9",
-					isShow: false,
-					child: [{
-						name: "标志桩安装检查信息记录",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "电子标签信息记录",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "通信光缆人（手）孔位置信息记录",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "管道沿线地下障碍物信息记录",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "管道沿线水工保护信息记录",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "伴行路",
-						total: '100',
-						noView: '20'
-					}, {
-						name: "套管",
-						total: '100',
-						noView: '20'
-					}]
+					cnName: "管道焊接/补口",
+					unit: "111111111111",
+					total: 100,
+					unaudited: 20,
+					childItem: {
+						cnName: "dfghj",
+						total: 100,
+						unaudited: 20,
+					}
 				}]
 			}
 		},
-		created: function () {
-
+		watch: {
+			'searchObj.unit': function () {
+				var that = this;
+				that.units.forEach(function (item) {
+					if (item.value == that.searchObj.unit) {
+						that.unitName = item.label;
+					}
+				});
+				that.requestTotalNum();
+			}
 		},
 		mounted: function () {
 			var that = this;
-
+			appcan.ready(function () {
+				that.requestUnit();
+				// that.requestTotalNum(); //请求统计数据
+			});
 		},
 		methods: {
+			requestUnit: function () { //获取施工单位
+				var that = this;
+				var url = "/daq/privilege/getConstructAndDetectionUnitList.do";
+				jasTools.ajax.post(url, {
+
+				}, function (data) {
+					data.rows.forEach(function (item) {
+						that.units.push({
+							label: item.value,
+							value: item.key
+						})
+					});
+					that.searchObj.unit = that.units[0].value;
+					that.unitName = that.units[0].label;
+				});
+			},
+			requestTotalNum: function () {
+				var that = this;
+				var url = "/statistics/dataAuditing.do";
+				appcan.logs(that.searchObj.unit);
+				jasTools.ajax.get(url, {
+					'constructUnit': that.searchObj.unit
+				}, function (data) {
+					data.data.forEach(function (item) {
+						item.isShow = false;
+					});
+					that.reviewList = data.data;
+				});
+			}, //请求数据审核页面的数据统计
 			goToDetail: function (obj) {
-				appcan.window.open('checkList','checkList/checkList.html?obj='+JSON.stringify(obj),10, 16, 0, 0, 0);
+				var that=this;
+				appcan.window.open('checkList', 'checkList/checkList.html?obj=' + JSON.stringify(obj)+"&constructUnit="+that.searchObj.unit, 10, 16, 0, 0, 0);
 			}
 		},
 	});

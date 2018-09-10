@@ -20,8 +20,8 @@
 		<!-- tab-container -->
 		<div v-setheight style="overflow: auto;">
 			<div style="margin-bottom: 10px;overflow: hidden;background: #fff;">
-				<jas-select-top-field style="width:50vw;float:left;" tip="请选择数据分类" v-model="topSearchForm.module" :options="modules"></jas-select-top-field>
-				<jas-select-top-field style="width:50vw;float:left;" tip="请选择数据状态" v-model="topSearchForm.status" :options="statuses"></jas-select-top-field>
+				<jas-select-field style="width:50vw;float:left;" label="数据分类" :is-search="true" v-model="topSearchForm.module" :options="modules"></jas-select-field>
+				<jas-select-field style="width:50vw;float:left;" label="数据状态" :is-search="true" v-model="topSearchForm.status" :options="statuses"></jas-select-field>
 			</div>
 		</div>
 		<jas-button-footer :is-return="true" :buttons="['上传','上报']" @click="clickbtn"></jas-button-footer>

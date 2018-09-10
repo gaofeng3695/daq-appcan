@@ -30,8 +30,12 @@
     float: right;
   }
 
-  ul li {
+  ul li:first-child {
     margin-top: 10px;
+  }
+
+  ul li {
+    margin-bottom: 10px;
     padding: 5px 10px;
     list-style: none;
     overflow: hidden;
@@ -44,6 +48,16 @@
     height: 50px;
     margin-right: 10px;
   }
+
+  /*
+  .mint-checklist-label {
+    padding: 0px 10px 0px 0px;
+  }
+
+  .mint-checkbox {
+    padding-top: 15px;
+    display: inline-block;
+  }*/
 
   .checkImg {
     background-size: 16px 16px;
@@ -93,83 +107,119 @@
 
   .jas-button-footer {
     padding: 0px 10px;
-    line-height: 38px;
+    line-height: 47px;
+    height: 47px;
   }
 
-  .mint-button {
-    height: 25px;
-    line-height: 25px;
+
+  .jas-button-footer .mint-checkbox {
+    padding-top: 0px !important;
   }
-/*.passMask{
+
+  .passMask {
     position: relative;
-}
-.passMask:after{
-    content : '';
-    height : 100%;
+  }
+
+  .passMask:after {
+    content: '';
+    height: 100%;
     width: 100%;
     position: absolute;
     top: 0;
     left: 0;
-    background:  url("../../../common/images/pass.png") no-repeat right 20px bottom 10px;
-    background-size:70px 30px;
-}*/
+    background: url("../../../common/images/pass.png") no-repeat right 20px bottom 10px;
+    background-size: 70px 30px;
+  }
+
+  .clr333 {
+    color: #333;
+  }
+
+  .clr666 {
+    color: #999;
+  }
+
+  .txt-c {
+    text-align: center;
+  }
 </style>
 
 <body>
   <div class="_outer-wrapper " v-cloak>
+    <jas-header title="数据审核"></jas-header>
     <mt-navbar v-model="selected">
-      <mt-tab-item id="1">未审核数据</mt-tab-item>
-      <mt-tab-item id="2">已审核数据</mt-tab-item>
+      <mt-tab-item id="a">未审核数据</mt-tab-item>
+      <mt-tab-item id="b">已审核数据</mt-tab-item>
     </mt-navbar>
-    <div v-setheight style="overflow: auto;">
+
+    <div v-setheight style="overflow: auto;" class="heightContent">
       <mt-tab-container v-model="selected">
-        <mt-tab-container-item id="1">
-          <ul>
-            <li class="ub passMask " v-for="item in checkList">
-              <div class="checkbox">
-                <div class="checkImg" :class="item.checked?'checked':'check'" @click="clickItem(item)">
-                </div>
-              </div>
-              <div class="ub-f1  ">
-                <div class="item ub ub-ac">
-                  <div class="ub-f1 ulim100">管线：{{item.pipeName}}</div>
-                  <div class="ub-f1 txt-r ulim100">标段：{{item.biaoName}}</div>
-                </div>
-                <div class="item ub ub-ac">
-                  <div class="ub-f1 ulim100 w35">采集人：{{item.createName}}</div>
-                  <div class="ub-f1 txt-r ulim100 w35">编号：{{item.code}}</div>
-                </div>
-              </div>
-            </li>
-          </ul>
+        <mt-tab-container-item id="a">
+          <mt-loadmore ref="loadmore" :top-method="refresh" :auto-fill="false" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded">
+            <div v-if="checkList.length==0" style="margin-top:10px;text-align: center;color:#999">
+              暂无数据
+            </div>
+            <ul>
+              <li v-for="item in checkList">
+                <jas-checkbox :checked="item.checked" :itemdate="item" @clickitem="clickItem">
+                  <div slot="options" class="ub-f1" @click="clickDetail(item)">
+                    <div class="item ub ub-ac clr333">
+                      <div class="ub-f1 ulim100">{{item.code}}</div>
+
+                    </div>
+                    <div class="item ub ub-ac clr666">
+                      <div class="ub-f1 ulim100 w35">{{item.createUserName||item.create_user_name}}</div>
+                      <div class="ub-f1 txt-c ulim100 w35">{{item.pipelineName||item.pipeline_name}}</div>
+                      <div class="ub-f1 txt-r ulim100 w35">{{item.tendersName||item.tenders_name}}</div>
+                    </div>
+                  </div>
+
+                </jas-checkbox>
+              </li>
+            </ul>
+          </mt-loadmore>
         </mt-tab-container-item>
-        <mt-tab-container-item id="2">
-          <ul>
-            <li class="ub " v-for="item in checkList">
-              <div class="ub-f1  ">
-                <div class="item ub ub-ac">
-                  <div class="ub-f1 ulim100">管线：{{item.pipeName}}</div>
-                  <div class="ub-f1 txt-r ulim100">标段：{{item.biaoName}}</div>
+        <mt-tab-container-item id="b">
+          <mt-loadmore ref="loadmore1" :top-method="refresh" :auto-fill="false" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded">
+            <div v-if="checkList.length==0" style="margin-top:10px;text-align: center;color:#999">
+              暂无数据
+            </div>
+            <ul>
+              <li class="ub passMask" v-for="item in checkList" @click="clickDetail(item)">
+                <div class="ub-f1">
+                  <div class="item ub ub-ac clr333">
+                    <!--<div class="ub-f1 ulim100">{{item.projectName||item.project_name}}</div>-->
+                    <div class="ub-f1 ulim100">{{item.code}}</div>
+                  </div>
+                  <div class="item ub ub-ac clr666">
+                    <div class="ub-f1 ulim100 w35">{{item.createUserName||item.create_user_name}}</div>
+                    <div class="ub-f1 ulim100 txt-c">{{item.pipelineName||item.pipeline_name}}</div>
+                    <div class="ub-f1 txt-r ulim100 w35">{{item.tendersName||item.tenders_name}}</div>
+                  </div>
                 </div>
-                <div class="item ub ub-ac">
-                  <div class="ub-f1 ulim100 w35">采集人：{{item.createName}}</div>
-                  <div class="ub-f1 txt-r ulim100 w35">编号：{{item.code}}</div>
-                </div>
-              </div>
-            </li>
-          </ul>
+              </li>
+            </ul>
+          </mt-loadmore>
         </mt-tab-container-item>
       </mt-tab-container>
     </div>
-    <div class="jas-button-footer ub " v-if="selected=='1'">
-      <div class=" allcheck  " :class="allchecked?'allcheckedImg':'allcheckImg'" @click="chooseAll">
+
+    <div class="jas-button-footer " v-if="isShow">
+      <jas-checkbox :checked="allchecked" @clickitem="chooseAll" :is-all='true'>
+        <div slot="options" class="txt-r ub-f1" style="line-height: 47px;">
+          <mt-button type="primary" size="small" @click="pass">通过</mt-button>
+          <mt-button type="primary" size="small" @click="reject" style="background:#ed9028">驳回</mt-button>
+        </div>
+      </jas-checkbox>
+      <!--<div class=" allcheck  " :class="allchecked?'allcheckedImg':'allcheckImg'" @click="chooseAll">
         <label for="">全选</label>
       </div>
       <div class="txt-r ub-f1">
         <mt-button type="primary" size="small">通过</mt-button>
         <mt-button type="primary" size="small">驳回</mt-button>
-      </div>
+      </div>-->
     </div>
+
   </div>
 </body>
 <script src="./../../../appcan/js/appcan.js"></script>
@@ -182,39 +232,288 @@
     el: '._outer-wrapper',
     data: function () {
       return {
-        selected: "1",
+        selected: "a",
+        isShow: true,
         allchecked: false,
-        checkList: [{
-          checked: false,
-          pipeName: "干线",
-          biaoName: "一标段",
-          createName: "王思",
-          code: "98"
+        checkList: [],
+        requestURL: [{
+          name: "冷弯信息",
+          url: "/jdbc/commonData/coldBendingPipe/getPage.do",
+          code: "pipeColdBendingCode",
+          className: "cn.jasgroup.jasframework.acquisitiondata.material.base.coldbending.dao.entity.ColdBendingPipe"
         }, {
-          checked: false,
-          pipeName: "干线",
-          biaoName: "一标段",
-          createName: "王思",
-          code: "ERTGHIOLKNBVBNM<"
+          name: "焊口信息记录",
+          url: "/jdbc/commonData/constructionWeld/getPage.do",
+          code: "weldCode",
+          className: "cn.jasgroup.jasframework.acquisitiondata.weld.weldinfo.dao.entity.ConstructionWeld"
         }, {
-          checked: false,
-          pipeName: "干线",
-          biaoName: "一标段",
-          createName: "王思",
-          code: "q1qaz2wsx3edc4rfv5tgv6yhn7ujik,"
+          name: "焊口返修信息记录",
+          url: "/jdbc/commonData/reworkWeld/getPage.do",
+          code: "reworkWeldCode",
+          className: "cn.jasgroup.jasframework.acquisitiondata.weld.reworkweld.dao.entity.ReworkWeld"
         }, {
-          checked: false,
-          pipeName: "干线",
-          biaoName: "一标段",
-          createName: "王思",
-          code: "ertyui"
+          name: "焊口割口信息记录",
+          url: "/jdbc/commonData/weldCut/getPage.do",
+          code: "weldCode",
+          className: "cn.jasgroup.jasframework.acquisitiondata.weld.weldcut.dao.entity.DaqWeldCut"
         }, {
-          checked: false,
-          pipeName: "干线",
-          biaoName: "一标段",
-          createName: "王思",
-          code: "ghjklddsoiu09889"
-        }]
+          name: "钢管切管信息记录",
+          url: "/jdbc/commonData/cutWeld/getPage.do",
+          code: "pipeCode",
+          className: "cn.jasgroup.jasframework.acquisitiondata.weld.cutweld.dao.entity.CutWeld"
+        }, {
+          name: "防腐补口检查信息记录",
+          url: "/jdbc/commonData/weldAnticorrosionCheck/getPage.do",
+          detailURL: "/map/commonData/F000036/get.do",
+          code: "weld_code",
+          functionCode: "F000036"
+        }, {
+          name: "防腐补口剥离强度试验",
+          url: "/jdbc/commonData/weldAnticorrosionTest/getPage.do",
+          detailURL: "/map/commonData/F000037/get.do",
+          code: "weld_code",
+          functionCode: "F000037"
+        }, {
+          name: "防腐补伤信息记录",
+          url: "/jdbc/commonData/weldAnticorrosionRepair/getPage.do",
+          code: "weld_code",
+          detailURL: "/map/commonData/F000038/get.do",
+          functionCode: "F000038"
+        }, {
+          name: "焊口测量成果信息记录",
+          url: "/jdbc/commonData/weldMeasuredResult/getPage.do",
+          code: "weldCode",
+          className: "cn.jasgroup.jasframework.acquisitiondata.weld.measuredresult.dao.entity.WeldMeasuredResult"
+        }, {
+          name: "射线检测",
+          url: "/jdbc/commonData/detectionRay/getPage.do",
+          code: "weldCode",
+          className: "cn.jasgroup.jasframework.acquisitiondata.material.detection.ray.dao.entity.DaqDetectionRay",
+          detailURL: "/daq/detectionRay/get.do",
+          type: "get"
+        }, {
+          name: "超声波检测",
+          url: "/jdbc/commonData/detectionUltrasonic/getPage.do",
+          detailURL: "/daq/detectionUltrasonic/get.do",
+          className: "cn.jasgroup.jasframework.acquisitiondata.material.detection.ultrasonic.dao.entity.DaqDetectionUltrasonic",
+          code: "weldCode",
+          type: "get"
+        }, {
+          name: "磁粉检测",
+          url: "/jdbc/commonData/detectionMagneticPowder/getPage.do",
+          code: "weldCode",
+          detailURL: "/daq/detectionMagneticPowder/get.do",
+          className: "cn.jasgroup.jasframework.acquisitiondata.material.detection.magneticpowder.dao.entity.DaqDetectionMagneticPowder",
+          type: "get"
+        }, {
+          name: "渗透检测",
+          url: "/jdbc/commonData/detectionInfiltration/getPage.do",
+          code: "weldCode",
+          detailURL: "/daq/detectionInfiltration/get.do",
+          className: "cn.jasgroup.jasframework.acquisitiondata.material.detection.infiltration.dao.entity.DaqDetectionInfiltration",
+          type: "get"
+        }, {
+          name: "相控阵超声波检测",
+          url: "/jdbc/commonData/detectionPaUltrasonic/getPage.do",
+          className: "cn.jasgroup.jasframework.acquisitiondata.material.detection.paultrasonic.dao.entity.DaqDetectionPaUltrasonic",
+          code: "weldCode",
+          detailURL: "/daq/detectionPaUltrasonic/get.do",
+          type: "get"
+        }, {
+          name: "全自动超声波检测",
+          url: "/jdbc/commonData/detectionFaUltrasonic/getPage.do",
+          className: "cn.jasgroup.jasframework.acquisitiondata.material.detection.faultrasonic.dao.entity.DaqDetectionFaUltrasonic",
+          code: "weldCode",
+          detailURL: "/daq/detectionFaUltrasonic/get.do",
+          type: "get"
+        }, {
+          name: "测量放线",
+          url: "/jdbc/commonData/laySurveying/getPage.do",
+          code: "medianStakeCode",
+          className: "cn.jasgroup.jasframework.acquisitiondata.lay.surveying.dao.entity.LaySurveying"
+        }, {
+          name: "管沟开挖",
+          url: "/jdbc/commonData/layPipeTrenchExcavation/getPage.do",
+          code: "startMedianStakeName",
+          className: "cn.jasgroup.jasframework.acquisitiondata.lay.excavation.dao.entity.LayPipeTrenchExcavation"
+        }, {
+          name: "管沟回填",
+          url: "/jdbc/commonData/layPipeTrenchBackfill/getPage.do",
+          code: "startMedianStakeName",
+          className: "cn.jasgroup.jasframework.acquisitiondata.lay.backfill.dao.entity.LayPipeTrenchBackfill"
+        }, {
+          name: "地貌恢复验收",
+          url: "/jdbc/commonData/layLandRestoration/getPage.do",
+          code: "certificateNum",
+          className: "cn.jasgroup.jasframework.acquisitiondata.lay.restoration.dao.entity.LayLandRestoration"
+        }, {
+          name: "保温",
+          url: "/jdbc/commonData/layThermalInsulation/getPage.do",
+          code: "startMedianStakeName",
+          className: "cn.jasgroup.jasframework.acquisitiondata.lay.Insulation.dao.entity.LayThermalInsulation"
+        }, {
+          name: "开挖穿越",
+          url: "/jdbc/commonData/crossExcavation/getPage.do",
+          code: "startMedianStakeName",
+          className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.excavation.dao.entity.DaqCrossExcavation"
+        }, {
+          name: "顶管穿越",
+          url: "/jdbc/commonData/crossPipeJacking/getPage.do",
+          code: "startMedianStakeName",
+          className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.pipejacking.dao.entity.DaqCrossPipeJacking"
+        }, {
+          name: "箱涵穿越",
+          url: "/jdbc/commonData/crossBoxCulvert/getPage.do",
+          code: "startMedianStakeName",
+          className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.boxculvert.dao.entity.DaqCrossBoxCulvert"
+        }, {
+          name: "定向钻穿越",
+          url: "/jdbc/commonData/crossDrilling/getPage.do",
+          code: "startMedianStakeName",
+          className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.drilling.dao.entity.DaqCrossDrilling"
+        }, {
+          name: "钻爆隧道穿越",
+          url: "/jdbc/commonData/crossDrillingBlasting/getPage.do",
+          code: "startMedianStakeName",
+          className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.drillingblasting.dao.entity.DaqCrossDrillingBlasting"
+        }, {
+          name: "跨越",
+          url: "/jdbc/commonData/crossAcross/getPage.do",
+          code: "startMedianStakeName",
+          className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.across.dao.entity.DaqCrossAcross"
+        }, {
+          name: "盾构隧道穿越",
+          url: "/jdbc/commonData/crossShield/getPage.do",
+          code: "startMedianStakeName",
+          className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.shield.dao.entity.DaqCrossShield"
+        }, {
+          name: "绝缘件",
+          url: "/jdbc/commonData/cathodicIsolatingPiece/getPage.do",
+          code: "isolatingPieceCode",
+          className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.isolating.dao.entity.CathodicIsolatingPiece"
+        }, {
+          name: "阴极保护电缆",
+          url: "/jdbc/commonData/cathodicCableProtection/getPage.do",
+          code: "cableCode",
+          className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.cable.dao.entity.CathodicCableProtection"
+        }, {
+          name: "牺牲阳极",
+          url: "/jdbc/commonData/cathodicSacrificeAnode/getPage.do",
+          code: "anodeCode",
+          className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.sacrifice.dao.entity.CathodicSacrificeAnode"
+        }, {
+          name: "绝缘接头保护器",
+          url: "/jdbc/commonData/cathodicInsulatedJoint/getPage.do",
+          code: "equipmentCode",
+          className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.protector.dao.entity.CathodicInsulatedJoint"
+        }, {
+          name: "固态去耦合器",
+          url: "/jdbc/commonData/cathodicSolidDecouplert/getPage.do",
+          code: "equipmentCode",
+          className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.decoupler.dao.entity.CathodicSolidDecoupler"
+        }, {
+          name: "阴极保护测试桩",
+          url: "/jdbc/commonData/cathodicTestStake/getPage.do",
+          code: "testStakeCode",
+          className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.teststack.dao.entity.CathodicTestStake"
+        }, {
+          name: "极性排流器",
+          url: "/jdbc/commonData/cathodicPolarityDrainage/getPage.do",
+          code: "equipmentCode",
+          className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.drainage.dao.entity.CathodicPolarityDrainage"
+        }, {
+          name: "辅助阳极地床",
+          url: "/jdbc/commonData/cathodicAnodeBed/getPage.do",
+          code: "groundBed",
+          className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.bed.dao.entity.CathodicAnodeBed"
+        }, {
+          name: "牺牲阳极电参数测试信息记录",
+          url: "/jdbc/commonData/cathodicElectricalParameterTest/getPage.do",
+          code: "test_stake_code",
+          detailURL: "/map/commonData/F000040/get.do",
+          functionCode: "F000040"
+        }, {
+          name: "外加电流电参数测试信息记录",
+          url: "/jdbc/commonData/cathodicImpressedCurrentTest/getPage.do",
+          code: "test_stake_code",
+          detailURL: "/map/commonData/F000041/get.do",
+          functionCode: "F000041"
+        }, {
+          name: "标志桩安装检查信息记录",
+          url: "/jdbc/commonData/appendagesMarkStake/getPage.do",
+          code: "markStakeCode",
+          className: "cn.jasgroup.jasframework.acquisitiondata.material.appendages.markstake.dao.entity.DaqAppendagesMarkStake"
+        }, {
+          name: "电子标签信息记录",
+          url: "/jdbc/commonData/appendagesElectronicLabel/getPage.do",
+          code: "electronicLabelCode",
+          detailURL: "/daq/appendagesElectronicLabel/get.do",
+          type: "get",
+          className: "cn.jasgroup.jasframework.acquisitiondata.material.appendages.electroniclabel.dao.entity.DaqAppendagesElectronicLabel"
+        }, {
+          name: "通信光缆人（手）孔位置信息记录",
+          url: "/jdbc/commonData/appendagesHandHole/getPage.do",
+          code: "handHoleCode",
+          className: "cn.jasgroup.jasframework.acquisitiondata.material.appendages.handhole.dao.entity.DaqAppendagesHandHole"
+        }, {
+          name: "管道沿线地下障碍物信息记录",
+          url: "/jdbc/commonData/appendagesObstacle/getPage.do",
+          code: "obstacleCode",
+          detailURL: "/daq/appendagesObstacle/get.do",
+          type: "get",
+          className: "cn.jasgroup.jasframework.acquisitiondata.material.appendages.obstacle.dao.entity.DaqAppendagesObstacle"
+        }, {
+          name: "管道沿线水工保护信息记录",
+          url: "/jdbc/commonData/appendagesHydraulicProtection/getPage.do",
+          code: "hydraulicProtectionCode",
+          className: "cn.jasgroup.jasframework.acquisitiondata.material.appendages.hydraulicprotection.dao.entity.DaqAppendagesHydraulicProtection"
+        }, {
+          name: "伴行路",
+          url: "/jdbc/commonData/appendagesConcomitantRoad/getPage.do",
+          code: "concomitant_road_code",
+          detailURL: "/map/commonData/F000043/get.do",
+          functionCode: "F000043"
+        }, {
+          name: "套管",
+          url: "/jdbc/commonData/appendagesCasingPipe/getPage.do",
+          code: "startMedianStakeCode",
+          className: "cn.jasgroup.jasframework.acquisitiondata.material.appendages.casingpipe.dao.entity.DaqAppendagesCasingPipe"
+        }],
+        serverURL: "",
+        searchObj: {
+          pageNo: 1,
+          pageSize: 10,
+          approveStatus: "1"
+        },
+        currentRequestUrl: {},
+        allLoaded: false,
+        constructUnit: "", //施工单位oid
+      }
+    },
+    watch: {
+      'selected': function () { //当选择改变的时候 重新计算高度
+        this.isShow = !this.isShow;
+        var otherHeight = 0;
+        var that = this;
+        setTimeout(function () {
+          var arr = $("._outer-wrapper").children();
+          for (var i = 0; i < arr.length; i++) {
+            if (i != 2 && i != 3) {
+              otherHeight += arr[i].clientHeight;
+            }
+            if (i == 3 && that.isShow) {
+              otherHeight += arr[i].clientHeight;
+            }
+          }
+          $(".heightContent").css('height', 'calc(100% - ' + otherHeight + 'px)');
+          $(".heightContent").css('overflow', 'auto');
+        }, 0);
+        if (that.selected == 'a') {
+          that.searchObj.approveStatus = "1";
+        } else {
+          that.searchObj.approveStatus = "-1,2";
+        }
+        that.refresh();
       }
     },
     created: function () {
@@ -224,10 +523,97 @@
       var that = this;
       appcan.ready(function () {
         var params = jasTools.base.getParamsInUrl();
-        appcan.logs(params.obj);
+        that.constructUnit = params.constructUnit;
+        try {
+          that.requestURL.forEach(function (item, index) {
+            if (item.name == JSON.parse(params.obj).cnName) {
+              that.currentRequestUrl = item;
+              that.serverURL = item.url;
+              that.searchObj.code = item.code;
+              if (item.className) {
+                that.searchObj.className = item.className;
+              }
+              if (item.functionCode) {
+                that.searchObj.functionCode = item.functionCode;
+              }
+              foreach.break = new Error("StopIteration");
+            }
+          });
+        } catch (e) {
+
+        }
+        that.refresh();
+
       });
     },
     methods: {
+      refresh: function () {
+        var that = this;
+        that.searchObj.pageNo = 1;
+        that.checkList = [];
+        that.allLoaded = false;
+        that.requestServer();
+      },
+      requestServer: function () {
+        var that = this;
+        var obj = {
+          "pageNo": that.searchObj.pageNo,
+          "pageSize": that.searchObj.pageSize,
+          "approveStatus": that.searchObj.approveStatus,
+          "constructUnit": that.constructUnit,
+        };
+        jasTools.ajax.post(that.serverURL, obj, function (data) {
+          if (data.status == 1) {
+            if (that.searchObj.pageNo == 1) {
+              if (data.rows.length > 0) {
+                that.checkList = data.rows;
+                data.rows.forEach(function (item, index) {
+                  that.checkList[index].code = item[that.searchObj.code];
+                });
+              } else {
+                that.checkList = [];
+                that.$toast('暂无数据');
+                that.allLoaded = true;
+              }
+              that.searchObj.pageNo++;
+            } else {
+              if (data.rows.length > 0) {
+                data.rows.forEach(function (item, index) {
+                  item.code = item[that.searchObj.code];
+                  that.checkList.push(item);
+                });
+                that.searchObj.pageNo++;
+              } else {
+                that.allLoaded = true;
+                that.$toast('没有更多数据');
+              }
+            }
+          } else {
+            that.$toast("网络异常，请稍候尝试")
+          }
+          if (that.selected == "a") {
+            that.$refs.loadmore.onTopLoaded();
+            that.$refs.loadmore.onBottomLoaded();
+          } else {
+            that.$refs.loadmore1.onTopLoaded();
+            that.$refs.loadmore1.onBottomLoaded();
+          }
+        }, function () {
+          if (that.selected == "a") {
+            that.$refs.loadmore.onTopLoaded();
+            that.$refs.loadmore.onBottomLoaded();
+          } else {
+            that.$refs.loadmore1.onTopLoaded();
+            that.$refs.loadmore1.onBottomLoaded();
+          }
+        });
+      },
+      loadBottom: function () {
+        if (this.allLoaded) {
+          return;
+        }
+        this.requestServer();
+      },
       chooseAll: function () {
         var that = this;
         if (!that.allchecked) {
@@ -261,6 +647,61 @@
         } else {
           that.allchecked = false;
         }
+      },
+      clickDetail: function (obj) {
+        //进入详情
+        var that = this;
+        appcan.window.open('checkdetail', 'detail.html?obj=' + JSON.stringify(obj) + "&currentRequestUrl=" + JSON
+          .stringify(that.currentRequestUrl), 10, 16, 0, 0, 0);
+      },
+      pass: function () { //通过
+        var that = this;
+        var businessOid = [];
+        that.checkList.forEach(function (item) {
+          if (item.checked) {
+            businessOid.push(item.oid);
+          }
+        });
+        if (businessOid.length == 0) {
+          that.$toast("请至少选择一条数据");
+          return;
+        }
+        that.approvesToServer(businessOid, 2);
+      },
+      reject: function () { //决绝
+        var that = this;
+        var businessOid = [];
+        that.checkList.forEach(function (item) {
+          if (item.checked) {
+            businessOid.push(item.oid);
+          }
+        });
+        if (businessOid.length == 0) {
+          that.$toast("请至少选择一条数据");
+          return;
+        }
+        that.approvesToServer(businessOid, -1);
+      },
+      approvesToServer: function (oids, approveStatus) {
+        var that = this;
+        var obj = {
+          businessOid: oids,
+          approveStatus: approveStatus,
+        };
+        if (that.searchObj.className) {
+          obj.className = that.searchObj.className;
+        }
+        if (that.searchObj.functionCode) {
+          obj.functionCode = that.searchObj.functionCode;
+        }
+        jasTools.ajax.post('/daq/dataApprove/save.do', obj, function (data) {
+          if (data.status == 1) {
+            that.refresh();
+            that.allchecked = false;
+          } else {
+            that.$toast("网络异常，请稍候尝试")
+          }
+        });
       }
     },
   });

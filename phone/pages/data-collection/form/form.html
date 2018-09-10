@@ -22,8 +22,55 @@
 
 			<jas-form-items-group ref="mainForm" :fields-group="fieldsGroup" :fields-config="fieldsConfig" :form="form"></jas-form-items-group>
 
+			<jas-file-group is-edit="true" ref="files" @success="uploadSuccess"></jas-file-group>
+
+			<!-- <jas-group title="附件信息">
+				<div>
+					<div v-if="isEdit" class="topLine" style="padding:10px;overflow: hidden;">
+						<span style="line-height: 33px;font-size: 12px;color:#666;">最上传{{max}}个附件</span>
+						<div style="float:right;overflow: hidden;">
+							<mt-button type="primary" size="small" :disabled="files.length>=max" @click.native="takePhoto">拍照</mt-button>
+							<mt-button type="primary" size="small" :disabled="files.length>=max" @click.native="selectPhoto">选择图片</mt-button>
+						</div>
+					</div>
+					<div>
+						<template v-for="item in files">
+							<mt-cell-swipe v-if="isPhoto(item.fileName)" :right="isEdit && [{
+								content: '刪除',
+								style: {
+									background: 'red',
+									color: '#fff'
+								},
+								handler: function () {
+									deleteItem(item)
+								}
+							}]" :title="item.fileName" is-link @click.native="seeDetail(item)">
+								<span>预览图片</span>
+								<div slot="icon" style="margin:4px;height:40px;width:40px;display: inline-block;vertical-align: middle;" :style="styleBgImg(item)"></div>
+							</mt-cell-swipe>
+							<mt-cell-swipe v-else :title="item.fileName" :right="isEdit && [{
+								content: '刪除',
+								style: {
+									background: 'red',
+									color: '#fff'
+								},
+								handler: function () {
+									deleteItem(item)
+								}
+							}]" is-link>
+								<span>下载附件</span>
+								<div slot="icon" style="margin:4px;height:40px;width:40px;display: inline-block;vertical-align: middle;text-align: center;">
+									<i class="fa fa-file-text-o" style="font-size:24px;color:#666;line-height: 40px;" aria-hidden="true"></i>
+								</div>
+							</mt-cell-swipe>
+						</template>
+					</div>
+				</div>
+
+			</jas-group> -->
+
 		</div>
-		<jas-button-footer :is-return="true" :buttons="['保存']" @click="clickbtn"></jas-button-footer>
+		<jas-button-footer :is-return="true" :buttons="['保存','在录一条']" :buttons-color="['','#f90']" @click="clickbtn"></jas-button-footer>
 	</div>
 </body>
 <script src="./../../../appcan/js/appcan.js"></script>
@@ -31,245 +78,88 @@
 <script src="./../../../lib/mint-ui/index.js"></script>
 <script src="./../../../common/js/jas-tools.js"></script>
 <script src="./../../../common/components/jas-components.js"></script>
+<script src="./fields-config.js"></script>
+
+
 <script>
 	window.vm = new Vue({
 		el: '._outer-wrapper',
 		data: function () {
+			var that = this;
 			return {
 				title: '数据录入',
 				value: '',
-				options: [{
-						label: '被禁用',
-						value: '值F',
-					},
-					{
-						label: '选中禁用',
-						value: '选中禁用的值',
-					},
-					{
-						label: '选项A',
-						value: '值A'
-					},
-					{
-						label: '选项B',
-						value: '值B'
-					}
-				],
-				fieldsGroup: [ //
-					{
-						groupName: '检查信息',
-						fields: [
-							'project_oid',
-							'tenders_oid',
-							'pipe_code',
-							'construct_unit',
-							'groove_check',
-							'pipe_end_proring_check',
-							'coating_io_face_check',
-							'diameter_check',
-							'coating_io_ends_check',
-							'excess_weld_metal',
-							'ovality',
-							'checked_by',
-							'checked_date',
-						],
-					}, {
-						groupName: '其他信息',
-						fields: [
-							'remarks',
-						]
-					}
-				],
-				fieldsConfig: {
-					'project_oid': {
-						name: '项目名称',
-						type: 'select',
-						required: true,
-						options: [],
-						// domainName: 'across_type_domain',
-						optionUrl: '/daq/privilege/getProjectList.do',
-						childSelect: ['tenders_oid', 'construct_unit'],
-						childUrl: ['/daq/privilege/getTendersList.do', '/daq/privilege/getCurrentUnitId.do'],
-						// requestParams: {
-						// 	crossWay: 'cross_way_code01'
-						// },
-					},
-					'tenders_oid': {
-						name: '标段名称',
-						type: 'select',
-						required: true,
-						options: []
-					},
-					'pipe_code': {
-						name: '钢管编号',
-						type: 'select',
-						required: true,
-						options: []
-					},
-					'construct_unit': {
-						name: '施工单位',
-						type: 'select',
-						required: true,
-						options: []
-					},
-					'groove_check': {
-						name: '坡口检查',
-						type: 'select',
-						options: [ //
-							{
-								label: '合格',
-								value: '合格',
-							},
-							{
-								label: '不合格',
-								value: '不合格',
-							},
-						]
-					},
-					'pipe_end_proring_check': {
-						name: '管端保护圈',
-						type: 'select',
-						options: [ //
-							{
-								label: '合格',
-								value: '合格',
-							},
-							{
-								label: '不合格',
-								value: '不合格',
-							},
-						]
-					},
-					'coating_io_face_check': {
-						name: '防腐层内外表面质量',
-						type: 'select',
-						options: [ //
-							{
-								label: '合格',
-								value: '合格',
-							},
-							{
-								label: '不合格',
-								value: '不合格',
-							},
-						]
-					},
-					'diameter_check': {
-						name: '管径偏差+0.2mm至-0.5mm',
-						type: 'select',
-						options: [ //
-							{
-								label: '合格',
-								value: '合格',
-							},
-							{
-								label: '不合格',
-								value: '不合格',
-							},
-						]
-					},
-					'coating_io_ends_check': {
-						name: '防腐层端部内外涂层',
-						type: 'select',
-						options: [ //
-							{
-								label: '合格',
-								value: '合格',
-							},
-							{
-								label: '不合格',
-								value: '不合格',
-							},
-						]
-					},
-					'excess_weld_metal': {
-						name: '管端焊缝余高（0mm）',
-						type: 'select',
-						options: [ //
-							{
-								label: '合格',
-								value: '合格',
-							},
-							{
-								label: '不合格',
-								value: '不合格',
-							},
-						]
-					},
-					'ovality': {
-						name: '椭圆度<0.6%D',
-						type: 'select',
-						options: [ //
-							{
-								label: '合格',
-								value: '合格',
-							},
-							{
-								label: '不合格',
-								value: '不合格',
-							},
-						]
-					},
-					'checked_by': {
-						name: '检查人',
-						type: 'text',
-					},
-					'checked_date': {
-						name: '检查日期',
-						type: 'date',
-					},
-					'remarks': {
-						name: '备注',
-						type: 'textarea',
-					},
-				},
-				form: {
-					oid: '',
-					checked_by: '',
-					checked_date: '',
-					coating_io_ends_check: '',
-					coating_io_face_check: '',
-					construct_unit: '',
-					diameter_check: '',
-					excess_weld_metal: '',
-					groove_check: '',
-					ovality: '',
-					pipe_code: '',
-					pipe_end_proring_check: '',
-					project_name: '',
-					project_oid: '',
-					tenders_name: '',
-					tenders_oid: '',
-					unit_name: '',
-					remarks: '',
-				}
+				fieldsGroup: [],
+				fieldsConfig: {},
+				form: {},
 			}
 		},
 		created: function () {
 			var that = this;
 			appcan.ready(function () {
 				var params = jasTools.base.getParamsInUrl();
-				that.title = params.title;
-				that.getDetailByObjectId('dfe088c3-de1d-454e-85f3-6b131681d65b');
+				var config = FieldsConfig[params.title];
+				that.title = config.title;
+				that.fieldsGroup = config.fieldsGroup;
+				that.fieldsConfig = config.fieldsConfig;
+				that.form = FieldsConfig.methods.formatForms(that.fieldsGroup);
+				// that.getDetailByObjectId('dfe088c3-de1d-454e-85f3-6b131681d65b');
+				// that.getDetailByObjectId('b1ec91d9-5443-4f04-8d85-22014aa5a707', config.detailUrl); // 汉口信息
 			});
+			// var config = FieldsConfig['weldRework'];
+			// that.title = config.title;
+			// that.fieldsGroup = config.fieldsGroup;
+			// that.fieldsConfig = config.fieldsConfig;
+			// that.form = FieldsConfig.methods.formatForms(that.fieldsGroup);
 		},
 		mounted: function () {
 			var that = this;
-
+			appcan.ready(function () {
+				that.$refs.files.requestFile('1f4dea6c-0ae2-487c-8151-4e52bc7a20a7');
+			});
 		},
 		methods: {
+
 			clickbtn: function (index) {
-				this.$toast('您点击了第' + index + '个按钮')
+				// this.$toast('您点击了第' + index + '个按钮');
+				this.$refs.files.uploadFiles('1f4dea6c-0ae2-487c-8151-4e52bc7a20a7');
+
 			},
-			getDetailByObjectId: function (oid) {
+			getDetailByObjectId: function (oid, url) {
 				var that = this;
-				var url = '/map/commonData/F000030/get.do';
+				// var url = '/map/commonData/F000030/get.do';
+				// var url = '/jdbc/commonData/constructionWeld/getPage.do';
 				jasTools.ajax.post(url, {
 					oid: oid
 				}, function (data) {
-					that.form = data.data;
-					that.$refs['mainForm'].triggerFatherSelectsChange();
+					that.form = data.data || data.rows[0];
+					// that.$refs['mainForm'].triggerFatherSelectsChange();
+					// that.form
 				});
+			},
+			uploadSuccess: function (isSuccess) {
+				if (isSuccess) {
+					window.Vue && Vue.prototype.$toast('上传成功');
+				} else {
+					window.Vue && Vue.prototype.$toast('上传失败');
+
+				}
+			},
+			save: function () { //
+				var that = this;
+				var msg = "";
+				if (!this.isEdit) {
+					msg = "增加成功";
+					url = jasTools.base.rootPath + "/jdbc/commonData/detectionFaUltrasonic/save.do";
+				} else {
+					msg = "修改成功";
+					url = jasTools.base.rootPath + "/jdbc/commonData/detectionFaUltrasonic/update.do";
+				}
+
+				jasTools.ajax.post(url, that.form, function (data) {
+					that.$refs.upload.uploadFile(data.data || that.oid);
+				});
+
 			},
 
 		},

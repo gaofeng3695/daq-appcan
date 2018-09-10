@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title></title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<link rel="stylesheet" href="./../../../lib/mint-ui/style.css">
+	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../common/css/jas-main.css">
+</head>
+<style>
+</style>
+
+<body>
+	<div class="_outer-wrapper " v-cloak>
+
+		<jas-header title="数据同步"></jas-header>
+
+		<!-- tab-container -->
+		<div v-setheight style="overflow: auto;">
+			<div>
+				<mt-button type="primary" @click.native="downloadBasic">同步基础数据</mt-button>
+
+			</div>
+
+		</div>
+		<jas-button-footer :is-return="true"></jas-button-footer>
+	</div>
+</body>
+<script src="./../../../appcan/js/appcan.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/mint-ui/index.js"></script>
+<script src="./../../../common/js/data-base-operation.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./local-server.js"></script>
+<script src="./data-loader.js"></script>
+
+
+<script>
+	window.vm = new Vue({
+		el: '._outer-wrapper',
+		data: function () {
+			return {}
+		},
+		created: function () {
+			var that = this;
+			appcan.ready(function () {
+
+			});
+		},
+		mounted: function () {
+			var that = this;
+		},
+		methods: {
+			downloadBasic: function () {
+				dataLoader.basic.request(function (odata) {
+					dataLoader.basic.deleteTable(function () {
+						dataLoader.basic.insertData(odata, function () {
+							console.log('更新成功');
+						});
+					});
+				});
+			}
+
+		},
+	});
+</script>
+
+</html>

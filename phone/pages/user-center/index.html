@@ -102,19 +102,19 @@
 <script src="./../../common/js/jas-tools.js"></script>
 <script src="./../../common/components/jas-components.js"></script>
 <script>
-var vm = new Vue({
+	var vm = new Vue({
 		el: '._outer-wrapper',
 		data: function () {
 			return {
-			    userBo:JSON.parse(localStorage.getItem("user")),
+				userBo: JSON.parse(localStorage.getItem("user")),
 				personList: [ //
 					{
 						name: '个人设置',
 						link: 'setting/setting.html',
 						icon: "../../common/images/personSet.png"
 					}, {
-						name: '基础数据同步',
-						link: 'scroll/scroll.html',
+						name: '数据同步',
+						link: 'data-sync/data-sync.html',
 						icon: "../../common/images/async.png"
 					}, {
 						name: '版本更新',
@@ -133,14 +133,14 @@ var vm = new Vue({
 		},
 		mounted: function () {
 			var that = this;
-			that.userBo.unitName=that.userBo.unitName.split("-->")[that.userBo.unitName.split("-->").length-1]
+			that.userBo.unitName = that.userBo.unitName.split("-->")[that.userBo.unitName.split("-->").length - 1]
 		},
 		methods: {
 			goto: function (link) {
 				appcan.window.open('link', link, 10, 16, 0, 0, 0);
 			},
 			logOut: function () { //退出登录
-				appcan.window.open('login','../../login.html',10, 16, 0, 0, 0);
+				appcan.window.open('login', '../../login.html', 10, 16, 0, 0, 0);
 			}
 		},
 	});

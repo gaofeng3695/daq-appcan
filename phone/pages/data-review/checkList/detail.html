@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="./../../../lib/mint-ui/style.css">
+    <link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="./../../../common/css/jas-main.css">
+</head>
+<style>
+</style>
+
+<body>
+    <div class="_outer-wrapper ">
+        <jas-header title="数据审核"></jas-header>
+        <div v-setheight style="overflow: auto;">
+            <div v-for="item in fieldConfig" >
+                <jas-group :title="item.groupName" v-if="!item.groupS">
+                    <jas-check-detail-field-group :fields="item.fileds" :form="form">
+                    </jas-check-detail-field-group>
+                </jas-group>
+                <jas-group  v-else v-for="(values,index) in form[item.groupS]" :title="item.groupName+(index+1)">
+                    <div v-for="child in item.fileds">
+                        <jas-detail-field :label="child.name" :value="values[child.field]"></jas-detail-field>
+                    </div>
+                </jas-group>
+            </div>
+        </div>
+        <jas-button-footer :is-return="true" :buttons="['通过','驳回']" @click="clickbtn"></jas-button-footer>
+    </div>
+</body>
+<script src="./../../../appcan/js/appcan.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/mint-ui/index.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="formDetail.js"></script>
+<script src="domain.js"></script>
+<script>
+    window.vm = new Vue({
+        el: '._outer-wrapper',
+        data: function () {
+            return {
+                form: {},
+                oid: '',
+                currentRequestUrl: {},
+                fieldConfig: [],
+                isShow: true,
+            }
+        },
+        created: function () {
+
+        },
+        mounted: function () {
+            var that = this;
+            appcan.ready(function () {
+                that.$indicator.open({
+                    spinnerType: 'fading-circle'
+                });
+                var params = jasTools.base.getParamsInUrl();
+                if (JSON.parse(params.obj).approveStatus == 1) {
+                    that.isShow = true;
+                } else {
+                    that.isShow = false;
+                }
+                that.oid = JSON.parse(params.obj).oid;
+                that.currentRequestUrl = JSON.parse(params.currentRequestUrl);
+                try {
+                    fieldConfigs.forEach(function (item, index) {
+                        if (item.name == that.currentRequestUrl.name) {
+                            that.fieldConfig = item.fields;
+                            foreach.break = new Error("StopIteration");
+                        }
+                    });
+                } catch (e) {
+
+                }
+                that.requestDetail(params.oid);
+            });
+        },
+        methods: {
+            clickbtn: function (index) {
+                if (index == 0) {
+
+                }
+                this.$toast('您点击了第' + index + '个按钮')
+            },
+            requestDetail: function () {
+                var that = this;
+                var url = that.currentRequestUrl.detailURL || that.currentRequestUrl.url;
+                if (that.currentRequestUrl.type) {
+                    jasTools.ajax.get(url, {
+                        oid: that.oid
+                    }, function (data) {
+                        that.$indicator.close();
+                        that.form = data.data || data.rows[0];
+                        for (var key in domain) {
+                            that.form[key] = domain[key][that.form[key]];
+                        }
+                    });
+                } else {
+                    jasTools.ajax.post(url, {
+                        oid: that.oid
+                    }, function (data) {
+                        that.$indicator.close();
+                        that.form = data.data || data.rows[0];
+                        for (var key in domain) {
+                            that.form[key] = domain[key][that.form[key]];
+                        }
+                    });
+                }
+
+            }
+        },
+    });
+</script>
+
+</html>
