@@ -50,14 +50,14 @@
   }
 
   /*
-  .mint-checklist-label {
-    padding: 0px 10px 0px 0px;
-  }
+         .mint-checklist-label {
+         padding: 0px 10px 0px 0px;
+         }
 
-  .mint-checkbox {
-    padding-top: 15px;
-    display: inline-block;
-  }*/
+         .mint-checkbox {
+         padding-top: 15px;
+         display: inline-block;
+         }*/
 
   .checkImg {
     background-size: 16px 16px;
@@ -75,8 +75,8 @@
   }
 
   ul li .item {
-    height: 25px;
-    line-height: 25px;
+    height: 35px;
+    line-height: 35px;
   }
 
   .txt-r {
@@ -90,7 +90,6 @@
     margin: 10px 0px;
     line-height: 16px;
     padding-left: 20px;
-
   }
 
   .allcheckImg {
@@ -111,7 +110,6 @@
     height: 47px;
   }
 
-
   .jas-button-footer .mint-checkbox {
     padding-top: 0px !important;
   }
@@ -127,8 +125,23 @@
     position: absolute;
     top: 0;
     left: 0;
-    background: url("../../../common/images/pass.png") no-repeat right 20px bottom 10px;
-    background-size: 70px 30px;
+    background: url("../../../common/images/pass1.png") no-repeat right 20px bottom 10px;
+    background-size: 40px 40px;
+  }
+
+  .passMask1 {
+    position: relative;
+  }
+
+  .passMask1:after {
+    content: '';
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: url("../../../common/images/reject.png") no-repeat right 20px bottom 10px;
+    background-size: 40px 40px;
   }
 
   .clr333 {
@@ -147,12 +160,17 @@
 <body>
   <div class="_outer-wrapper " v-cloak>
     <jas-header title="数据审核"></jas-header>
-    <mt-navbar v-model="selected">
-      <mt-tab-item id="a">未审核数据</mt-tab-item>
-      <mt-tab-item id="b">已审核数据</mt-tab-item>
-    </mt-navbar>
-
-    <div v-setheight style="overflow: auto;" class="heightContent">
+    <div style="overflow: hidden;">
+      <mt-navbar v-model="selected">
+        <mt-tab-item id="a">
+          未审核数据
+        </mt-tab-item>
+        <mt-tab-item id="b">
+          已审核数据
+        </mt-tab-item>
+      </mt-navbar>
+    </div>
+    <div class="heightContent">
       <mt-tab-container v-model="selected">
         <mt-tab-container-item id="a">
           <mt-loadmore ref="loadmore" :top-method="refresh" :auto-fill="false" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded">
@@ -164,13 +182,24 @@
                 <jas-checkbox :checked="item.checked" :itemdate="item" @clickitem="clickItem">
                   <div slot="options" class="ub-f1" @click="clickDetail(item)">
                     <div class="item ub ub-ac clr333">
-                      <div class="ub-f1 ulim100">{{item.code}}</div>
+                      <div class="ub-f1 ulim100">
+                        {{item.code}}
+                      </div>
+                      <div class="w35 txt-r">
+                        {{item.createTime}}
+                      </div>
 
                     </div>
                     <div class="item ub ub-ac clr666">
-                      <div class="ub-f1 ulim100 w35">{{item.createUserName||item.create_user_name}}</div>
-                      <div class="ub-f1 txt-c ulim100 w35">{{item.pipelineName||item.pipeline_name}}</div>
-                      <div class="ub-f1 txt-r ulim100 w35">{{item.tendersName||item.tenders_name}}</div>
+                      <div class="ub-f1 ulim100 w35">
+                        {{item.createUserName||item.create_user_name}}
+                      </div>
+                      <div class="ub-f1 txt-c ulim100 w35">
+                        {{item.pipelineName||item.pipeline_name}}
+                      </div>
+                      <div class="ub-f1 txt-r ulim100 w35">
+                        {{item.tendersName||item.tenders_name}}
+                      </div>
                     </div>
                   </div>
 
@@ -185,16 +214,27 @@
               暂无数据
             </div>
             <ul>
-              <li class="ub passMask" v-for="item in checkList" @click="clickDetail(item)">
+              <li class="ub " v-for="item in checkList" @click="clickDetail(item)" :class="item.approveStatus=='-1'?'passMask1':'passMask'">
                 <div class="ub-f1">
                   <div class="item ub ub-ac clr333">
                     <!--<div class="ub-f1 ulim100">{{item.projectName||item.project_name}}</div>-->
-                    <div class="ub-f1 ulim100">{{item.code}}</div>
+                    <div class="ub-f1 ulim100">
+                      {{item.code}}
+                    </div>
+                    <div class="w35 txt-r">
+                      {{item.createTime}}
+                    </div>
                   </div>
                   <div class="item ub ub-ac clr666">
-                    <div class="ub-f1 ulim100 w35">{{item.createUserName||item.create_user_name}}</div>
-                    <div class="ub-f1 ulim100 txt-c">{{item.pipelineName||item.pipeline_name}}</div>
-                    <div class="ub-f1 txt-r ulim100 w35">{{item.tendersName||item.tenders_name}}</div>
+                    <div class="ub-f1 ulim100 w35">
+                      {{item.createUserName||item.create_user_name}}
+                    </div>
+                    <div class="ub-f1 ulim100 txt-c">
+                      {{item.pipelineName||item.pipeline_name}}
+                    </div>
+                    <div class="ub-f1 txt-r ulim100 w35">
+                      {{item.tendersName||item.tenders_name}}
+                    </div>
                   </div>
                 </div>
               </li>
@@ -203,23 +243,18 @@
         </mt-tab-container-item>
       </mt-tab-container>
     </div>
-
-    <div class="jas-button-footer " v-if="isShow">
+    <div class="jas-button-footer" v-show="isShow">
       <jas-checkbox :checked="allchecked" @clickitem="chooseAll" :is-all='true'>
         <div slot="options" class="txt-r ub-f1" style="line-height: 47px;">
-          <mt-button type="primary" size="small" @click="pass">通过</mt-button>
-          <mt-button type="primary" size="small" @click="reject" style="background:#ed9028">驳回</mt-button>
+          <mt-button type="primary" size="small" @click="pass">
+            通过
+          </mt-button>
+          <mt-button type="primary" size="small" @click="reject" style="background:#ed9028">
+            驳回
+          </mt-button>
         </div>
       </jas-checkbox>
-      <!--<div class=" allcheck  " :class="allchecked?'allcheckedImg':'allcheckImg'" @click="chooseAll">
-        <label for="">全选</label>
-      </div>
-      <div class="txt-r ub-f1">
-        <mt-button type="primary" size="small">通过</mt-button>
-        <mt-button type="primary" size="small">驳回</mt-button>
-      </div>-->
     </div>
-
   </div>
 </body>
 <script src="./../../../appcan/js/appcan.js"></script>
@@ -236,6 +271,7 @@
         isShow: true,
         allchecked: false,
         checkList: [],
+        approveOpinion: "", //驳回意见
         requestURL: [{
           name: "冷弯信息",
           url: "/jdbc/commonData/coldBendingPipe/getPage.do",
@@ -265,13 +301,13 @@
           name: "防腐补口检查信息记录",
           url: "/jdbc/commonData/weldAnticorrosionCheck/getPage.do",
           detailURL: "/map/commonData/F000036/get.do",
-          code: "weld_code",
+          code: "weldCode",
           functionCode: "F000036"
         }, {
           name: "防腐补口剥离强度试验",
           url: "/jdbc/commonData/weldAnticorrosionTest/getPage.do",
           detailURL: "/map/commonData/F000037/get.do",
-          code: "weld_code",
+          code: "weldCode",
           functionCode: "F000037"
         }, {
           name: "防腐补伤信息记录",
@@ -334,12 +370,12 @@
         }, {
           name: "管沟开挖",
           url: "/jdbc/commonData/layPipeTrenchExcavation/getPage.do",
-          code: "startMedianStakeName",
+          code: "pipeSegmentOrCrossName",
           className: "cn.jasgroup.jasframework.acquisitiondata.lay.excavation.dao.entity.LayPipeTrenchExcavation"
         }, {
           name: "管沟回填",
           url: "/jdbc/commonData/layPipeTrenchBackfill/getPage.do",
-          code: "startMedianStakeName",
+          code: "pipeSegmentOrCrossName",
           className: "cn.jasgroup.jasframework.acquisitiondata.lay.backfill.dao.entity.LayPipeTrenchBackfill"
         }, {
           name: "地貌恢复验收",
@@ -349,42 +385,42 @@
         }, {
           name: "保温",
           url: "/jdbc/commonData/layThermalInsulation/getPage.do",
-          code: "startMedianStakeName",
+          code: "pipeSegmentOrCrossName",
           className: "cn.jasgroup.jasframework.acquisitiondata.lay.Insulation.dao.entity.LayThermalInsulation"
         }, {
           name: "开挖穿越",
           url: "/jdbc/commonData/crossExcavation/getPage.do",
-          code: "startMedianStakeName",
+          code: "crossName",
           className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.excavation.dao.entity.DaqCrossExcavation"
         }, {
           name: "顶管穿越",
           url: "/jdbc/commonData/crossPipeJacking/getPage.do",
-          code: "startMedianStakeName",
+          code: "crossName",
           className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.pipejacking.dao.entity.DaqCrossPipeJacking"
         }, {
           name: "箱涵穿越",
           url: "/jdbc/commonData/crossBoxCulvert/getPage.do",
-          code: "startMedianStakeName",
+          code: "crossName",
           className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.boxculvert.dao.entity.DaqCrossBoxCulvert"
         }, {
           name: "定向钻穿越",
           url: "/jdbc/commonData/crossDrilling/getPage.do",
-          code: "startMedianStakeName",
+          code: "crossName",
           className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.drilling.dao.entity.DaqCrossDrilling"
         }, {
           name: "钻爆隧道穿越",
           url: "/jdbc/commonData/crossDrillingBlasting/getPage.do",
-          code: "startMedianStakeName",
+          code: "crossName",
           className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.drillingblasting.dao.entity.DaqCrossDrillingBlasting"
         }, {
           name: "跨越",
           url: "/jdbc/commonData/crossAcross/getPage.do",
-          code: "startMedianStakeName",
+          code: "crossName",
           className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.across.dao.entity.DaqCrossAcross"
         }, {
           name: "盾构隧道穿越",
           url: "/jdbc/commonData/crossShield/getPage.do",
-          code: "startMedianStakeName",
+          code: "crossName",
           className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.shield.dao.entity.DaqCrossShield"
         }, {
           name: "绝缘件",
@@ -476,7 +512,7 @@
         }, {
           name: "套管",
           url: "/jdbc/commonData/appendagesCasingPipe/getPage.do",
-          code: "startMedianStakeCode",
+          code: "pipeSegmentOrCrossName",
           className: "cn.jasgroup.jasframework.acquisitiondata.material.appendages.casingpipe.dao.entity.DaqAppendagesCasingPipe"
         }],
         serverURL: "",
@@ -488,31 +524,20 @@
         currentRequestUrl: {},
         allLoaded: false,
         constructUnit: "", //施工单位oid
+        firestRequest: true
       }
     },
     watch: {
       'selected': function () { //当选择改变的时候 重新计算高度
-        this.isShow = !this.isShow;
-        var otherHeight = 0;
         var that = this;
-        setTimeout(function () {
-          var arr = $("._outer-wrapper").children();
-          for (var i = 0; i < arr.length; i++) {
-            if (i != 2 && i != 3) {
-              otherHeight += arr[i].clientHeight;
-            }
-            if (i == 3 && that.isShow) {
-              otherHeight += arr[i].clientHeight;
-            }
-          }
-          $(".heightContent").css('height', 'calc(100% - ' + otherHeight + 'px)');
-          $(".heightContent").css('overflow', 'auto');
-        }, 0);
+        that.isShow = !that.isShow;
+
         if (that.selected == 'a') {
           that.searchObj.approveStatus = "1";
         } else {
           that.searchObj.approveStatus = "-1,2";
         }
+        that.reHeight();
         that.refresh();
       }
     },
@@ -522,8 +547,10 @@
     mounted: function () {
       var that = this;
       appcan.ready(function () {
+
         var params = jasTools.base.getParamsInUrl();
         that.constructUnit = params.constructUnit;
+        that.reHeight();
         try {
           that.requestURL.forEach(function (item, index) {
             if (item.name == JSON.parse(params.obj).cnName) {
@@ -543,10 +570,33 @@
 
         }
         that.refresh();
-
+        appcan.window.on("resume", function () {
+          if (that.firestRequest) {
+            that.firestRequest = false;
+            return;
+          }
+          that.refresh();
+        });
       });
     },
     methods: {
+      reHeight: function () {
+        var otherHeight = 0;
+        var that = this;
+        setTimeout(function () {
+          var arr = $("._outer-wrapper").children();
+          for (var i = 0; i < arr.length; i++) {
+            if (i == 0 || i == 1) {
+              otherHeight += arr[i].clientHeight;
+            }
+            if (i == 3 && that.isShow) {
+              otherHeight += arr[i].clientHeight;
+            }
+          }
+          $(".heightContent").css('height', 'calc(100% - ' + otherHeight + 'px)');
+          $(".heightContent").css('overflow', 'auto');
+        }, 0);
+      },
       refresh: function () {
         var that = this;
         that.searchObj.pageNo = 1;
@@ -561,13 +611,17 @@
           "pageSize": that.searchObj.pageSize,
           "approveStatus": that.searchObj.approveStatus,
           "constructUnit": that.constructUnit,
+          "projectOid": localStorage.getItem("defaultProject")
         };
+
         jasTools.ajax.post(that.serverURL, obj, function (data) {
           if (data.status == 1) {
             if (that.searchObj.pageNo == 1) {
               if (data.rows.length > 0) {
                 that.checkList = data.rows;
                 data.rows.forEach(function (item, index) {
+                  var time = item.create_datetime || item.createDatetime;
+                  that.checkList[index].createTime = time.split(" ")[0];
                   that.checkList[index].code = item[that.searchObj.code];
                 });
               } else {
@@ -580,6 +634,8 @@
               if (data.rows.length > 0) {
                 data.rows.forEach(function (item, index) {
                   item.code = item[that.searchObj.code];
+                  var time = item.create_datetime || item.createDatetime;
+                  item.createTime = time.split(" ")[0];
                   that.checkList.push(item);
                 });
                 that.searchObj.pageNo++;
@@ -668,7 +724,7 @@
         }
         that.approvesToServer(businessOid, 2);
       },
-      reject: function () { //决绝
+      reject: function () { //驳回，需要输入批量驳回意见
         var that = this;
         var businessOid = [];
         that.checkList.forEach(function (item) {
@@ -680,7 +736,25 @@
           that.$toast("请至少选择一条数据");
           return;
         }
-        that.approvesToServer(businessOid, -1);
+        //差条件判断，验证驳回意见不能为空
+        that.$messagebox.prompt('审批意见', {
+          inputValidator: function (val) {
+            if (val && val.trim().length > 0) {
+              return true;
+              //初始化的值为null，不做处理的话，刚打开MessageBox就会校验出错，影响用户体验
+            } else {
+              return false;
+            }
+          },
+          inputErrorMessage: '审批意见不能为空'
+        }).then(function (data) {
+          if (data.action == 'confirm') {
+            that.approveOpinion = data.value;
+            that.approvesToServer(businessOid, -1);
+          }
+        }, function () {
+
+        });
       },
       approvesToServer: function (oids, approveStatus) {
         var that = this;
@@ -693,6 +767,10 @@
         }
         if (that.searchObj.functionCode) {
           obj.functionCode = that.searchObj.functionCode;
+        }
+        if (that.approveOpinion) {
+          obj.approveOpinion = that.approveOpinion;
+          //驳回意见
         }
         jasTools.ajax.post('/daq/dataApprove/save.do', obj, function (data) {
           if (data.status == 1) {

@@ -23,12 +23,20 @@
 
 	.top_img {
 		padding: 10px 10px 10px 0px;
-
+		width: 20vw;
+		box-sizing: content-box;
 	}
 
 	img {
 		width: 20vw;
 		height: 20vw;
+	}
+
+	.photo {
+		width: 20vw;
+		height: 20vw;
+		border-radius: 50%;
+		float: left;
 	}
 
 	.top_info {
@@ -67,6 +75,19 @@
 		padding: 10px;
 		overflow: hidden;
 	}
+
+	.mint-cell-value {
+		width: 50vw;
+
+	}
+
+	.mint-cell-value span {
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		text-align: right;
+		width: 100%;
+	}
 </style>
 
 <body>
@@ -74,7 +95,8 @@
 		<div v-setheight style="overflow: auto;">
 			<div class="top">
 				<div class="top_img">
-					<img src="../../common/images/girl.png" alt="">
+					<div @click="seeDetail" :style="styleBgImg" class="photo"></div>
+					<!-- <img src="../../common/images/girl.png" alt=""> -->
 				</div>
 				<div class="top_info">
 					<div class="item ulim100">
@@ -86,7 +108,7 @@
 				</div>
 			</div>
 			<div class="bottom">
-				<mt-cell v-for="item in personList" :title="item.name" @click.native="goto(item.link)" is-link>
+				<mt-cell v-for="item in personList" :title="item.name" @click.native="goto(item.link)" :value="item.value?project:''" is-link>
 					<img slot="icon" :src="item.icon" style="width:24px;height:24px;">
 				</mt-cell>
 			</div>
@@ -106,6 +128,8 @@
 		el: '._outer-wrapper',
 		data: function () {
 			return {
+				photoOid: '',
+				project: localStorage.getItem('defaultProject'),
 				userBo: JSON.parse(localStorage.getItem("user")),
 				personList: [ //
 					{
@@ -113,34 +137,96 @@
 						link: 'setting/setting.html',
 						icon: "../../common/images/personSet.png"
 					}, {
+						name: '项目设置',
+						link: 'setting/setting_project.html',
+						icon: "../../common/images/icon_qy.png",
+						value: true,
+					}, {
 						name: '数据同步',
-						link: 'data-sync/data-sync.html',
+						link: 'data-sync/data-sync-main.html',
 						icon: "../../common/images/async.png"
 					}, {
 						name: '版本更新',
-						link: 'detail/detail.html',
+						link: 'setting/version_update.html',
 						icon: "../../common/images/updateversion.png"
-					}, {
-						name: '帮助',
-						link: 'detail/detail.html',
-						icon: "../../common/images/help.png"
 					}
+					// , {
+					// 	name: '帮助',
+					// 	link: 'detail/detail.html',
+					// 	icon: "../../common/images/help.png"
+					// }
 				]
 			}
 		},
-		created: function () {
-
+		computed: {
+			styleBgImg: function () {
+				var obj = {
+					backgroundImage: '', //url(' + sUrl + ')
+					backgroundSize: 'cover',
+					backgroundPosition: 'center center',
+				};
+				if (this.photoOid) {
+					var src = [
+						jasTools.ajax.serverURL,
+						'DAQProject/attachment/app/getImageBySize.do?oid=',
+						this.photoOid,
+						'&token=',
+						localStorage.getItem("token")
+					].join('');
+				} else {
+					var src = '../../common/images/girl.png ';
+				}
+				this.photoSrc = src;
+				obj.backgroundImage = 'url(' + src + ')';
+				return obj;
+			},
 		},
 		mounted: function () {
 			var that = this;
-			that.userBo.unitName = that.userBo.unitName.split("-->")[that.userBo.unitName.split("-->").length - 1]
+			that.userBo.unitName = that.userBo && that.userBo.unitName.split("-->")[that.userBo.unitName.split("-->").length -
+				1]
+			appcan.ready(function () {
+				that.initPage();
+			});
 		},
 		methods: {
+			initPage: function () {
+				var that = this;
+				that.requestFile();
+				that.project = localStorage.getItem('defaultProjectName');
+			},
 			goto: function (link) {
 				appcan.window.open('link', link, 10, 16, 0, 0, 0);
 			},
+			seeDetail: function () {
+				var that = this;
+				this.photoSrc && uexImage.openBrowser({
+					enableGrid: true,
+					displayActionButton: true,
+					startIndex: 1,
+					enableGrid: false,
+					data: [this.photoSrc],
+				});
+			},
+			requestFile: function () {
+				var that = this;
+				var url = "/attachment/getInfo.do";
+				var sBizId = JSON.parse(localStorage.getItem('user')).oid;
+				jasTools.ajax.get(url, {
+					businessType: 'photo',
+					businessId: sBizId,
+				}, function (data) {
+					// alert(JSON.stringify(data, 4, 4));
+					var arr = data.rows;
+					data.rows.length > 0 && (that.photoOid = arr[arr.length - 1].oid);
+					// that.deleteFile(data.rows.map(function (item) {
+					// 	return item.oid;
+					// }).join(','));
+				});
+			},
 			logOut: function () { //退出登录
-				appcan.window.open('login', '../../login.html', 10, 16, 0, 0, 0);
+				// appcan.window.open('login', '../../login.html', 10, 16, 0, 0, 0);
+				appcan.window.evaluateScript('index', 'appcan.window.close()')
 			}
 		},
 	});

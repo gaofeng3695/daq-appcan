@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title></title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<link rel="stylesheet" href="./../../lib/mint-ui/style.css">
+	<link rel="stylesheet" href="./../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../common/css/jas-main.css">
+</head>
+<style>
+	.item_active {
+		border: 1px solid #26a2ff;
+	}
+</style>
+
+<body>
+	<div class="_outer-wrapper" style="overflow: hidden;" v-cloak>
+		<div style="overflow: hidden;">
+			<div style="overflow: hidden;background: #fff;margin-bottom: 10px">
+				<jas-select-field ref="project" label="项目" :is-search="true" v-model="projectId" :options="projectList"></jas-select-field>
+			</div>
+		</div>
+		<div v-setheight style="overflow: auto;">
+
+			<jas-group title="昨日进度统计">
+				<div style="margin:0 5px;padding:0 0 5px;overflow: hidden;">
+					<div v-for="item,key in progress.config" style="width:25%;float:left;padding:5px;">
+						<div style="height:100%; padding:5px 0;background-color: rgb(232, 245, 255);" :class="{'item_active':(key == progress.currentItem)}"
+						  @click="switchItem(key)">
+							<div style="text-align: center;line-height:24px;font-size:14px;color:#333;">{{item.name}}</div>
+							<div style="text-align: center;height:30px;line-height:30px;font-size:16px;color:#26a2ff;" v-text="progressStateNum(item)"></div>
+							<div style="text-align: right;line-height:1.2;font-size:12px;color:#999;padding-right:10px;">{{item.unit}}</div>
+						</div>
+					</div>
+				</div>
+				<div v-if="progress.currentItem">
+					<!-- <mt-cell v-show="progress.config[progress.currentItem].detail.length==0" value="暂无数据"></mt-cell> -->
+					<template v-for="detail in progress.config[progress.currentItem].detail">
+						<mt-cell :title="detail.constructName">
+							<div v-text="formatProgressDetail(detail)"></div>
+						</mt-cell>
+					</template>
+				</div>
+			</jas-group>
+			<jas-group title="近一周完成情况统计" btn-name="更多>" @clickbtn="goToMore">
+				<div>
+					<div>
+						<canvas id="myChart" :width="canvasWidth" :height="250"></canvas>
+					</div>
+				</div>
+			</jas-group>
+			<jas-group title="焊口检测情况统计" :btn-name="isClosed?'展开':'收起'" @clickbtn="showToMorePie">
+				<div>
+					<div style="overflow: hidden;">
+						<div class="rightLine" style="float:left;background-size: 1px 70%">
+							<canvas id="pie01" :width="canvasWidth/2" :height="200"></canvas>
+						</div>
+						<div style="float:left;">
+							<canvas id="pie02" :width="canvasWidth/2" :height="200"></canvas>
+						</div>
+					</div>
+					<div v-show="!isClosed">
+						<mt-cell :title="projectName" :label="formatDetail(totalWeldCheck)" style="background-color: rgb(232, 245, 255);">
+							<div>
+								<span style="color:#999;font-size:12px; ">一次合格率</span>
+								<span v-text="totalWeldCheck.onceQualifiedRate "></span>
+							</div>
+						</mt-cell>
+						<template v-for="detail in WeldCheckDetails ">
+							<mt-cell :title="detail.unitName" :label="formatDetail(detail) ">
+								<div>
+									<span style="color:#999;font-size:12px; ">一次合格率</span>
+									<span v-text="detail.onceQualifiedRate "></span>
+								</div>
+							</mt-cell>
+						</template>
+					</div>
+				</div>
+			</jas-group>
+			<jas-group title="数据录入及审核情况统计 ">
+				<div style=" ">
+					<canvas id="myChart02" :width="canvasWidth" :height="250 "></canvas>
+				</div>
+			</jas-group>
+
+		</div>
+
+	</div>
+</body>
+<script src="./../../appcan/js/appcan.js "></script>
+<script src="./../../lib/vue/vue.js "></script>
+<script src="./../../lib/mint-ui/index.js "></script>
+<script src="./../../lib/f2/f2.js "></script>
+<script src="./../../common/js/f2-tools.js "></script>
+<script src="./../../common/js/jas-tools.js "></script>
+<script src="./../../common/components/jas-components.js "></script>
+<script>
+	window.vm = new Vue({
+		el: '._outer-wrapper',
+		data: {
+			isClosed: true,
+			projectList: [],
+			projectId: '',
+			canvasWidth: $(document).width(),
+			canvasHeight: $(document).width() * 4 / 7,
+			pieWidth: $(document).width() / 2,
+			pieHeight: $(document).width() * 0.4 > 180 ? 180 : $(document).width() * 0.4,
+			WeldCheckDetails: [],
+			progress: {},
+		},
+		computed: {
+			projectName: function () {
+				if (this.projectId) {
+					return this.$refs.project.labelvalue;
+				}
+				return '';
+			},
+			totalWeldCheck: function () {
+				var obj = {
+					// unitName: this.getProjectName(),
+					weldCount: 0,
+					checkedCount: 0,
+					uncheckedCount: 0,
+					qualifiedCount: 0,
+					onceQualifiedRate: 0,
+				};
+				this.WeldCheckDetails.forEach(function (item) {
+					obj.weldCount += item.weldCount;
+					obj.checkedCount += item.checkedCount;
+					obj.uncheckedCount += item.uncheckedCount;
+					obj.qualifiedCount += item.qualifiedCount;
+				});
+				obj.onceQualifiedRate = obj.checkedCount ? (obj.qualifiedCount / obj.checkedCount * 100).toFixed(1) + '%' : '0%';
+				return obj;
+			}
+		},
+		created: function () {
+			this.initData();
+		},
+		mounted: function () {
+			var that = this;
+			appcan.ready(function () {
+				that.requestProject();
+			});
+		},
+		watch: {
+			projectId: function (newval) {
+				// alert(newval);
+				var that = this;
+
+				this.initData();
+				this.clearAllChart();
+				this.requestYesterdayProcess();
+				this.requestLatestWeekCumulativeProcess();
+				this.requeststatsWeldCheck();
+				this.requestStatsDateEntryAndAuditing();
+			}
+		},
+		methods: {
+			initData: function () {
+				this.isClosed = true;
+				this.WeldCheckDetails = [];
+				this.progress = {
+					currentItem: '',
+					fields: ['pipe', 'weld', 'patch', 'lay_pipe_trench_backfill'],
+					detailArr: [],
+					config: {
+						pipe: {
+							name: '管材',
+							statsCount: '-',
+							statsResult: '-',
+							detail: [],
+							unit: 'km',
+						},
+						weld: {
+							name: '焊接',
+							statsCount: '-',
+							statsResult: '-',
+							detail: [],
+							unit: 'km/口',
+						},
+						patch: {
+							name: '补口',
+							statsCount: '-',
+							statsResult: '-',
+							detail: [],
+							unit: 'km/口',
+						},
+						lay_pipe_trench_backfill: {
+							name: '回填',
+							statsCount: '-',
+							statsResult: '-',
+							detail: [],
+							unit: 'km',
+						},
+					}
+				}
+			},
+			clearAllChart: function () {
+				this.complateChart && (this.complateChart.destroy() || (this.complateChart = ''));
+				this.pie01 && (this.pie01.destroy() || (this.pie01 = ''));
+				this.pie02 && (this.pie02.destroy() || (this.pie02 = ''));
+				this.recordChart && (this.recordChart.destroy() || (this.recordChart = ''));
+			},
+			progressStateNum: function (item) {
+				if (item.name === '管材' || item.name === '回填') {
+					return item.statsResult;
+				} else {
+					return item.statsResult + '/' + item.statsCount;
+				}
+			},
+			formatProgressDetail: function (item) {
+				if (this.progress.currentItem == 'pipe') {
+					return '管材 ' + item.statsResult + 'km';
+				}
+				if (this.progress.currentItem == 'lay_pipe_trench_backfill') {
+					return '回填 ' + item.statsResult + 'km';
+				}
+				if (this.progress.currentItem == 'weld') {
+					return '焊接 ' + item.statsResult + 'km' + '/' + item.statsCount + '口';
+				}
+				if (this.progress.currentItem == 'patch') {
+					return '补口 ' + item.statsResult + 'km' + '/' + item.statsCount + '口';
+				}
+			},
+			formatDetail: function (item) {
+				return '焊口' + item.weldCount + ' 已检' + item.checkedCount + ' 合格' + item.qualifiedCount;
+			},
+			switchItem: function (key) {
+				var that = this;
+				if (this.progress.currentItem === key) {
+					this.progress.currentItem = '';
+				} else {
+					if (this.progress.config[key].detail.length === 0) {
+						this.requestYesterdayProcessDetail(key, function () {
+							that.progress.currentItem = key;
+						});
+					} else {
+						that.progress.currentItem = key;
+					}
+				}
+			},
+
+			goToMore: function () {
+				var that = this;
+				var url = jasTools.base.setParamsToUrl("detail/complete-detail.html", {
+					projectId: this.projectId,
+					projectName: this.$refs.project.labelvalue,
+				})
+				appcan.window.open('moredetail', url, 10, 16, 0, 0, 0);
+			},
+			showToMorePie: function () {
+				this.isClosed = !this.isClosed;
+				if (!this.isClosed && this.WeldCheckDetails.length === 0) {
+					this.requeststatsWeldCheckDetail();
+				}
+			},
+			requestProject: function () {
+				var that = this;
+				var url = "/daq/privilege/getProjectList.do";
+				that.$indicator.open({
+					text: '加载中...',
+					spinnerType: 'fading-circle'
+				});
+				jasTools.ajax.post(url, {}, function (data) {
+					that.$indicator.close();
+					that.projectList = data.rows.map(function (item) {
+						return {
+							value: item.key,
+							label: item.value,
+						}
+					});
+					that.projectId = that.projectList[0] && that.projectList[0].value;
+				});
+			},
+			requestYesterdayProcess: function () {
+				var that = this;
+				var url = "/statistics/statsYesterdayProcess.do";
+				jasTools.ajax.get(url, {
+					projectId: this.projectId
+				}, function (data) {
+					// alert(JSON.stringify(data, 4, 4))
+					data.data.forEach(function (item) {
+						that.progress.config[item.statsType].statsCount = item.statsCount || 0;
+						that.progress.config[item.statsType].statsResult = item.statsResult || 0;
+					});
+				});
+			},
+			requestYesterdayProcessDetail: function (name, callback) {
+				var that = this;
+				// var name = ;
+				var url = "/statistics/statsYesterdayProcessDetail.do";
+				jasTools.ajax.get(url, {
+					projectId: this.projectId,
+					statsType: name
+				}, function (data) {
+					// alert(JSON.stringify(data, 4, 4))
+					that.progress.config[name].detail = data.data;
+					callback && callback();
+				});
+			},
+			requestLatestWeekCumulativeProcess: function () {
+				var that = this;
+				var url = "/statistics/statsLatestWeekCumulativeProcess.do";
+				jasTools.ajax.get(url, {
+					projectId: this.projectId,
+				}, function (data) {
+					// alert(JSON.stringify(data, 4, 4))
+					var aData = [];
+					for (var key in data.data) {
+						for (var date in data.data[key]) {
+							aData.push({
+								type: that.progress.config[key].name,
+								date: date,
+								value: data.data[key][date],
+								index: that.progress.fields.indexOf(key)
+							});
+						}
+					}
+					aData.sort(function (a, b) {
+						return a.index - b.index
+					});
+					that.renderComplateChart(aData);
+				});
+			},
+			requeststatsWeldCheck: function () {
+				var that = this;
+				var url = "/statistics/statsWeldCheck.do";
+				jasTools.ajax.get(url, {
+					projectId: this.projectId,
+				}, function (data) {
+					// alert(JSON.stringify(data, 4, 4))
+					that.renderPie01(data.data.weldCount, data.data.checkedCount);
+					that.renderPie02(data.data.checkedCount, data.data.qualifiedCount);
+				});
+			},
+			requeststatsWeldCheckDetail: function () {
+				var that = this;
+				var url = "/statistics/statsWeldCheckDetail.do";
+				jasTools.ajax.get(url, {
+					projectId: this.projectId,
+				}, function (data) {
+					// alert(JSON.stringify(data, 4, 4))
+					that.WeldCheckDetails = data.data;
+				});
+			},
+			requestStatsDateEntryAndAuditing: function () {
+				var that = this;
+				var url = "/statistics/statsDateEntryAndAuditing.do";
+				jasTools.ajax.get(url, {
+					projectId: this.projectId,
+				}, function (data) {
+					// alert(JSON.stringify(data, 4, 4))
+					var aData = [];
+					for (var date in data.data) {
+						for (var type in data.data[date]) {
+							aData.push({
+								type: type === 'totalCount' ? '已录入' : '已审核',
+								date: date,
+								value: data.data[date][type],
+								index: type === 'totalCount' ? 1 : 2
+							});
+						}
+					}
+					aData.sort(function (a, b) {
+						return a.index - b.index;
+					})
+					that.renderRecordChart(aData);
+				});
+			},
+			renderComplateChart: function (aData) {
+				// var data = [{
+				// 	date: "07/01 ",
+				// 	type: "能源 ",
+				// 	value: 99.9
+				// }];
+				if (this.complateChart) {
+					this.complateChart.changeData(aData);
+				} else {
+					this.complateChart = new F2.Chart({
+						id: 'myChart',
+						pixelRatio: window.devicePixelRatio
+					});
+					var chart = this.complateChart;
+					chart.source(aData);
+					chart.scale('date', {
+						type: 'timeCat',
+						tickCount: 4
+						// nice:true
+					});
+					chart.scale('value', {
+						tickCount: 5
+					});
+					chart.axis('value', {
+						label: function (text, index, total) {
+							return {
+								text: text + 'km'
+							};
+						}
+					});
+					chart.legend({
+						position: 'top',
+						align: 'center',
+						itemWidth: 90,
+						wordSpace: 4,
+						offsetX: -12
+					});
+					chart.tooltip({
+						custom: true, // 自定义 tooltip 内容框
+						onChange: function onChange(obj) {
+							var legend = chart.get('legendController').legends.top[0];
+							var tooltipItems = obj.items;
+							var legendItems = legend.items;
+							var map = {};
+							legendItems.map(function (item) {
+								map[item.name] = _.clone(item);
+							});
+							tooltipItems.map(function (item) {
+								var name = item.name;
+								var value = item.value;
+								if (map[name]) {
+									map[name].value = value;
+								}
+							});
+							legend.setItems(_.values(map));
+						},
+						onHide: function onHide() {
+							var legend = chart.get('legendController').legends.top[0];
+							legend.setItems(chart.getLegendItems().country);
+						}
+					});
+					chart.line().position('date*value').color('type');
+					chart.render();
+				}
+
+
+
+			},
+			renderPie01: function (nTotal, nDone) {
+
+				var data = [{
+					name: '已检测',
+					percent: nDone,
+					a: '1'
+				}, {
+					name: '未检测',
+					percent: nTotal - nDone,
+					a: '1'
+				}];
+				if (this.pie01) {
+					this.pie01.changeData(data);
+				} else {
+					this.pie01 = new F2.Chart({
+						id: 'pie01',
+						pixelRatio: window.devicePixelRatio
+					});
+					var chart = this.pie01;
+					chart.source(data);
+					chart.coord('polar', {
+						transposed: true,
+						radius: 1
+					});
+					var legendMap = {};
+					data.forEach(function (obj) {
+						legendMap[obj.name] = {
+							value: obj.percent,
+							percent: nTotal ? (obj.percent / nTotal * 100).toFixed(1) + '%' : '0%'
+						}
+					});
+					chart.legend({
+						position: 'bottom',
+						align: 'center',
+						itemWidth: '220',
+						itemFormatter: function (val) {
+							return val + '  ' + legendMap[val].percent + '(' + legendMap[val].value + ')'; // val 为每个图例项的文本值
+						}
+					});
+					chart.axis(false);
+					chart.tooltip(false);
+					chart.interval().position('a*percent').color('name').adjust('stack').style({
+						lineWidth: 1,
+						stroke: '#fff',
+						lineJoin: 'round',
+						lineCap: 'round'
+					}).animate({
+						appear: {
+							duration: 1200,
+							easing: 'bounceOut'
+						}
+					});
+					chart.render();
+				}
+
+			},
+			renderPie02: function (nTotal, nDone) {
+				var data = [{
+					name: '合格',
+					percent: nDone,
+					a: '1'
+				}, {
+					name: '不合格',
+					percent: nTotal - nDone,
+					a: '1'
+				}];
+				if (this.pie02) {
+					this.pie02.changeData(data);
+				} else {
+					this.pie02 = new F2.Chart({
+						id: 'pie02',
+						pixelRatio: window.devicePixelRatio
+					});
+					var chart = this.pie02;
+					chart.source(data);
+					chart.coord('polar', {
+						transposed: true,
+						radius: 1
+					});
+					var legendMap = {};
+					data.forEach(function (obj) {
+						legendMap[obj.name] = {
+							value: obj.percent,
+							percent: (obj.percent / nTotal * 100).toFixed(1) + '%'
+						}
+					});
+					chart.legend({
+						position: 'bottom',
+						align: 'center',
+						itemWidth: '220',
+						itemFormatter: function (val) {
+							return val + '  ' + legendMap[val].percent + '(' + legendMap[val].value + ')'; // val 为每个图例项的文本值
+						}
+					});
+
+
+					chart.axis(false);
+					chart.tooltip(false);
+					chart.interval().position('a*percent').color('name').adjust('stack').style({
+						lineWidth: 1,
+						stroke: '#fff',
+						lineJoin: 'round',
+						lineCap: 'round'
+					}).animate({
+						appear: {
+							duration: 1200,
+							easing: 'bounceOut'
+						}
+					});
+					chart.render();
+				}
+			},
+			renderRecordChart: function (aData) {
+				// var data = [{
+				// 	date: "07/01 ",
+				// 	type: "已录入 ",
+				// 	value: 56
+				// }];
+
+				if (this.recordChart) {
+					this.recordChart.changeData(aData);
+				} else {
+					this.recordChart = new F2.Chart({
+						id: 'myChart02',
+						pixelRatio: window.devicePixelRatio
+					});
+					var chart = this.recordChart;
+					chart.source(aData);
+					chart.scale('date', {
+						type: 'timeCat',
+						tickCount: 4,
+					});
+					chart.scale('value', {
+						tickCount: 5,
+					});
+					chart.legend({
+						position: 'top',
+						align: 'center',
+						wordSpace: 4,
+					});
+					chart.tooltip({
+						custom: true, // 自定义 tooltip 内容框
+						onChange: function onChange(obj) {
+							var legend = chart.get('legendController').legends.top[0];
+							var tooltipItems = obj.items;
+							var legendItems = legend.items;
+							var map = {};
+							legendItems.map(function (item) {
+								map[item.name] = _.clone(item);
+							});
+							tooltipItems.map(function (item) {
+								var name = item.name;
+								var value = item.value;
+								if (map[name]) {
+									map[name].value = value;
+								}
+							});
+							legend.setItems(_.values(map));
+						},
+						onHide: function onHide() {
+							var legend = chart.get('legendController').legends.top[0];
+							legend.setItems(chart.getLegendItems().country);
+						}
+					});
+					chart.line().position('date*value').color('type');
+					chart.area().position('date*value').color('type');
+					chart.point().position('date*value').color('type');
+					chart.render();
+				}
+			},
+		}
+	});
+</script>
+
+</html>

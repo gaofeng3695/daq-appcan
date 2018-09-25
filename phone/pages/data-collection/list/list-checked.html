@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title></title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<link rel="stylesheet" href="./../../../lib/mint-ui/style.css">
+	<link rel="stylesheet" href="./../../../appcan/css/ui-box.css">
+	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../common/css/jas-main.css">
+</head>
+<style>
+	* {
+		margin: 0px;
+		padding: 0px;
+	}
+
+	ul li {
+		list-style: none;
+	}
+
+	li {
+		padding: 10px;
+		background: #fff;
+		box-shadow: 0px 0px 12px #fafafa;
+		margin-bottom: 10px;
+	}
+
+	.type {
+		/*padding-top: 5px;*/
+		height: 35px;
+		line-height: 35px;
+	}
+
+	.content {
+		height: 35px;
+		line-height: 35px;
+	}
+
+
+
+	.ulim100 {
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+	}
+
+	.w40 {
+		width: 30vw;
+	}
+
+	.txt-r {
+		text-align: right;
+	}
+
+	.btns {
+		/*padding: 10px 0px;*/
+		text-align: right;
+		height: 35px;
+		line-height: 35px;
+	}
+
+	.btns .mint-button--small {
+		height: 26px;
+		line-height: 26px;
+	}
+
+	.mint-button--yellow {
+		color: #fff;
+		background-color: yellow
+	}
+
+	.jas-button-footer {
+		padding: 0px 10px;
+		line-height: 47px;
+		height: 47px;
+	}
+
+	.jas-button-footer .mint-checkbox {
+		padding-top: 0px !important;
+	}
+
+	.bg {
+		/*background: #ed9028;*/
+		border: 1px solid #ed9028;
+	}
+
+	.borRed {
+		border: 1px solid red;
+	}
+
+	.borblue {
+		border: 1px solid blue;
+	}
+
+	.bororgane {
+		border: 1px solid orange;
+	}
+
+	.borgreen {
+		border: 1px solid green;
+	}
+
+	.bage {
+		padding: 3px 5px;
+		border-radius: 5px;
+	}
+
+	.clr333 {
+		color: #333;
+	}
+
+	.clr999 {
+		color: #999;
+	}
+</style>
+
+<body>
+	<div class="_outer-wrapper" v-cloak>
+		<jas-header title="数据采集列表"></jas-header>
+		<div style="overflow: hidden;">
+			<div style="overflow: hidden;margin-bottom: 10px;background: #fff;">
+				<jas-select-field style="width:50vw;float:left;" label="数据分类" :is-search="true" v-model="topSearchForm.module" :options="modules"></jas-select-field>
+				<jas-select-field style="width:50vw;float:left;" label="数据状态" :is-search="true" v-model="topSearchForm.status" :options="statusArry"></jas-select-field>
+			</div>
+		</div>
+		<div class="heightContent">
+			<div style="height:100%;overflow: scroll">
+				<mt-loadmore ref="loadmore" :top-method="refresh" :auto-fill="false" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded">
+					<ul>
+						<li v-for="item in typeList" v-show="topSearchForm.status=='0,1,-1,2'">
+							<div class="type ub bottomLine">
+								<div class="ub-f1 ulim100 clr999">{{item.code}}</div>
+								<div class="clr333">
+									<span class=" bage borblue" v-show="item.approveStatus==1">审核中</span>
+									<span class=" bage borgreen" v-show="item.approveStatus==2">通过</span>
+									<span class=" bage borRed" v-show="item.approveStatus==-1">被驳回</span>
+									<span class=" bororgane bage" v-show="item.approveStatus==0">待上报</span>
+								</div>
+							</div>
+							<div class="content ub" @click="goToDetail(item)">
+								<div class="w40 ub-f1 ulim100">{{item.tenders_name||item.tendersName}}</div>
+								<div class="w40 ub-f1 ulim100  txt-r">{{item.construct_unit_name||item.constructUnitName||item.unitName}}</div>
+							</div>
+							<div class="btns ub">
+								<div>
+									{{item.createTime}}
+								</div>
+								<div class="ub-f1" v-show="item.approveStatus!='-1'">
+									<!--<mt-button v-show="topSearchForm.status=='3'" size="small" type="primary" @click="approve(item)">上传</mt-button>
+								<mt-button v-show="topSearchForm.status!='0,1,-1,2'" size="small" type="danger" @click="submit(item)">上报</mt-button>-->
+									<mt-button size="small" type="primary" @click="copyobject(item)">再来一条</mt-button>
+								</div>
+							</div>
+						</li>
+						<li v-for="item in typeList" v-show="topSearchForm.status=='-1'||topSearchForm.status=='0'||topSearchForm.status=='3'">
+							<div class="type ub bottomLine">
+								<div class="ub-f1 ulim100 clr999">{{item.code}}</div>
+								<div class="clr333">
+									<span class=" borblue bage " v-show="item.approveStatus==1">审核中</span>
+									<span class="bage borgreen" v-show="item.approveStatus==2">通过</span>
+									<span class=" bage borRed" v-show="item.approveStatus==-1">被驳回</span>
+									<span class=" bororgane bage" v-show="item.approveStatus==0">待上报</span>
+								</div>
+							</div>
+							<jas-checkbox :checked="item.checked" :itemdate="item" @clickitem="clickItem">
+								<div slot="options" class="ub-f1">
+									<div class="content ub" @click="goToDetail(item)">
+										<div class="w40 ulim100 ub-f1">{{item.tenders_name||item.tendersName}}</div>
+										<div class="w40 ub-f1 txt-r ulim100">
+											<spn>{{item.construct_unit_name||item.constructUnitName||item.unitName}}</spn>
+										</div>
+									</div>
+									<div class="btns ub">
+										<div>
+											{{item.createTime}}
+										</div>
+										<div class="ub-f1" v-show="item.approveStatus!='-1'">
+											<mt-button size="small" type="primary" @click="copyobject(item)">再来一条</mt-button>
+										</div>
+									</div>
+								</div>
+								<jas-checkbox>
+						</li>
+					</ul>
+				</mt-loadmore>
+			</div>
+		</div>
+		<div class="jas-button-footer" v-show="topSearchForm.status!='0,1,-1,2'">
+			<jas-checkbox :checked="allchecked" @clickitem="chooseAll" :is-all='true'>
+				<div slot="options" class="txt-r ub-f1" style="line-height: 47px;">
+					<mt-button type="primary" size="small" v-show="topSearchForm.status=='3'" @click="submit">上传</mt-button>
+					<mt-button style="background:#FF5722" type="primary" size="small" v-show="topSearchForm.status=='0'||topSearchForm.status=='-1'"
+					  @click="changestatus">上报</mt-button>
+					<mt-button type="primary" size="small" @click="deletes">删除</mt-button>
+				</div>
+			</jas-checkbox>
+		</div>
+	</div>
+</body>
+<script src="./../../../appcan/js/appcan.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/mint-ui/index.js"></script>
+<script src="./../../../common/js/common_device.js "></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./../../../common/js/data-base-operation.js"></script>
+<script src="../../user-center/data-sync/local-server.js"></script>
+<script>
+	window.vm = new Vue({
+		el: '._outer-wrapper',
+		data: function () {
+			var that = this;
+			return {
+				allchecked: false,
+				topSearchForm: {
+					module: '',
+					status: '',
+				},
+				modules: [{
+					value: 'coating_pipe',
+					label: '防腐管检查'
+				}, {
+					value: 'hot_bends',
+					label: '热煨弯管检查'
+				}, {
+					value: 'pipe_cold_bending',
+					label: '冷弯管检查'
+				}, {
+					value: 'construction_weld',
+					label: '焊口记录'
+				}, {
+					value: 'rework_weld',
+					label: '焊口返修'
+				}, {
+					value: 'measured_result',
+					label: '焊口测量'
+				}, {
+					value: 'anticorrosion_check',
+					label: '补口记录'
+				}, ],
+				statuses: [ //
+					{
+						value: '0,1,-1,2',
+						label: '已录入'
+					}, {
+						value: '3',
+						label: '待上传'
+					}, {
+						value: '0',
+						label: '待上报'
+					}, {
+						value: '-1',
+						label: '被驳回'
+					}
+				],
+				statuses1: [{
+					value: '0,1,-1,2',
+					label: '已录入'
+				}, {
+					value: '3',
+					label: '待上传'
+				}],
+				statuses2: [{
+					value: '3',
+					label: '待上传'
+				}],
+				typeUrl: {
+					coating_pipe: {
+						id: "coating_pipe",
+						url: "/map/commonData/F000030/getPage.do",
+						localURl: "checkCoatingPipe", //待上传
+						deleteBatchURL: "/map/commonData/F000030/delete.do",
+						deleteURL: "/map/commonData/F000030/delete.do",
+						detailURL: "/map/commonData/F000030/get.do",
+						addURL: "/map/commonData/F000030/save.do",
+						chooseStatues: "statuses1",
+						type: "防腐管检查",
+						code: "pipe_code",
+						searchObj: {
+							page: 1,
+							rows: 10
+						}
+					},
+					hot_bends: {
+						id: "hot_bends",
+						url: "/map/commonData/F000031/getPage.do",
+						localURl: "checkHotBends", //待上传
+						deleteBatchURL: "/map/commonData/F000031/delete.do",
+						deleteURL: "/map/commonData/F000031/delete.do",
+						detailURL: "/map/commonData/F000031/get.do",
+						addURL: "/map/commonData/F000031/save.do",
+						chooseStatues: "statuses1",
+						type: "热煨弯管检查",
+						code: "hot_bends_code",
+						searchObj: {
+							page: 1,
+							rows: 10
+						}
+					},
+					pipe_cold_bending: {
+						id: "pipe_cold_bending",
+						url: "/jdbc/commonData/checkPipeColdBending/getPage.do",
+						localURl: "checkPipeColdBending", //待上传
+						deleteBatchURL: "/jdbc/commonData/checkPipeColdBending/deleteBatch.do",
+						deleteURL: "/jdbc/commonData/checkPipeColdBending/delete.do",
+						detailURL: "/jdbc/commonData/checkPipeColdBending/getPage.do",
+						addURL: "/jdbc/commonData/checkPipeColdBending/save.do",
+						chooseStatues: "statuses1",
+						code: "pipeColdBendingCode",
+						type: "冷弯管检查"
+					},
+					construction_weld: {
+						id: "construction_weld",
+						url: "/jdbc/commonData/constructionWeld/getPage.do",
+						deleteBatchURL: "/jdbc/commonData/constructionWeld/deleteBatch.do",
+						deleteURL: "/jdbc/commonData/constructionWeld/delete.do",
+						detailURL: "/jdbc/commonData/constructionWeld/getPage.do",
+						className: "cn.jasgroup.jasframework.acquisitiondata.weld.weldinfo.dao.entity.ConstructionWeld",
+						addURL: "/jdbc/commonData/constructionWeld/save.do",
+						chooseStatues: "statuses",
+						code: "weldCode",
+						type: "焊口记录"
+					},
+					rework_weld: {
+						id: "rework_weld",
+						url: "/jdbc/commonData/reworkWeld/getPage.do",
+						localURl: "reworkWeld", //待上传
+						deleteBatchURL: "/jdbc/commonData/reworkWeld/deleteBatch.do",
+						deleteURL: "/jdbc/commonData/reworkWeld/delete.do",
+						detailURL: "/jdbc/commonData/reworkWeld/getPage.do",
+						addURL: "/jdbc/commonData/reworkWeld/save.do",
+						chooseStatues: "statuses",
+						code: "weldCode",
+						type: "焊口返修",
+						className: "cn.jasgroup.jasframework.acquisitiondata.weld.reworkweld.dao.entity.ReworkWeld"
+					},
+					measured_result: {
+						id: "measured_result",
+						url: "/jdbc/commonData/weldMeasuredResult/getPage.do",
+						deleteBatchURL: "/jdbc/commonData/weldMeasuredResult/deleteBatch.do",
+						detailURL: "/jdbc/commonData/weldMeasuredResult/getPage.do",
+						deleteURL: "/jdbc/commonData/weldMeasuredResult/delete.do",
+						addURL: "/jdbc/commonData/weldMeasuredResult/save.do",
+						chooseStatues: "statuses",
+						code: "medianStakeCode",
+						type: "焊口测量",
+						className: "cn.jasgroup.jasframework.acquisitiondata.weld.measuredresult.dao.entity.WeldMeasuredResult"
+					},
+					anticorrosion_check: {
+						id: "anticorrosion_check",
+						localURl: "anticorrosionCheck", //待上传
+						url: "/jdbc/commonData/weldAnticorrosionCheck/getPage.do",
+						deleteBatchURL: "/map/commonData/F000036/delete.do",
+						deleteURL: "/map/commonData/F000036/delete.do",
+						detailURL: "/map/commonData/F000036/get.do",
+						addURL: "/map/commonData/F000036/save.do",
+						chooseStatues: "statuses",
+						type: "补口记录",
+						functionCode: "F000036",
+						code: "weld_code",
+						searchObj: {
+							page: 1,
+							rows: 10
+						}
+					}
+				},
+				statusArry: [],
+				typeList: [],
+				currentUrl: {},
+				searchObj: {
+					"pageNo": 1,
+					"pageSize": 10,
+					"approveStatus": "-1"
+				},
+				allLoaded: false,
+				type: "",
+				code: "",
+				record: 0,
+				isConnectNet: 1, //是否连接网络，0表示无网络
+				index: 0, //表示此时上传的条数
+				sucsNum: 0,
+				failSum: 0,
+				firestRequest: true
+			}
+		},
+		watch: {
+			'topSearchForm': {
+				handler: function () {
+					var that = this;
+					if (that.isConnectNet) {
+						that.statusArry = that[that.typeUrl[that.topSearchForm.module].chooseStatues];
+					} else {
+						that.statusArry = that.statuses2; //无网，只有待上传
+					}
+					that.currentUrl = that.typeUrl[that.topSearchForm.module];
+					that.type = that.typeUrl[that.topSearchForm.module].type;
+					that.code = that.typeUrl[that.topSearchForm.module].code;
+					if (that.typeUrl[that.topSearchForm.module].searchObj) {
+						that.searchObj = that.typeUrl[that.topSearchForm.module].searchObj
+					} else {
+						that.searchObj.approveStatus = that.topSearchForm.status;
+					}
+					var isExit = 0;
+					that.statusArry.forEach(function (item) {
+						if (item.value == that.topSearchForm.status) {
+							isExit++;
+						}
+					});
+					if (isExit == 0) {
+						that.topSearchForm.status = that.statuses1[0].value;
+					}
+					that.resetHeight();
+					that.refresh(); //请求数据列表
+				},
+				deep: true
+			},
+		},
+		created: function () {
+
+		},
+		mounted: function () {
+			var that = this;
+			appcan.ready(function () {
+				var params = jasTools.base.getParamsInUrl();
+				that.topSearchForm.module = params.id;
+				that.topSearchForm.status = params.type;
+				JasDevice.getConnectStatus(function (status) {
+					if (status == -1) { //表示当前无网络
+						that.isConnectNet = 0;
+					}
+				});
+				appcan.window.on("resume", function () {
+				  if(that.firestRequest) {
+					  that.firestRequest=false;
+					  return;
+					 }
+					that.refresh();
+				});
+			});
+		},
+		methods: {
+			refresh: function () {
+				var that = this;
+				if (that.searchObj.pageNo) {
+					that.searchObj.pageNo = 1;
+				} else {
+					that.searchObj.page = 1;
+				}
+				that.typeList = [];
+				that.allLoaded = false;
+				that.allchecked = false;
+				that.requestList();
+			},
+			requestList: function () {
+				var that = this;
+				if (that.topSearchForm.status == '3') { //待上传
+					that.requestByLoacl(); //请求本地列表
+				} else {
+					that.requestByServer(); //请求服务器数据
+				}
+			},
+			requestByLoacl: function () {
+				var that = this;
+				if (that.currentUrl.localURl) {
+					localServer[that.currentUrl.localURl].query({
+						projectOid: localStorage.getItem("defaultProject")
+					}, function (data) {
+						if (data.status == 1) {
+							data.rows.forEach(function (item, index) {
+								item.code = item[that.code];
+								// var time = item.createDatetime || item.create_datetime;
+								// item.createTime = time.split(" ")[0];
+								item.checked = false;
+								that.typeList.push(item);
+							});
+						} else {
+							that.$toast("网络异常，请稍候尝试");
+						}
+
+					});
+				} else {
+					that.$toast("暂无接口");
+				}
+			},
+			requestByServer: function () {
+				var that = this;
+
+				that.searchObj.projectOid = localStorage.getItem("defaultProject");
+				that.searchObj.project_oid = localStorage.getItem("defaultProject");
+				jasTools.ajax.post(that.currentUrl.url, that.searchObj, function (data) {
+					if (data.status == 1) {
+						if (that.searchObj.pageNo == 1 || that.searchObj.page == 1) {
+							if (data.rows.length > 0) {
+								that.typeList = [];
+								data.rows.forEach(function (item) {
+									item.code = item[that.code];
+									var time = item.createDatetime || item.create_datetime;
+									item.createTime = time.split(" ")[0];
+									item.checked = false;
+								});
+								that.typeList = data.rows;
+							} else {
+								that.typeList = [];
+								that.$toast('暂无数据');
+								that.allLoaded = true;
+							}
+							if (that.searchObj.pageNo) {
+								that.searchObj.pageNo++;
+							} else {
+								that.searchObj.page++;
+							}
+						} else {
+							if (data.rows.length > 0) {
+								data.rows.forEach(function (item, index) {
+									item.code = item[that.code];
+									var time = item.createDatetime || item.create_datetime;
+									item.createTime = time.split(" ")[0];
+									item.checked = false;
+									that.typeList.push(item);
+								});
+								if (that.searchObj.pageNo) {
+									that.searchObj.pageNo++;
+								} else {
+									that.searchObj.page++;
+								}
+							} else {
+								that.allLoaded = true;
+								that.$toast('没有更多数据');
+							}
+						}
+					} else {
+						that.$toast("网络异常，请稍候尝试")
+					}
+					that.$refs.loadmore.onTopLoaded();
+					that.$refs.loadmore.onBottomLoaded();
+				}, function () {
+					that.$refs.loadmore.onTopLoaded();
+					that.$refs.loadmore.onBottomLoaded();
+				});
+			},
+			loadBottom: function () {
+				if (this.allLoaded) {
+					return;
+				}
+				this.requestList();
+			},
+			submit: function () {
+				var that = this;
+				var forms = [];
+				that.typeList.forEach(function (item) {
+					if (item.checked) {
+						forms.push(item);
+					}
+				});
+				if (forms.length == 0) {
+					that.$toast("请至少选择一条数据");
+					return;
+				}
+				if (that.isConnectNet) {
+					that.submitToServer(forms);
+				} else {
+					that.$toast("当前无网络")
+				}
+			},
+			submitToServer: function (forms) {
+				var that = this;
+				if (that.index < forms.length) {
+					that.submitBusData(forms[that.index], function (data) {
+						that.sucsNum++;
+						that.deleteLocalForm(forms[that.index], function () {
+							that.index++;
+							that.submitToServer(forms);
+						});
+					}, function (data) {
+						that.failSum++;
+						that.index++;
+						that.submitToServer(forms);
+						// that.deleteLocalForm(forms[that.index]); //上传失败，本地不删除
+					});
+				} else {
+					that.$toast(that.sucsNum + "条上传成功；" + that.failSum + "条已经被检查");
+					that.index = 0;
+					that.sucsNum = 0;
+					that.failSum = 0;
+				}
+			},
+			submitBusData: function (form, fnSuccess, fnfail) {
+				var that = this;
+				jasTools.ajax.post(that.currentUrl.addURL, form, function (data) {
+					var sBizId = data.data || form.oid;
+					var aFiles = form.attachment.map(function (item) {
+						return item.src
+					});
+					if (aFiles && aFiles.length > 0) {
+						jasTools.ajax.uploadFiles(sBizId, {
+							file: aFiles
+						}, function () {
+							fnSuccess && fnSuccess();
+						}, function () {
+							fnSuccess && fnSuccess(); // 附件上传失败依然执行成功方法
+						});
+					} else {
+						fnSuccess && fnSuccess();
+					}
+				}, function (data) {
+					fnfail && fnfail(data);
+				}, true);
+			},
+			deleteLocalForm: function (form, callback) {
+				var that = this;
+				localServer[that.currentUrl.localURl].delete({
+					oid: form.oid
+				}, function (data) {
+					callback && callback();
+					that.refresh();
+					that.allchecked = false;
+				});
+			},
+			changestatus: function () {
+				var that = this;
+				var idList = [];
+				that.typeList.forEach(function (item) {
+					if (item.checked) {
+						idList.push(item.oid);
+					}
+				});
+				if (idList.length == 0) {
+					that.$toast("请至少选择一条数据");
+					return;
+				}
+				that.$messagebox({
+					title: '上报',
+					message: '确定上报所选数据?',
+					showCancelButton: true
+				}, function (value) {
+					if (value == 'confirm') {
+						var obj = {
+							businessOid: idList,
+							approveStatus: 1,
+						};
+						if (that.currentUrl.className) {
+							obj.className = that.currentUrl.className;
+						}
+						if (that.currentUrl.functionCode) {
+							obj.functionCode = that.currentUrl.functionCode;
+						}
+						jasTools.ajax.post('/daq/dataApprove/save.do', obj, function (data) {
+							if (data.status == 1) {
+								that.refresh();
+								that.allchecked = false;
+							} else {
+								that.$toast("网络异常，请稍候尝试");
+							}
+						});
+					}
+				});
+			},
+			deletes: function () {
+				var that = this;
+				var idList = [];
+				that.typeList.forEach(function (item) {
+					if (item.checked) {
+						idList.push(item.oid);
+					}
+				});
+				if (idList.length == 0) {
+					that.$toast("请至少选择一条数据");
+					return;
+				}
+				that.$messagebox({
+					title: '删除',
+					message: '确定删除所选数据?',
+					showCancelButton: true
+				}, function (value) {
+					if (value == 'confirm') {
+						if (that.topSearchForm.status == '3') {
+							that.deleteByLocal(idList);
+						} else {
+							that.deleteByServer(idList);
+						}
+					}
+				});
+			},
+			deleteByLocal: function (ids) { //本地批量删除
+				var that = this;
+				var id = '';
+				ids.forEach(function (item) {
+					id += "'" + item + "',";
+				});
+				id = id.substring(0, id.length - 1);
+				localServer[that.currentUrl.localURl].deleteBatch({
+					"ids": id
+				}, function (data) {
+					if (data.status == 1) {
+						that.$toast("删除成功");
+						that.refresh();
+					}
+				});
+			},
+			deleteByServer: function (ids) {
+				var that = this;
+				jasTools.ajax.post(that.currentUrl.deleteBatchURL, {
+					"idList": ids
+				}, function (data) {
+					if (data.status == 1) {
+						that.refresh();
+						that.$toast("删除成功");
+					}
+				});
+			},
+			copyobject: function (obj) {
+				var that = this;
+				var isOnline = 1;
+				if (that.topSearchForm.status == '3') {
+					isOnline = 0;
+				}
+				appcan.window.open('form-copy', '../form/form.html?isOnline=' + isOnline + '&isAgain=1&oid=' +
+					obj.oid + '&title=' + that.currentUrl.id, 10, 16, 0, 0, 0);
+			},
+			chooseAll: function () {
+				var that = this;
+				if (!that.allchecked) {
+					that.allchecked = true;
+					that.typeList.forEach(function (item) {
+						item.checked = true;
+					});
+				} else {
+					that.allchecked = false;
+					that.typeList.forEach(function (item) {
+						item.checked = false;
+					});
+				}
+			},
+			clickItem: function (item) {
+				var that = this;
+				item.checked = !item.checked;
+				if (item.checked) {
+					var num = 0;
+					that.typeList.forEach(function (item) {
+						if (!item.checked) {
+							num++;
+							return;
+						}
+					});
+					if (num > 0) {
+						that.allchecked = false;
+					} else {
+						that.allchecked = true;
+					}
+				} else {
+					that.allchecked = false;
+				}
+			},
+			resetHeight: function () {
+				var otherHeight = 0;
+				var that = this;
+				setTimeout(function () {
+					var arr = $("._outer-wrapper").children();
+					for (var i = 0; i < arr.length; i++) {
+						if (i != 2 && i != 3) {
+							otherHeight += arr[i].clientHeight;
+						}
+						if (i == 3 && that.topSearchForm.status != '0,1,-1,2') {
+							otherHeight += arr[i].clientHeight;
+						}
+					}
+					$(".heightContent").css('height', 'calc(100% - ' + otherHeight + 'px)');
+					$(".heightContent").css('overflow', 'auto');
+				}, 0);
+			},
+			goToDetail: function (obj) {
+				var that = this;
+				appcan.window.open('collection-detail', 'detail.html?obj=' + JSON.stringify(obj) + "&currentRequestUrl=" + JSON
+					.stringify(that.currentUrl) + "&currentStatus=" + that.topSearchForm.status, 10, 16, 0, 0, 0);
+			}
+
+		},
+	});
+</script>
+
+</html>

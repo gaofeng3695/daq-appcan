@@ -27,8 +27,11 @@ var FieldsConfig = (function () {
     },
   ];
   return {
-    antiseptic: {
+    'coating_pipe': {
       title: '防腐管检查',
+      detailUrl: '/map/commonData/F000030/get.do',
+      addUrl: '/map/commonData/F000030/save.do',
+      updateUrl: '/map/commonData/F000030/update.do',
       fieldsGroup: [ //
         {
           groupName: '检查信息',
@@ -36,7 +39,7 @@ var FieldsConfig = (function () {
             'project_oid',
             'tenders_oid',
             'construct_unit',
-            'pipe_code',
+            'pipe_oid',
             'groove_check',
             'pipe_end_proring_check',
             'coating_io_face_check',
@@ -58,7 +61,9 @@ var FieldsConfig = (function () {
         'project_oid': {
           name: '项目名称',
           type: 'select',
+          labelfield: 'project_name',
           required: true,
+          disabled: true,
           optionUrl: '/daq/privilege/getProjectList.do',
           childSelect: ['tenders_oid', 'construct_unit'],
           childUrl: ['/daq/privilege/getTendersList.do', '/daq/privilege/getCurrentUnitId.do'],
@@ -66,54 +71,64 @@ var FieldsConfig = (function () {
         'tenders_oid': {
           name: '标段名称',
           type: 'select',
+          labelfield: 'tenders_name',
           required: true,
           options: [],
         },
         'construct_unit': {
           name: '施工单位',
           type: 'select',
+          labelfield: 'construct_unit_name',
           required: true,
           options: []
         },
-        'pipe_code': {
+        'pipe_oid': {
           name: '钢管编号',
           type: 'select',
+          labelfield: 'pipe_code',
           required: true,
-          options: []
+          optionUrl: 'materialPipe',
         },
         'groove_check': {
           name: '坡口检查',
           type: 'select',
+          labelfield: 'groove_check',
           options: checkOption
         },
         'pipe_end_proring_check': {
           name: '管端保护圈',
           type: 'select',
+          labelfield: 'pipe_end_proring_check',
           options: checkOption
         },
         'coating_io_face_check': {
           name: '防腐层内外表面质量',
           type: 'select',
+          labelfield: 'coating_io_face_check',
           options: checkOption
         },
         'diameter_check': {
           name: '管径偏差+0.2mm至-0.5mm',
           type: 'select',
+          labelfield: 'diameter_check',
           options: checkOption
         },
         'coating_io_ends_check': {
           name: '防腐层端部内外涂层',
           type: 'select',
+          labelfield: 'coating_io_ends_check',
           options: checkOption
         },
         'excess_weld_metal': {
           name: '管端焊缝余高（0mm）',
           type: 'select',
+          labelfield: 'excess_weld_metal',
           options: checkOption
         },
         'ovality': {
           name: '椭圆度<0.6%D',
           type: 'select',
+          labelfield: 'ovality',
           options: checkOption
         },
         'checked_by': {
@@ -130,8 +145,11 @@ var FieldsConfig = (function () {
         },
       }
     },
-    hotBend: {
+    'hot_bends': {
       title: '热煨弯管检查',
+      detailUrl: '/map/commonData/F000031/get.do',
+      addUrl: '/map/commonData/F000031/save.do',
+      updateUrl: '/map/commonData/F000031/update.do',
       fieldsGroup: [ //
         {
           groupName: '检查信息',
@@ -139,7 +157,7 @@ var FieldsConfig = (function () {
             'project_oid', //项目oid
             'tenders_oid', //标段oid
             'construct_unit', //施工单位oid
-            'hot_bends_code', //弯管编号
+            'hot_bends_oid', //弯管编号
             'weld_position', //纵焊缝位置
             'pipe_length', //直管段长度
             'ovality', //椭圆度<0.6%D
@@ -160,7 +178,10 @@ var FieldsConfig = (function () {
         'project_oid': {
           name: '项目名称',
           type: 'select',
+          labelfield: 'project_name',
           required: true,
+          disabled: true,
+
           optionUrl: '/daq/privilege/getProjectList.do',
           childSelect: ['tenders_oid', 'construct_unit'],
           childUrl: ['/daq/privilege/getTendersList.do', '/daq/privilege/getCurrentUnitId.do'],
@@ -168,46 +189,56 @@ var FieldsConfig = (function () {
         'tenders_oid': {
           name: '标段名称',
           type: 'select',
+          labelfield: 'tenders_name',
           required: true,
         },
         'construct_unit': {
           name: '施工单位',
           type: 'select',
+          labelfield: 'construct_unit_name',
           required: true,
         },
-        'hot_bends_code': {
+        'hot_bends_oid': {
           name: '弯管编号',
           type: 'select',
+          labelfield: 'hot_bends_code',
           required: true,
+          optionUrl: 'this is materialHotBends url',
         },
         'weld_position': {
           name: '纵焊缝位置',
           type: 'select',
+          labelfield: 'weld_position',
           options: checkOption
         },
         'pipe_length': {
           name: '直管段长度',
           type: 'select',
+          labelfield: 'pipe_length',
           options: checkOption
         },
         'ovality': {
           name: '椭圆度<0.6%D',
           type: 'select',
+          labelfield: 'ovality',
           options: checkOption
         },
         'groove_check': {
           name: '坡口检查',
           type: 'select',
+          labelfield: 'groove_check',
           options: checkOption
         },
         'coating_io_face_check': {
           name: '防腐层内外表面质量',
           type: 'select',
+          labelfield: 'coating_io_face_check',
           options: checkOption
         },
         'coating_io_ends_check': {
           name: '防腐层端部内外涂层',
           type: 'select',
+          labelfield: 'coating_io_ends_check',
           options: checkOption
         },
         'checked_by': {
@@ -224,8 +255,12 @@ var FieldsConfig = (function () {
         },
       }
     },
-    coldBend: {
+    'pipe_cold_bending': {
       title: '冷弯管检查',
+      detailUrl: '/jdbc/commonData/checkPipeColdBending/getPage.do',
+      addUrl: '/jdbc/commonData/checkPipeColdBending/save.do',
+      updateUrl: '/jdbc/commonData/checkPipeColdBending/update.do',
+
       fieldsGroup: [ //
         {
           groupName: '检查信息',
@@ -259,7 +294,9 @@ var FieldsConfig = (function () {
         'projectOid': {
           name: '项目名称',
           type: 'select',
+          labelfield: 'projectName',
           required: true,
+          disabled: true,
           optionUrl: '/daq/privilege/getProjectList.do',
           childSelect: ['tendersOid', 'constructUnit'],
           childUrl: ['/daq/privilege/getTendersList.do', '/daq/privilege/getCurrentUnitId.do'],
@@ -267,6 +304,7 @@ var FieldsConfig = (function () {
         'tendersOid': {
           name: '标段名称',
           type: 'select',
+          labelfield: 'tendersName',
           required: true,
           childSelect: ['pipeColdBendingOid'],
           childUrl: ['/daq/clodBendingPipe/getList.do'],
@@ -274,6 +312,7 @@ var FieldsConfig = (function () {
         'constructUnit': {
           name: '施工单位',
           type: 'select',
+          labelfield: 'constructUnitName',
           required: true,
         },
         'certificateNum': {
@@ -284,10 +323,12 @@ var FieldsConfig = (function () {
         'pipeColdBendingOid': {
           name: '冷弯管编号',
           type: 'select',
+          labelfield: 'pipeColdBendingCode',
         },
         'pipeLength': {
           name: '弯管长度(m)',
           type: 'select',
+          labelfield: 'pipeLength',
           options: checkOption
         },
         'pipeDiameter': {
@@ -309,26 +350,31 @@ var FieldsConfig = (function () {
         'weldPosition': {
           name: '纵焊缝位置',
           type: 'select',
+          labelfield: 'weldPosition',
           options: checkOption
         },
         'ovality': {
           name: '椭圆度<0.6%D',
           type: 'select',
+          labelfield: 'ovality',
           options: checkOption
         },
         'grooveCheck': {
           name: '坡口检查',
           type: 'select',
+          labelfield: 'grooveCheck',
           options: checkOption
         },
         'coatingIoFaceCheck': {
           name: '防腐层内外表面质量',
           type: 'select',
+          labelfield: 'coatingIoFaceCheck',
           options: checkOption
         },
         'coatingIoEndsCheck': {
           name: '防腐层端部内外涂层',
           type: 'select',
+          labelfield: 'coatingIoEndsCheck',
           options: checkOption
         },
         'checkedBy': {
@@ -345,9 +391,11 @@ var FieldsConfig = (function () {
         },
       }
     },
-    weldRecord: {
+    'construction_weld': {
       title: '焊口记录',
       detailUrl: '/jdbc/commonData/constructionWeld/getPage.do',
+      addUrl: '/jdbc/commonData/constructionWeld/save.do',
+      updateUrl: '/jdbc/commonData/constructionWeld/update.do',
       fieldsGroup: [ //
         {
           groupName: '基础信息',
@@ -407,7 +455,9 @@ var FieldsConfig = (function () {
         'projectOid': {
           name: '项目名称',
           type: 'select',
+          labelfield: 'projectName',
           required: true,
+          disabled: true,
           optionUrl: '/daq/privilege/getProjectList.do',
           childSelect: ['tendersOid', 'constructUnit', 'workUnitOid', 'weldProduce'],
           childUrl: ['/daq/privilege/getTendersList.do', '/daq/privilege/getCurrentUnitId.do', '/daq/workUnit/getWorkUnitList.do', '/daq/weldProduct/getListByCondition.do'],
@@ -415,6 +465,7 @@ var FieldsConfig = (function () {
         'tendersOid': {
           name: '标段名称',
           type: 'select',
+          labelfield: 'tendersName',
           required: true,
           childSelect: ['supervisionUnit', 'pipelineOid'],
           childUrl: ['/daq/privilege/getSupervisionUnitByTendersOid.do', '/daq/privilege/getPipelineListByTendersOid.do'],
@@ -422,11 +473,13 @@ var FieldsConfig = (function () {
         'constructUnit': {
           name: '施工单位',
           type: 'select',
+          labelfield: 'constructUnitName',
           required: true,
         },
         'pipelineOid': {
           name: '管线名称',
           type: 'select',
+          labelfield: 'pipelineName',
           childSelect: ['pipeSegmentOrCrossOid'],
           childUrl: ['/daq/privilege/getPipeSegmentOrCrossList.do'],
           required: true,
@@ -434,6 +487,7 @@ var FieldsConfig = (function () {
         'pipeSegmentOrCrossOid': {
           name: '线路段/穿跨越',
           type: 'select',
+          labelfield: 'pipeSegmentOrCrossName',
           childSelect: ['medianStakeOid'],
           childUrl: ['/daq/privilege/getMedianStakeList.do'],
           required: true,
@@ -441,10 +495,12 @@ var FieldsConfig = (function () {
         'medianStakeOid': {
           name: '桩号',
           type: 'select',
+          labelfield: 'medianStakeCode',
         },
         'workUnitOid': {
           name: '施工机组代号',
-          type: 'select', //            , //	打底人员
+          type: 'select',
+          labelfield: 'workUnitCode', //            , //	打底人员
           childSelect: ['coverOid', 'padderOid', 'renderOid'],
           childUrl: ['/daq/workPerson/getWorkPersonList.do'],
           requestParams: {
@@ -467,35 +523,42 @@ var FieldsConfig = (function () {
         'supervisionUnit': {
           name: '监理单位',
           type: 'select',
+          labelfield: 'supervisionUnitName',
           required: true,
         },
         'weldMethod': {
           name: '焊接方式',
           type: 'select',
+          labelfield: 'weldMethodName',
           domainName: 'welding_method_temp_domain',
         },
         'weldType': {
           name: '焊口类型',
           type: 'select',
+          labelfield: 'weldTypeName',
           domainName: 'weld_type_domain',
         },
         'frontPipeType': {
           name: '前管件类型',
           type: 'select',
+          labelfield: 'frontPipeTypeName',
           domainName: 'pipe_type_domain',
         },
         'frontPipeCode': {
           name: '前管件编号',
           type: 'select',
+          labelfield: 'frontPipeCode',
         },
         'backPipeType': {
           name: '后管件类型',
           type: 'select',
+          labelfield: 'backPipeTypeName',
           domainName: 'pipe_type_domain',
         },
         'backPipeCode': {
           name: '后管件编号',
           type: 'select',
+          labelfield: 'backPipeCode',
         },
         'constructDate': {
           name: '施工日期',
@@ -534,20 +597,24 @@ var FieldsConfig = (function () {
         'weldProduce': {
           name: '焊接工艺规程',
           type: 'select',
+          labelfield: 'weldProduceCode',
         },
         'surfaceCheck': {
           name: '外观质量检查',
           type: 'select',
+          labelfield: 'surfaceCheck',
           options: checkOptionForNumber
         },
         'isGoldeJoint': {
           name: '是否金口',
           type: 'select',
+          labelfield: 'isGoldeJoint',
           options: booleanOption
         },
         'isPipeHead': {
           name: '是否连头口',
           type: 'select',
+          labelfield: 'isPipeHead',
           options: booleanOption
         },
         'remarks': {
@@ -556,9 +623,12 @@ var FieldsConfig = (function () {
         },
       }
     },
-    weldRework: {
+    'rework_weld': {
       title: '焊口返修',
       detailUrl: '/jdbc/commonData/constructionWeld/getPage.do',
+      addUrl: '/jdbc/commonData/constructionWeld/save.do',
+      updateUrl: '/jdbc/commonData/constructionWeld/update.do',
+
       fieldsGroup: [ //
         {
           groupName: '基础信息',
@@ -606,7 +676,9 @@ var FieldsConfig = (function () {
         'projectOid': {
           name: '项目名称',
           type: 'select',
+          labelfield: 'projectName',
           required: true,
+          disabled: true,
           optionUrl: '/daq/privilege/getProjectList.do',
           childSelect: ['tendersOid', 'constructUnit', 'workUnitOid', 'weldProduce'],
           childUrl: ['/daq/privilege/getTendersList.do', '/daq/privilege/getCurrentUnitId.do', '/daq/workUnit/getWorkUnitList.do', '/daq/weldProduct/getListByCondition.do'],
@@ -614,6 +686,7 @@ var FieldsConfig = (function () {
         'tendersOid': {
           name: '标段名称',
           type: 'select',
+          labelfield: 'tendersName',
           required: true,
           childSelect: ['supervisionUnit', 'pipelineOid'],
           childUrl: ['/daq/privilege/getSupervisionUnitByTendersOid.do', '/daq/privilege/getPipelineListByTendersOid.do'],
@@ -621,11 +694,13 @@ var FieldsConfig = (function () {
         'constructUnit': {
           name: '施工单位',
           type: 'select',
+          labelfield: 'constructUnitName',
           required: true,
         },
         'pipelineOid': {
           name: '管线名称',
           type: 'select',
+          labelfield: 'pipelineName',
           childSelect: ['pipeSegmentOrCrossOid'],
           childUrl: ['/daq/privilege/getPipeSegmentOrCrossList.do'],
           required: true,
@@ -633,13 +708,15 @@ var FieldsConfig = (function () {
         'pipeSegmentOrCrossOid': {
           name: '线路段/穿跨越',
           type: 'select',
+          labelfield: 'pipeSegmentOrCrossName',
           childSelect: ['weldOid'],
           childUrl: ['/daq/weld/getOnlyWeldList.do'],
           required: true,
         },
         'workUnitOid': {
           name: '施工机组代号',
-          type: 'select', //            , //	打底人员
+          type: 'select',
+          labelfield: 'workUnitName', //            , //	打底人员
           childSelect: ['coverOid', 'padderOid', 'renderOid'],
           childUrl: ['/daq/workPerson/getWorkPersonList.do'],
           requestParams: {
@@ -662,11 +739,13 @@ var FieldsConfig = (function () {
         'supervisionUnit': {
           name: '监理单位',
           type: 'select',
+          labelfield: 'supervisionUnitName',
           required: true,
         },
         'weldOid': {
           name: '返修口编号',
           type: 'select',
+          labelfield: 'weldCode',
           childText: ['reworkWeldCode'],
           childTextFormat: [function (value) {
             return value ? value + '-R' : '';
@@ -706,6 +785,7 @@ var FieldsConfig = (function () {
         'weldProduce': {
           name: '焊接工艺规程',
           type: 'select',
+          labelfield: 'weldProduceCode',
         },
         'remarks': {
           name: '备注',
@@ -713,9 +793,12 @@ var FieldsConfig = (function () {
         },
       }
     },
-    weldMeasure: {
+    'measured_result': {
       title: '焊口测量',
       detailUrl: '/jdbc/commonData/constructionWeld/getPage.do',
+      addUrl: '/jdbc/commonData/constructionWeld/save.do',
+      updateUrl: '/jdbc/commonData/constructionWeld/update.do',
+
       fieldsGroup: [ //
         {
           groupName: '基础信息',
@@ -770,7 +853,9 @@ var FieldsConfig = (function () {
         'projectOid': {
           name: '项目名称',
           type: 'select',
+          labelfield: 'projectName',
           required: true,
+          disabled: true,
           optionUrl: '/daq/privilege/getProjectList.do',
           childSelect: ['tendersOid', 'constructUnit', 'workUnitOid', ],
           childUrl: ['/daq/privilege/getTendersList.do', '/daq/privilege/getCurrentUnitId.do', '/daq/workUnit/getWorkUnitList.do'],
@@ -778,6 +863,7 @@ var FieldsConfig = (function () {
         'tendersOid': {
           name: '标段名称',
           type: 'select',
+          labelfield: 'tendersName',
           required: true,
           childSelect: ['supervisionUnit', 'pipelineOid'],
           childUrl: ['/daq/privilege/getSupervisionUnitByTendersOid.do', '/daq/privilege/getPipelineListByTendersOid.do'],
@@ -785,11 +871,13 @@ var FieldsConfig = (function () {
         'constructUnit': {
           name: '施工单位',
           type: 'select',
+          labelfield: 'constructUnitName',
           required: true,
         },
         'pipelineOid': {
           name: '管线名称',
           type: 'select',
+          labelfield: 'pipelineName',
           childSelect: ['pipeSegmentOrCrossOid'],
           childUrl: ['/daq/privilege/getPipeSegmentOrCrossList.do'],
           required: true,
@@ -797,6 +885,7 @@ var FieldsConfig = (function () {
         'pipeSegmentOrCrossOid': {
           name: '线路段/穿跨越',
           type: 'select',
+          labelfield: 'pipeSegmentOrCrossName',
           childSelect: ['weldOid', 'medianStakeOid'],
           childUrl: ['/daq/weld/getOnlyWeldList.do', '/daq/privilege/getMedianStakeList.do'],
           required: true,
@@ -804,10 +893,12 @@ var FieldsConfig = (function () {
         'weldOid': {
           name: '焊口编号',
           type: 'select',
+          labelfield: 'weldCode',
         },
         'workUnitOid': {
           name: '施工机组代号',
-          type: 'select', //            , //	打底人员
+          type: 'select',
+          labelfield: 'workUnitName', //            , //	打底人员
           childSelect: ['coverOid', 'padderOid', 'renderOid'],
           childUrl: ['/daq/workPerson/getWorkPersonList.do'],
           requestParams: {
@@ -818,6 +909,7 @@ var FieldsConfig = (function () {
         'supervisionUnit': {
           name: '监理单位',
           type: 'select',
+          labelfield: 'supervisionUnitName',
           required: true,
         },
         'supervisionEngineer': {
@@ -839,6 +931,7 @@ var FieldsConfig = (function () {
         'medianStakeOid': {
           name: '桩号',
           type: 'select',
+          labelfield: 'medianStakeCode',
         },
         'relativeMileage': {
           name: '相对桩位置',
@@ -876,8 +969,11 @@ var FieldsConfig = (function () {
         },
       }
     },
-    patchRecord: {
+    'anticorrosion_check': {
       title: '防腐管检查',
+      detailUrl: '/map/commonData/F000036/get.do',
+      addUrl: '/map/commonData/F000036/save.do',
+      updateUrl: '/map/commonData/F000036/update.do',
       fieldsGroup: [ //
         {
           groupName: '基础信息',
@@ -923,7 +1019,9 @@ var FieldsConfig = (function () {
         'project_oid': {
           name: '项目名称',
           type: 'select',
+          labelfield: 'project_name',
           required: true,
+          disabled: true,
           optionUrl: '/daq/privilege/getProjectList.do',
           childSelect: ['tenders_oid', 'construct_unit'],
           childUrl: ['/daq/privilege/getTendersList.do', '/daq/privilege/getCurrentUnitId.do'],
@@ -931,6 +1029,7 @@ var FieldsConfig = (function () {
         'tenders_oid': {
           name: '标段名称',
           type: 'select',
+          labelfield: 'tenders_name',
           required: true,
           childSelect: ['supervision_unit', 'pipeline_oid'],
           childUrl: ['/daq/privilege/getSupervisionUnitByTendersOid.do', '/daq/privilege/getPipelineListByTendersOid.do'],
@@ -938,6 +1037,7 @@ var FieldsConfig = (function () {
         'pipeline_oid': {
           name: '管线名称',
           type: 'select',
+          labelfield: 'pipeline_name',
           childSelect: ['pipe_segment_or_cross_oid'],
           childUrl: ['/daq/privilege/getPipeSegmentOrCrossList.do'],
           required: true,
@@ -945,6 +1045,7 @@ var FieldsConfig = (function () {
         'pipe_segment_or_cross_oid': {
           name: '线路段/穿跨越',
           type: 'select',
+          labelfield: 'pipe_segment_or_cross_name',
           childSelect: ['weld_oid'],
           childUrl: ['/daq/weld/getOnlyWeldList.do'],
           required: true,
@@ -952,12 +1053,14 @@ var FieldsConfig = (function () {
         'construct_unit': {
           name: '施工单位',
           type: 'select',
+          labelfield: 'construct_unit_name',
           required: true,
           options: []
         },
         'supervision_unit': {
           name: '监理单位',
           type: 'select',
+          labelfield: 'supervision_unit_name',
           required: true,
         },
         'supervision_engineer': {
@@ -975,6 +1078,7 @@ var FieldsConfig = (function () {
         'weld_oid': {
           name: '焊口编号',
           type: 'select',
+          labelfield: 'weld_code',
           required: true,
         },
         'buckle_material_batch_num': {
@@ -989,61 +1093,73 @@ var FieldsConfig = (function () {
         'buckle_anticorrosive_type': {
           name: '补口防腐类型',
           type: 'select',
+          labelfield: 'buckle_anticorrosive_type_name',
           domainName: 'buckle_anticorrosive_type_domain',
         },
         'buckle_anticorrosive_grade': {
           name: '防腐等级',
           type: 'select',
+          labelfield: 'buckle_anticorrosive_grade_name',
           domainName: 'anticorrosive_grade_domain',
         },
         'derusting_grade': {
           name: '除锈等级',
           type: 'select',
+          labelfield: 'derusting_grade_name',
           domainName: 'derusting_grade_domain',
         },
         'pipe_mouth_clean': {
           name: '管口清理',
           type: 'select',
+          labelfield: 'pipe_mouth_clean_name',
           options: checkOption,
         },
         'sandblasting_and_derusting': {
           name: '喷砂除绣',
           type: 'select',
+          labelfield: 'sandblasting_and_derusting_name',
           options: checkOption,
         },
         'pipe_mouth_preheat': {
           name: '管口预热',
           type: 'select',
+          labelfield: 'pipe_mouth_preheat_name',
           options: checkOption,
         },
         'epoxy_primer': {
           name: '环氧底漆',
           type: 'select',
+          labelfield: 'epoxy_primer_name',
           options: checkOption,
         },
         'baking_check': {
           name: '喷烤',
           type: 'select',
+          labelfield: 'baking_check_name',
           options: checkOption,
         },
         'overlap_check': {
           name: '轴向搭接',
           type: 'select',
+          labelfield: 'overlap_check_name',
           options: checkOption,
         },
         'appearance_check': {
           name: '外观检查',
           type: 'select',
+          labelfield: 'appearance_check_name',
           options: checkOption,
         },
         'electric_spark_leak_detection': {
           name: '电火花检漏',
           type: 'select',
+          labelfield: 'electric_spark_leak_detection_name',
           options: checkOption,
         },
         'buckle_conclusion': {
           name: '补口结论',
           type: 'select',
+          labelfield: 'buckle_conclusion_name',
           options: checkOption,
         },
         'anticorrosion': {
@@ -1066,7 +1182,59 @@ var FieldsConfig = (function () {
           });
         });
         return form;
-      }
+      },
+      formatConfig: function (oConfig) {
+        var map = {
+          '/daq/privilege/getProjectList.do': 'project',
+          '/daq/privilege/getTendersList.do': 'tender',
+          '/daq/privilege/getCurrentUnitId.do': 'constructUnit',
+          '/daq/privilege/getPipelineListByTendersOid.do': 'pipeline',
+          '/daq/privilege/getPipeSegmentOrCrossList.do': 'pipeSegmentOrCross',
+          '/daq/privilege/getSupervisionUnitByTendersOid.do': 'supervisionUnit',
+          '/daq/weld/getOnlyWeldList.do' :'',
+
+
+          'materialPipe': 'materialPipe',
+          '/daq/clodBendingPipe/getList.do': 'coldBending',
+          'this is materialHotBends url': 'materialHotBends',
+          'a': 'materialTee',
+          's': 'materialJnsulatedJoint',
+          'd': 'materialReducer',
+          'f': 'materialClosure',
+
+          '/daq/workUnit/getWorkUnitList.do': 'workUnit',
+          '/daq/weldProduct/getListByCondition.do': 'weldProduct',
+          '/daq/workPerson/getWorkPersonList.do': 'workPersonnel',
+          'priUser': 'priUser',
+        };
+        for (var item in oConfig) {
+          if (oConfig.hasOwnProperty(item)) {
+            var field = oConfig[item];
+            if (field.optionUrl) {
+              // alert(field.name)
+              field.optionTable = map[field.optionUrl];
+              if (!field.optionTable) {
+                alert('未找到对应表：\r\n' + field.optionUrl)
+              }
+            }
+
+            if (field.childUrl && field.childUrl.length > 0) {
+              field.childTable = field.childUrl.map(function (url) {
+                if (!map[url]) {
+                  alert('未找到对应表：\r\n' + url)
+                }
+                return map[url] || '';
+              });
+            }
+
+            if (field.options == checkOption || field.options == checkOptionForNumber) {
+              field.placeholder = '请选择是否合格'
+            }
+
+          }
+        }
+        return oConfig;
+      },
     }
   }
 })();

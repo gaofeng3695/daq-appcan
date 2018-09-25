@@ -6,6 +6,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 	<link rel="stylesheet" href="./../../lib/mint-ui/style.css">
+	<link rel="stylesheet" href="./../../appcan/css/ui-box.css">
 	<link rel="stylesheet" href="./../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
 	<link rel="stylesheet" href="./../../common/css/jas-main.css">
 </head>
@@ -89,7 +90,8 @@
 
 	.item {
 		/*padding: 0px 10px;*/
-		margin: 10px;
+		/*margin: 10px;*/
+		margin-top: 10px;
 		overflow: hidden;
 		background: #fff;
 		border-radius: 5px;
@@ -100,10 +102,12 @@
 	/*提示窗口样式*/
 
 	.tooltipWindos {
+		display: none;
+		/*进行下面样式的隐藏*/
 		border-top: 1px solid #39F;
 		background-color: #FFF;
 		position: relative;
-		height: 15px;
+		height: 10px;
 		background: #eee;
 	}
 
@@ -113,10 +117,10 @@
 		width: 0;
 		height: 0;
 		overflow: hidden;
-		border-width: 10px;
+		border-width: 5px;
 		border-style: solid;
 		position: absolute;
-		left: 41vw;
+		left: 45vw;
 	}
 
 	/*倒置三角中背景三角样式*/
@@ -131,47 +135,70 @@
 	.mainTriangle {
 		border-color: #39F transparent transparent;
 	}
+
+	.w50 {
+		width: 80px;
+		text-align: center;
+
+	}
+
+	.f20 {
+		font-size: 20px;
+	}
+
+	.clr333 {
+		color: #333;
+	}
+
+	.clr999 {
+		color: #999;
+	}
+
+	.item-line {
+		background: #fff;
+		padding-top: 10px;
+		margin-top: 10px;
+	}
+
+	.line {
+		padding: 0px 10px;
+		height: 25px;
+		line-height: 25px;
+	}
+
+	.paddBottom {
+		padding-bottom: 10px;
+	}
 </style>
 
 <body>
 	<div id="total" class="_outer-wrapper" v-cloak>
-		<div style="margin-bottom: 10px;overflow: hidden;background: #fff;">
-			<jas-select-top-field tip="请选择施工单位" v-model="searchObj.unit" :options="units"></jas-select-top-field>
+		<div style="overflow: hidden;">
+			<div style="overflow: hidden;background: #fff;">
+				<jas-select-field label="数据分类" :is-search="true" v-model="searchObj.unit" :options="units"></jas-select-field>
+			</div>
 		</div>
+
 		<div v-setheight style="overflow: auto;">
-			<div class="item" v-for="item in reviewList">
-				<div class="title bottomLine">
-					<div class="fl">
-						<i style="font-size:12px;border-left:3px solid #26a2ff;padding-left: 4px;"></i> {{item.cnName}}
+			<div class="item-line " v-for="item in reviewList">
+				<div @click="item.isShow=!item.isShow">
+					<div class="line ub">
+						<div class="ub-f1 ulim100 clr333">{{item.cnName}}</div>
+						<div class="w50 clrb f20"> {{item.total}}</div>
+						<div class="w50 clrr f20">{{item.unaudited}}</div>
 					</div>
-					<div class="fr unit ulim100">
-						报审单位：{{unitName}}
-					</div>
-				</div>
-				<div class="content" @click="item.isShow=!item.isShow">
-					<div class="fl w45 txt-c">
-						<div class="top clrb">
-							{{item.total}}
-						</div>
-						<div class="desc">
-							总条目
-						</div>
-					</div>
-					<div class="fr w45 txt-c">
-						<div class="top clrr">
-							{{item.unaudited}}
-						</div>
-						<div class="desc">
-							未审条目
-						</div>
+					<div class="line ub ">
+						<div class="ub-f1 ulim100 clr999">{{unitName}}</div>
+						<div class="w50 clr333">总条目</div>
+						<div class="w50 clr333">未审条目</div>
 					</div>
 				</div>
 				<div class="child" v-show="item.isShow">
 					<ul>
-						<li v-for="childItem in item.dataApproveSubBoList" @click="goToDetail(childItem)" class="topLine">
-							<div class="fl w50 ulim100">{{childItem.cnName}}</div>
-							<div class="fl w15">{{childItem.total}}</div>
-							<div class="fl w15 clrb">{{childItem.unaudited}}</div>
+						<li class="ub topLine" v-for="childItem in item.dataApproveSubBoList" @click="goToDetail(childItem)" class="topLine">
+							<div class="ub-f1 ulim100 clr333">{{childItem.cnName}}</div>
+							<div class="w50 clrb f20"> {{childItem.total}}</div>
+							<div class="w50 clrr f20">{{childItem.unaudited}}</div>
 						</li>
 					</ul>
 				</div>
@@ -179,12 +206,58 @@
 					<div class="invertedTriangle mainTriangle"></div>
 					<div class="invertedTriangle backgroundTriangle"></div>
 				</div>
-				<!--<div class="fa  fa-angle-down fastyle" style="color:#26a3ff;font-size:16px;">
-
-				</div>-->
 			</div>
 		</div>
+		<!--<div class="item" v-for="item in reviewList">
+			<div class="title bottomLine">
+			<div class="line ub">
+					<div class="ub-f1 ulim100 clr333">管道焊接/补口</div>
+					<div class="w50 clrb f20">260</div>
+					<div class="w50 clrr f20">260</div>
+				</div>
+				<div class="line ub">
+					<div class="ub-f1 ulim100 clr999">xxxxx对对对得到顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶大大大多</div>
+					<div class="w50 clr333">总条目</div>
+					<div class="w50 clr333">未审条目</div>
+				</div>
+			</div>
+			<div class="content" @click="item.isShow=!item.isShow">
+				<div class="fl w45 txt-c">
+					<div class="top clrb">
+						{{item.total}}
+					</div>
+					<div class="desc">
+						总条目
+					</div>
+				</div>
+				<div class="fr w45 txt-c">
+					<div class="top clrr">
+						{{item.unaudited}}
+					</div>
+					<div class="desc">
+						未审条目
+					</div>
+				</div>
+			</div>
+			<div class="child" v-show="item.isShow">
+				<ul>
+					<li v-for="childItem in item.dataApproveSubBoList" @click="goToDetail(childItem)" class="topLine">
+						<div class="fl w50 ulim100">{{childItem.cnName}}</div>
+						<div class="fl w15">{{childItem.total}}</div>
+						<div class="fl w15 clrb">{{childItem.unaudited}}</div>
+					</li>
+				</ul>
+			</div>
+			<div class="tooltipWindos" v-show="!item.isShow">
+				<div class="invertedTriangle mainTriangle"></div>
+				<div class="invertedTriangle backgroundTriangle"></div>
+			</div>
+		<div class="fa  fa-angle-down fastyle" style="color:#26a3ff;font-size:16px;">
+
+				</div>-->
+		<!--</div>-->
 	</div>
+
 </body>
 <script src="./../../appcan/js/appcan.js"></script>
 <script src="./../../lib/vue/vue.js"></script>
@@ -199,6 +272,7 @@
 				searchObj: {
 					unit: ""
 				},
+				firestRequest: true,
 				unitName: "",
 				units: [],
 				reviewList: [{
@@ -206,7 +280,7 @@
 					unit: "111111111111",
 					total: 100,
 					unaudited: 20,
-					childItem: {
+					dataApproveSubBoList: {
 						cnName: "dfghj",
 						total: 100,
 						unaudited: 20,
@@ -216,7 +290,7 @@
 					unit: "111111111111",
 					total: 100,
 					unaudited: 20,
-					childItem: {
+					dataApproveSubBoList: {
 						cnName: "dfghj",
 						total: 100,
 						unaudited: 20,
@@ -238,11 +312,35 @@
 		mounted: function () {
 			var that = this;
 			appcan.ready(function () {
-				that.requestUnit();
+				that.initPage();
 				// that.requestTotalNum(); //请求统计数据
 			});
 		},
 		methods: {
+			initPage: function () {
+				var that = this;
+				var defaultProjectId = localStorage.getItem("defaultProject");
+				if (defaultProjectId) {
+					that.requestUnit();
+				} else {
+					appcan.window.confirm({
+						title: '提示',
+						content: '初次使用需要进行数据同步及项目配置',
+						buttons: ['去配置'],
+						callback: function (err, data, dataType, optId) {
+							if (data == 0) {
+								that.goToDataSync();
+							}
+						}
+					});
+				}
+			},
+			goToDataSync: function () {
+				var url = jasTools.base.setParamsToUrl("../user-center/data-sync/data-sync-main.html", {
+					isInit: 1
+				});
+				appcan.window.open('list-checked', url, 10, 16, 0, 0, 0);
+			},
 			requestUnit: function () { //获取施工单位
 				var that = this;
 				var url = "/daq/privilege/getConstructAndDetectionUnitList.do";
@@ -262,9 +360,9 @@
 			requestTotalNum: function () {
 				var that = this;
 				var url = "/statistics/dataAuditing.do";
-				appcan.logs(that.searchObj.unit);
 				jasTools.ajax.get(url, {
-					'constructUnit': that.searchObj.unit
+					'constructUnit': that.searchObj.unit,
+					'projectOid': localStorage.getItem("defaultProject")
 				}, function (data) {
 					data.data.forEach(function (item) {
 						item.isShow = false;
@@ -273,8 +371,9 @@
 				});
 			}, //请求数据审核页面的数据统计
 			goToDetail: function (obj) {
-				var that=this;
-				appcan.window.open('checkList', 'checkList/checkList.html?obj=' + JSON.stringify(obj)+"&constructUnit="+that.searchObj.unit, 10, 16, 0, 0, 0);
+				var that = this;
+				appcan.window.open('checkList', 'checkList/checkList.html?obj=' + JSON.stringify(obj) + "&constructUnit=" + that
+					.searchObj.unit, 10, 16, 0, 0, 0);
 			}
 		},
 	});

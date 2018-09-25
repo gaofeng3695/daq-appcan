@@ -80,31 +80,31 @@
 
 			<jas-group title="施工数据采集详情">
 				<div style="padding: 0 3.5vw 2vw;overflow: hidden;">
-					<div v-for="item in modules" :key="item.id" class="numwrap">
+					<div v-for="(item,index) in modules" :key="item.id" class="numwrap">
 						<div class="bottomLine " style="padding:0.5vw 0;background-color: #f8fcff;overflow: hidden;">
 							<div style="height:7vw;line-height:7vw;text-align: center;">
 								<span style="padding:1vw  0 1vw 6vw ;" :style="backgroundForStatistics(item.icon)">{{item.name}}</span>
 							</div>
 						</div>
 						<div style="width: 100%;overflow: hidden;">
-							<div @click="gotoList(item.id,'0')" class="numbox bottomLine ">
+							<div @click="gotoList(item.id,'0,1,-1,2')" class="numbox" :class="statistics[item.id].toSubmitCount==0||statistics[item.id].toSubmitCount?'bottomLine':''">
 								<div style="width:10px;height:100%;position: absolute;top:0;right:0;" class="rightLine"></div>
-								<div class="num ">{{statistics[item.id].entered}}</div>
+								<div class="num ">{{statistics[item.id].enteredCount}}</div>
 								<div class="numtip ">已录入</div>
 							</div>
 
-							<div @click="gotoList(item.id,'1')" class="numbox bottomLine ">
-								<div class="num ">{{statistics[item.id].local}}</div>
+							<div @click="gotoList(item.id,'3')" class="numbox" :class="statistics[item.id].toSubmitCount==0||statistics[item.id].toSubmitCount?'bottomLine':''">
+								<div class="num ">{{statistics[item.id].toUpload}}</div>
 								<div class="numtip ">待上传</div>
 							</div>
-							<div @click="gotoList(item.id,'2')" class="numbox ">
+							<div @click="gotoList(item.id,'0')" class="numbox" v-show="['防腐管检查','热煨弯管检查','冷弯管检查'].indexOf(item.name)==-1">
 								<div style="width:10px;height:100%;position: absolute;top:0;right:0;" class="rightLine"></div>
 
-								<div class="num ">{{statistics[item.id].toBeApplyed}}</div>
+								<div class="num ">{{statistics[item.id].toSubmitCount}}</div>
 								<div class="numtip ">待上报</div>
 							</div>
-							<div @click="gotoList(item.id,'3')" class="numbox  ">
-								<div class="num ">{{statistics[item.id].rejected}}</div>
+							<div @click="gotoList(item.id,'-1')" class="numbox" v-show="['防腐管检查','热煨弯管检查','冷弯管检查'].indexOf(item.name)==-1">
+								<div class="num ">{{statistics[item.id].repulseCount}}</div>
 								<div class="numtip ">被驳回</div>
 							</div>
 
@@ -121,96 +121,128 @@
 <script src="./../../appcan/js/appcan.js "></script>
 <script src="./../../lib/vue/vue.js "></script>
 <script src="./../../lib/mint-ui/index.js "></script>
+<script src="./../../common/js/common_device.js "></script>
 <script src="./../../common/js/jas-tools.js "></script>
 <script src="./../../common/components/jas-components.js "></script>
+<script src="./../../common/js/data-base-operation.js"></script>
+<script src="../user-center/data-sync/local-server.js"></script>
 <script>
 	window.vm = new Vue({
 		el: '._outer-wrapper',
 		data: {
 			modules: [ //
 				{
-					id: 'antiseptic',
+					id: 'coating_pipe',
 					name: '防腐管检查',
 					icon: 'm1',
 				}, {
-					id: 'hotBend',
+					id: 'hot_bends',
 					name: '热煨弯管检查',
 					icon: 'm2',
 				}, {
-					id: 'coldBend',
+					id: 'pipe_cold_bending',
 					name: '冷弯管检查',
 					icon: 'm3',
-				}, {
-					id: 'weldRecord',
+				},
+				{
+					id: 'construction_weld',
 					name: '焊口记录',
 					icon: 'm4',
 				}, {
-					id: 'weldRework',
+					id: 'rework_weld',
 					name: '焊口返修',
 					icon: 'm5',
 				}, {
-					id: 'weldMeasure',
+					id: 'measured_result',
 					name: '焊口测量',
 					icon: 'm6',
 				}, {
-					id: 'patchRecord',
+					id: 'anticorrosion_check',
 					name: '补口记录',
 					icon: 'm7',
 				},
 			],
 			statistics: {
-				antiseptic: {
-					entered: 99241,
-					local: 9923,
-					toBeApplyed: 99965,
-					rejected: 99199
+				"coating_pipe": {
+					"enteredCount": '--', //已录入
+					"toSubmitCount": '--', //待上报
+					"repulseCount": '--', //被驳回
+					"toUpload": 0 //待上传
 				},
-				hotBend: {
-					entered: 2491,
-					local: 9923,
-					toBeApplyed: 65,
-					rejected: 19
+				"hot_bends": {
+					"enteredCount": '--', //已录入
+					"toSubmitCount": '--', //待上报
+					"repulseCount": '--', //被驳回
+					"toUpload": 0 //待上传
 				},
-				coldBend: {
-					entered: 241,
-					local: 23,
-					toBeApplyed: 6995,
-					rejected: 19
+				"pipe_cold_bending": {
+					"enteredCount": '--', //已录入
+					"toSubmitCount": '--', //待上报
+					"repulseCount": '--', //被驳回
+					"toUpload": 0 //待上传
 				},
-				weldRecord: {
-					entered: 241,
-					local: 23,
-					toBeApplyed: 65,
-					rejected: 19
+				"construction_weld": {
+					"enteredCount": '--', //已录入
+					"toSubmitCount": '--', //待上报
+					"repulseCount": '--', //被驳回
+					"toUpload": 0 //待上传
 				},
-				weldRework: {
-					entered: 241,
-					local: 23,
-					toBeApplyed: 65,
-					rejected: 19
+				"rework_weld": {
+					"enteredCount": '--', //已录入
+					"toSubmitCount": '--', //待上报
+					"repulseCount": '--', //被驳回
+					"toUpload": 0 //待上传
 				},
-				weldMeasure: {
-					entered: 241,
-					local: 23,
-					toBeApplyed: 65,
-					rejected: 19
+				"measured_result": {
+					"enteredCount": '--', //已录入
+					"toSubmitCount": '--', //待上报
+					"repulseCount": '--', //被驳回
+					"toUpload": 0 //待上传
 				},
-				patchRecord: {
-					entered: 241,
-					local: 23,
-					toBeApplyed: 65,
-					rejected: 19
-				},
+				"anticorrosion_check": {
+					"enteredCount": '--', //已录入
+					"toSubmitCount": '--', //待上报
+					"repulseCount": '--', //被驳回
+					"toUpload": 0 //待上传
+				}
 			},
+			projectOid: ""
 		},
 		created: function () {
 
 		},
 		mounted: function () {
 			var that = this;
-
+			appcan.ready(function () {
+				that.initPage();
+			});
 		},
 		methods: {
+			initPage: function () {
+				var that = this;
+				var defaultProjectId = localStorage.getItem("defaultProject");
+				if (defaultProjectId) {
+					that.requestLocal();
+					that.requestStatistics();
+				} else {
+					appcan.window.confirm({
+						title: '提示',
+						content: '初次使用需要进行数据同步及项目配置',
+						buttons: ['去配置'],
+						callback: function (err, data, dataType, optId) {
+							if (data == 0) {
+								that.goToDataSync();
+							}
+						}
+					});
+				}
+			},
+			goToDataSync: function () {
+				var url = jasTools.base.setParamsToUrl("../user-center/data-sync/data-sync-main.html", {
+					isInit: 1
+				});
+				appcan.window.open('list-checked', url, 10, 16, 0, 0, 0);
+			},
 			backgroundForModule: function (icon) {
 				return {
 					background: '#fff url(../../common/images/' + icon + '.png) no-repeat center center',
@@ -227,14 +259,57 @@
 				appcan.window.open('form', 'form/form.html?title=' + item.id, 10, 16, 0, 0, 0);
 			},
 			gotoList: function (id, type) {
-				var url = jasTools.base.setParamsToUrl('list/list.html', {
-					id: id,
-					type: type
+				var that = this;
+				if (type == 3) {
+					var url = jasTools.base.setParamsToUrl("list/list-checked.html", {
+						id: id,
+						type: type
+					});
+					appcan.window.open('list-checked', url, 10, 16, 0, 0, 0);
+					return;
+				}
+				JasDevice.getConnectStatus(function (status) {
+					if (status != -1) {
+						var url = jasTools.base.setParamsToUrl("list/list-checked.html", {
+							id: id,
+							type: type
+						});
+						appcan.window.open('list-checked', url, 10, 16, 0, 0, 0);
+					} else {
+						that.$toast("当前无网络，请检查");
+					}
 				});
-				appcan.window.open('form', url, 10, 16, 0, 0, 0);
-			}
 
-		},
+			},
+			requestLocal: function () {
+				var that = this;
+				that.projectOid = localStorage.getItem("defaultProject");
+				localServer.getOfflineUpload.getOffline({
+					projectOid: that.projectOid
+				}, function (data) {
+					data.rows.forEach(function (item) {
+						for (key in item) {
+							that.statistics[key].toUpload = item[key];
+						}
+					});
+				});
+			},
+			requestStatistics: function () {
+				var that = this;
+				var url = "/statistics/dataEntry.do";
+				jasTools.ajax.post(url, {
+					projectOid: that.projectOid
+				}, function (data) {
+					if (data.status == 1) {
+						data.data.forEach(function (item) {
+							that.statistics[item.statisType].enteredCount = item.enteredCount;
+							that.statistics[item.statisType].toSubmitCount = item.toSubmitCount;
+							that.statistics[item.statisType].repulseCount = item.repulseCount;
+						});
+					}
+				});
+			}
+		}
 	});
 </script>
 

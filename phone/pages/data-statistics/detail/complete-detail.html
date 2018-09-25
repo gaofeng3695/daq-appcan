@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title></title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<link rel="stylesheet" href="./../../../lib/mint-ui/style.css">
+	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../common/css/jas-main.css">
+</head>
+<style>
+</style>
+
+<body>
+	<div class="_outer-wrapper" style="overflow: hidden;" v-cloak>
+		<jas-header title="累计完成情况统计" :is-return="true"></jas-header>
+		<div v-setheight style="overflow: auto;">
+			<jas-group :title="'所属项目：' + projectName" style="background:rgb(232, 245, 255);">
+				<div>
+					<canvas id="myChart" :width="canvasWidth" :height="200"></canvas>
+				</div>
+			</jas-group>
+
+			<div>
+				<template v-for="item in detail">
+					<jas-group :title="'施工单位：' + item.constructName">
+						<div>
+							<canvas :id="item.constructName" :width="canvasWidth" :height="200"></canvas>
+						</div>
+					</jas-group>
+				</template>
+
+			</div>
+
+		</div>
+
+	</div>
+</body>
+<script src="./../../../appcan/js/appcan.js "></script>
+<script src="./../../../lib/vue/vue.js "></script>
+<script src="./../../../lib/mint-ui/index.js "></script>
+<script src="./../../../lib/f2/f2.js "></script>
+<script src="./../../../common/js/jas-tools.js "></script>
+<script src="./../../../common/components/jas-components.js "></script>
+<script>
+	window.vm = new Vue({
+		el: '._outer-wrapper',
+		data: {
+			chartInst: {},
+			projectId: '',
+			projectName: '',
+			canvasWidth: $(document).width(),
+			canvasHeight: $(document).width() * 4 / 7,
+			progress: {
+				fields: ['pipe', 'weld', 'patch', 'lay_pipe_trench_backfill'],
+				config: {
+					pipe: {
+						name: '管材',
+					},
+					weld: {
+						name: '焊接',
+					},
+					patch: {
+						name: '补口',
+					},
+					lay_pipe_trench_backfill: {
+						name: '回填',
+					},
+				}
+			},
+			detail: [],
+		},
+		created: function () {
+			// JSON.parse(localStorage.getItem("user")).oid;
+
+		},
+		mounted: function () {
+			var that = this;
+			appcan.ready(function () {
+				var oParam = jasTools.base.getParamsInUrl();
+				that.projectId = oParam.projectId;
+				that.projectName = oParam.projectName;
+				that.requestCumulativeProcess();
+				that.requestCumulativeProcessDetail();
+			});
+		},
+		methods: {
+			_formatChartData: function (oData) {
+				var that = this;
+				var aData = [];
+				for (var key in oData) {
+					for (var date in oData[key]) {
+						aData.push({
+							type: that.progress.config[key].name,
+							date: date,
+							value: oData[key][date],
+							index: that.progress.fields.indexOf(key)
+						});
+					}
+				}
+				aData.sort(function (a, b) {
+					return a.index - b.index
+				});
+				return aData;
+			},
+			requestCumulativeProcess: function () {
+				var that = this;
+				var url = "/statistics/statsLatestWeekCumulativeProcess.do";
+				jasTools.ajax.get(url, {
+					projectId: this.projectId,
+				}, function (data) {
+					// alert(JSON.stringify(data, 4, 4))
+					var aData = that._formatChartData(data.data);
+					that.renderComplateChart(aData, 'myChart');
+				});
+			},
+			requestCumulativeProcessDetail: function () {
+				var that = this;
+				var url = "/statistics/statsLatestWeekCumulativeProcessDetail.do";
+				jasTools.ajax.get(url, {
+					projectId: this.projectId,
+				}, function (data) {
+					// alert(JSON.stringify(data, 4, 4))
+					that.detail = data.data;
+					that.$nextTick(function () {
+						that.detail.forEach(function (item) {
+							that.renderDetailChart(item);
+						});
+					});
+				});
+			},
+			renderDetailChart: function (item) {
+				var aData = this._formatChartData(item.statsResult);
+				this.renderComplateChart(aData, item.constructName);
+			},
+			renderComplateChart: function (aData, elemId) {
+				// var data = [{
+				// 	date: "07/01 ",
+				// 	type: "能源 ",
+				// 	value: 99.9
+				// }];
+				if (this.chartInst[elemId]) {
+					this.chartInst[elemId].changeData(aData);
+				} else {
+					this.chartInst[elemId] = new F2.Chart({
+						id: elemId,
+						pixelRatio: window.devicePixelRatio
+					});
+					var chart = this.chartInst[elemId];
+					chart.source(aData);
+					chart.scale('date', {
+						type: 'timeCat',
+						tickCount: 4
+						// nice:true
+					});
+					chart.scale('value', {
+						tickCount: 5
+					});
+					chart.axis('value', {
+						label: function (text, index, total) {
+							return {
+								text: text + 'km'
+							};
+
+						}
+					});
+					chart.legend({
+						position: 'top',
+						align: 'center',
+						itemWidth: 90,
+						wordSpace: 4,
+						offsetX: -12
+					});
+					chart.tooltip({
+						custom: true, // 自定义 tooltip 内容框
+						onChange: function onChange(obj) {
+							var legend = chart.get('legendController').legends.top[0];
+							var tooltipItems = obj.items;
+							var legendItems = legend.items;
+							var map = {};
+							legendItems.map(function (item) {
+								map[item.name] = _.clone(item);
+							});
+							tooltipItems.map(function (item) {
+								var name = item.name;
+								var value = item.value;
+								if (map[name]) {
+									map[name].value = value;
+								}
+							});
+							legend.setItems(_.values(map));
+						},
+						onHide: function onHide() {
+							var legend = chart.get('legendController').legends.top[0];
+							legend.setItems(chart.getLegendItems().country);
+						}
+					});
+					chart.line().position('date*value').color('type');
+					chart.render();
+				}
+
+
+
+			},
+		}
+	});
+</script>
+
+</html>

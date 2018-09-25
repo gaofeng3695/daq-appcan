@@ -6,17 +6,23 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 	<link rel="stylesheet" href="./lib/mint-ui/style.css">
+	<link rel="stylesheet" href="./lib/font-awesome-4.7.0/css/font-awesome.min.css">
 	<link rel="stylesheet" href="./common/css/jas-main.css">
 </head>
 
 <body>
 	<div class="_outer-wrapper">
-		<jas-header title="登录" :is-return="false"></jas-header>
-		<div class="content-wrapper" v-setheight>
-
-			<mt-field label="用户名" placeholder="请输入用户名" v-model="form.username"></mt-field>
-			<mt-field label="密码" placeholder="请输入密码" type="password" v-model="form.password"></mt-field>
-			<mt-button type="primary" @click.native="login" size="large">登录</mt-button>
+		<jas-header title="登录" :is-return="false" right-icon="fa fa-cog" @clickright="gotoHost"></jas-header>
+		<div style="background: #fff " v-setheight>
+			<div style="height:50vw;background: #fff url(common/images/logo.png) no-repeat center center;background-size:25vw 25vw;">
+			</div>
+			<div>
+				<mt-field label="用户名" placeholder="请输入用户名" v-model="form.username"></mt-field>
+				<mt-field label="密码" placeholder="请输入密码" type="password" v-model="form.password"></mt-field>
+			</div>
+			<div style="margin:10px;">
+				<mt-button type="primary" @click.native="login" size="large">登录</mt-button>
+			</div>
 
 		</div>
 	</div>
@@ -26,7 +32,10 @@
 <script src="./lib/mint-ui/index.js"></script>
 <script src="./common/js/jas-tools.js"></script>
 <script src="./common/components/jas-components.js"></script>
-
+<script src="./common/js/common_device.js "></script>
+<script src="./common/js/md5.js"></script>
+<script src="./common/js/data-base-operation.js"></script>
+<script src="./pages/user-center/data-sync/local-server.js"></script>
 
 <script>
 	var vm = new Vue({
@@ -36,19 +45,68 @@
 				form: {
 					username: 'zhangyi',
 					password: '111111',
-				}
+				},
+				isNet: true //是否有网络
 			}
 		},
 		created: function () {},
-		mounted: function () {},
+		mounted: function () {
+			var that = this;
+			appcan.ready(function () {
+
+				appcan.window.on('resume', function () {
+					jasTools.ajax.refreshIpConfig();
+				});
+
+				//判断当前有无网络登录
+				JasDevice.getConnectStatus(function (status) {
+					if (status != -1) {
+						that.isNet = true;
+					} else {
+						that.isNet = false;
+					}
+				});
+			});
+		},
 		methods: {
 			login: function () {
 				var that = this;
-				var url = "/jasframework/login/login.do";
 				that.$indicator.open({
 					text: '正在登录...',
 					spinnerType: 'fading-circle'
 				});
+				if (that.isNet) {
+					that.loginByServer();
+					// that.loginByLoacl();
+				} else {
+					that.loginByLoacl(); //本地离线登录
+				}
+			},
+			loginByLoacl: function () {
+				var that = this;
+				var obj = {
+					"loginName": that.form.username,
+					"pwd": MD5(that.form.password)
+				};
+				localServer.login.loginByLocal(obj, function (data) {
+					// alert(JSON.stringify(data.rows[0]))
+					that.$indicator.close();
+					if (data.status == "1") {
+						// alert(JSON.stringify(data.rows[0], 4, 4))
+
+						localStorage.setItem("token", "");
+						localStorage.setItem("user", JSON.stringify(data.rows[0]));
+						localStorage.setItem("calculateType", 1); //1-显示桩和偏移量  2显示坐标
+						that.queryDefaultProject();
+						appcan.window.open('index', 'index.html', 10, 16, 0, 0, 0);
+					} else {
+						that.$toast(data.msg);
+					}
+				});
+			},
+			loginByServer: function () {
+				var that = this;
+				var url = "/jasframework/login/login.do";
 				jasTools.ajax.post(url, {
 					"logintype": "0",
 					"loginNum": that.form.username,
@@ -57,15 +115,35 @@
 					"appId": "402894a152681ba30152681e8b320003"
 				}, function (data) {
 					that.$indicator.close();
-
+					// alert(JSON.stringify(data.user, 4, 4))
 					localStorage.setItem("token", data.token);
 					localStorage.setItem("user", JSON.stringify(data.user));
 					localStorage.setItem("calculateType", 1); //1-显示桩和偏移量  2显示坐标
-
-					appcan.window.open('index', 'index.html', 10, 16, 0, 0, 0);
-					setTimeout(function () {
-						// appcan.window.close(0);
-					}, 800);
+					that.queryDefaultProject(function () {
+						appcan.window.open('index', 'index.html', 10, 16, 0, 0, 0);
+					});
+				});
+			},
+			gotoHost: function () {
+				appcan.window.open('host', 'pages/login-config/host.html', 10, 16, 0, 0, 0);
+			},
+			queryDefaultProject: function (cb) {
+				var that = this;
+				localStorage.removeItem("defaultProject");
+				localServer.login.queryDefaultProject(function (data) {
+					if (data.status == 1) {
+						if (data.rows.length > 0) {
+							// alert(JSON.stringify(data.rows[0], 4, 4))
+							localStorage.setItem("defaultProject", data.rows[0].projectOid);
+							localStorage.setItem("defaultProjectName", data.rows[0].projectName);
+						} else {
+							localStorage.setItem("defaultProject", "");
+							localStorage.setItem("defaultProjectName", "");
+						}
+					} else {
+						that.$toast("网络异常，请稍候尝试");
+					}
+					cb && cb();
 				});
 			}
 		},

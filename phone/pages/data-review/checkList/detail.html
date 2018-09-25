@@ -13,22 +13,27 @@
 </style>
 
 <body>
-    <div class="_outer-wrapper ">
+    <div class="_outer-wrapper">
         <jas-header title="数据审核"></jas-header>
-        <div v-setheight style="overflow: auto;">
-            <div v-for="item in fieldConfig" >
+        <div v-setheight style="overflow: auto;" class="heightContent">
+            <div v-for="item in fieldConfig">
                 <jas-group :title="item.groupName" v-if="!item.groupS">
                     <jas-check-detail-field-group :fields="item.fileds" :form="form">
                     </jas-check-detail-field-group>
                 </jas-group>
-                <jas-group  v-else v-for="(values,index) in form[item.groupS]" :title="item.groupName+(index+1)">
+                <jas-group v-else v-for="(values,index) in form[item.groupS]" :title="item.groupName+(index+1)">
                     <div v-for="child in item.fileds">
                         <jas-detail-field :label="child.name" :value="values[child.field]"></jas-detail-field>
                     </div>
                 </jas-group>
+
             </div>
+                <jas-file-group  ref="files"></jas-file-group>
         </div>
-        <jas-button-footer :is-return="true" :buttons="['通过','驳回']" @click="clickbtn"></jas-button-footer>
+        <div v-show="isBackIdea" style="width: 100%;position: absolute;bottom: 47px;">
+            <mt-field placeholder="请输入驳回意见" type="textarea" rows="3" v-model="idea"></mt-field>
+        </div>
+        <jas-button-footer v-show="isShow" :buttons="['通过','驳回']" :buttons-color="['','#ed9028']" @click="clickbtn"></jas-button-footer>
     </div>
 </body>
 <script src="./../../../appcan/js/appcan.js"></script>
@@ -48,6 +53,9 @@
                 currentRequestUrl: {},
                 fieldConfig: [],
                 isShow: true,
+                isBackIdea: false,
+                idea: "", //驳回意见
+                params: {}
             }
         },
         created: function () {
@@ -60,10 +68,12 @@
                     spinnerType: 'fading-circle'
                 });
                 var params = jasTools.base.getParamsInUrl();
+                that.params = JSON.parse(params.currentRequestUrl);
                 if (JSON.parse(params.obj).approveStatus == 1) {
                     that.isShow = true;
                 } else {
                     that.isShow = false;
+                    that.recount();
                 }
                 that.oid = JSON.parse(params.obj).oid;
                 that.currentRequestUrl = JSON.parse(params.currentRequestUrl);
@@ -77,15 +87,71 @@
                 } catch (e) {
 
                 }
-                that.requestDetail(params.oid);
+                that.$refs.files.requestFile(that.oid);
+                that.requestDetail();
             });
         },
         methods: {
+            recount: function () {
+                var otherHeight = 0;
+                var that = this;
+                setTimeout(function () {
+                    var arr = $("._outer-wrapper").children();
+                    for (var i = 0; i < arr.length; i++) {
+                        if (i == 0) {
+                            otherHeight += arr[i].clientHeight;
+                        }
+                        if (i == 3 && that.isShow) {
+                            otherHeight += arr[i].clientHeight;
+                        }
+                    }
+                    $(".heightContent").css('height', 'calc(100% - ' + otherHeight + 'px)');
+                    $(".heightContent").css('overflow', 'auto');
+                }, 0);
+            },
             clickbtn: function (index) {
                 if (index == 0) {
-
+                    this.pass();
                 }
-                this.$toast('您点击了第' + index + '个按钮')
+                if (index == 1) {
+                    this.reject();
+                }
+            },
+            reject: function () {
+                var that = this;
+                if (!that.isBackIdea) {
+                    that.isBackIdea = true;
+                    return;
+                }
+                that.approvesToServer(-1);
+            },
+            pass: function () {
+                var that = this;
+                that.approvesToServer(2);
+            },
+            approvesToServer: function (approveStatus) {
+                var that = this;
+                var obj = {
+                    businessOid: [],
+                    approveStatus: approveStatus,
+                };
+                obj.businessOid[0] = that.oid;
+                if (that.params.className) {
+                    obj.className = that.params.className;
+                }
+                if (that.params.functionCode) {
+                    obj.functionCode = that.params.functionCode;
+                }
+                if (that.idea) {
+                    obj.approveOpinion = that.idea;
+                }
+                jasTools.ajax.post('/daq/dataApprove/save.do', obj, function (data) {
+                    if (data.status == 1) {
+                        appcan.window.close(-1);
+                    } else {
+                        that.$toast("网络异常，请稍候尝试")
+                    }
+                });
             },
             requestDetail: function () {
                 var that = this;

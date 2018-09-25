@@ -20,7 +20,63 @@
 		<!-- tab-container -->
 		<div v-setheight style="overflow: auto;">
 			<div>
+                <br />
 				<mt-button type="primary" @click.native="downloadBasic">同步基础数据</mt-button>
+				<mt-button type="primary" @click.native="getBasic">获取基础数据</mt-button>
+                <br />
+                <br />
+				<mt-button type="primary" @click.native="downloadMaterial">同步物资数据</mt-button>
+				<mt-button type="primary" @click.native="getMaterial">获取物资数据</mt-button>
+                <br />
+                <br />
+				<mt-button type="primary" @click.native="downloadWorkPersonAndUnit">同步施工人员机组</mt-button>
+				<mt-button type="primary" @click.native="getWorkPersonAndUnit">获取施工人员机组</mt-button>
+                <br />
+                <br />
+				<mt-button type="primary" @click.native="downloadConstructUser">同步施工单位用户</mt-button>
+				<mt-button type="primary" @click.native="getConstructUser">获取施工单位用户</mt-button>
+                <br />
+                <br />
+				<mt-button type="primary" @click.native="downloadSysDomain">同步域值信息</mt-button>
+				<mt-button type="primary" @click.native="getSysDomain">获取域值信息</mt-button>
+                <br />
+                <br />
+				<mt-button type="primary" @click.native="saveCheckCoatingPipe">防腐管保存</mt-button>
+				<mt-button type="primary" @click.native="updateCheckCoatingPipe">防腐管更新</mt-button>
+				<mt-button type="primary" @click.native="deleteCheckCoatingPipe">防腐管删除</mt-button>
+				<mt-button type="primary" @click.native="selectCheckCoatingPipe">防腐管查询</mt-button>
+                <br />
+                <br />
+				<mt-button type="primary" @click.native="saveCheckPipeColdBending">冷弯管保存</mt-button>
+				<mt-button type="primary" @click.native="updateCheckPipeColdBending">冷弯管更新</mt-button>
+				<mt-button type="primary" @click.native="deleteCheckPipeColdBending">冷弯管删除</mt-button>
+				<mt-button type="primary" @click.native="selectCheckPipeColdBending">冷弯管查询</mt-button>
+                <br />
+                <br />
+				<mt-button type="primary" @click.native="saveCheckHotBends">热煨管保存</mt-button>
+				<mt-button type="primary" @click.native="updateCheckHotBends">热煨管更新</mt-button>
+				<mt-button type="primary" @click.native="deleteCheckHotBends">热煨管删除</mt-button>
+				<mt-button type="primary" @click.native="selectCheckHotBends">热煨管查询</mt-button>
+                <br />
+                <br />
+				<mt-button type="primary" @click.native="getOfflineUpload">离线待上传统计</mt-button>
+                <br />
+                <br />
+				<mt-button type="primary" @click.native="changeMaterialState">修改前后管件状态</mt-button>
+                <br />
+                <br />
+				<mt-button type="primary" @click.native="saveReworkWeld">焊口返修保存</mt-button>
+				<mt-button type="primary" @click.native="updateReworkWeld">焊口返修更新</mt-button>
+				<mt-button type="primary" @click.native="deleteReworkWeld">焊口返修删除</mt-button>
+				<mt-button type="primary" @click.native="selectReworkWeld">焊口返修查询</mt-button>
+                <br />
+                <br />
+				<mt-button type="primary" @click.native="saveAnticorrosionCheck">防腐补口保存</mt-button>
+				<mt-button type="primary" @click.native="updateAnticorrosionCheck">防腐补口更新</mt-button>
+				<mt-button type="primary" @click.native="deleteAnticorrosionCheck">防腐补口删除</mt-button>
+				<mt-button type="primary" @click.native="selectAnticorrosionCheck">防腐补口查询</mt-button>
+                <br />
+                <br />
 
 			</div>
 
@@ -54,17 +110,552 @@
 			var that = this;
 		},
 		methods: {
+		    //----------------------------基础数据--------------------------
+		    //------------同步基础数据
 			downloadBasic: function () {
+			    var that = this;
+			   this.$indicator.open({
+                    text: '正在同步，请稍后...',
+                    spinnerType: 'fading-circle'
+                });
 				dataLoader.basic.request(function (odata) {
 					dataLoader.basic.deleteTable(function () {
 						dataLoader.basic.insertData(odata, function () {
-							console.log('更新成功');
+							that.$indicator.close();
+							alert('更新成功');
 						});
 					});
 				});
-			}
-
-		},
+			},
+			//-------------基础数据查询
+		    getBasic: function () {
+		        var callback = function(data){
+		           appcan.logs(JSON.stringify(data))
+		           //alert(JSON.stringify(data))
+		        }
+                var obj1 = {};
+                localServer.project.get(obj1,callback)
+                var obj2 = {"projectOid":"8897c66d-b622-45ca-9cfd-405017447ed2"};
+                localServer.tender.get(obj2,callback)
+                var obj3 = {"tendersOid":"62cc19b1-a74a-4d8c-8cc3-8e72049c543b"};
+                localServer.pipeline.get(obj3,callback)
+                var obj4 = {"pipelineOid":"43c53ba4-a80b-40b8-8974-b995cef66102"};
+                localServer.pipeSegmentOrCross.get(obj4,callback)
+                var obj5 = {"tendersOid":"7c8be1ba-ecd8-4c0a-8705-083fdd0f3882"};
+                localServer.supervisionUnit.get(obj5,callback)
+             },
+        
+            
+            //----------------------------线路物资--------------------------
+            //------------同步线路物资
+            downloadMaterial: function () {
+               var that = this;
+               this.$indicator.open({
+                    text: '正在同步，请稍后...',
+                    spinnerType: 'fading-circle'
+                });
+                dataLoader.material.request(function (odata) {
+                    dataLoader.material.deleteTable(function () {
+                        dataLoader.material.insertData(odata, function () {
+                            that.$indicator.close();
+							alert('更新成功');
+                        });
+                    });
+                });
+            },
+            //------------线路物资查询
+            getMaterial: function () {
+                var callback = function(data){
+                   appcan.logs(JSON.stringify(data))
+                   // alert(JSON.stringify(data))
+                }
+                var obj1 = {"getNotUse":true};
+                localServer.materialPipe.get(obj1,callback)
+                var obj2 = {"tendersOid":"62cc19b1-a74a-4d8c-8cc3-8e72049c543b","pipeSegmentOrCrossOid":""};
+                localServer.coldBending.get(obj2,callback)
+                var obj3 = {"getNotUse":true};
+                localServer.materialHotBends.get(obj3,callback)
+                var obj4 = {};
+                localServer.materialTee.get(obj4,callback)
+                var obj5 = {};
+                localServer.materialJnsulatedJoint.get(obj5,callback)
+                var obj6 = {};
+                localServer.materialReducer.get(obj6,callback)
+                var obj7 = {};
+                localServer.materialClosure.get(obj7,callback)
+            },
+            
+            
+            //----------------------------施工机组人员--------------------------
+            //------------同步施工人员机组
+            downloadWorkPersonAndUnit: function () {
+               var that = this;
+               this.$indicator.open({
+                    text: '正在同步，请稍后...',
+                    spinnerType: 'fading-circle'
+                });
+                dataLoader.workPersonAndUnit.request(function (odata) {
+                    dataLoader.workPersonAndUnit.deleteTable(function () {
+                        dataLoader.workPersonAndUnit.insertData(odata, function () {
+                            that.$indicator.close();
+							alert('更新成功');
+                        });
+                    });
+                });
+            },
+            //------------施工人员机组查询
+            getWorkPersonAndUnit: function () {
+                var callback = function(data){
+                   appcan.logs(JSON.stringify(data))
+                   // alert(JSON.stringify(data))
+                }
+                var obj1 = {"projectOid":"9d0b31ca-ec1a-4ebe-8a9e-32a55fa5eeba","types":"work_unit_type_code_001,aaaaaaa"};
+                localServer.workUnit.get(obj1,callback)
+                var obj2 = {"projectOid":"9d0b31ca-ec1a-4ebe-8a9e-32a55fa5eeba"};
+                localServer.weldProduct.get(obj2,callback)
+                var obj3 = {"workUnitOid":"1cd29391-b86d-4691-8367-434bce7d39d3","types":"personnel_type_code_001,aaaaaaa"};
+                localServer.workPersonnel.get(obj3,callback)
+            },
+            
+            
+            //----------------------------施工单位用户--------------------------
+            //------------同步施工单位用户
+            downloadConstructUser: function () {
+               var that = this;
+               this.$indicator.open({
+                    text: '正在同步，请稍后...',
+                    spinnerType: 'fading-circle'
+                });
+                dataLoader.offlineUser.request(function (odata) {
+                    dataLoader.offlineUser.deleteTable(function () {
+                        dataLoader.offlineUser.insertData(odata, function () {
+                            that.$indicator.close();
+							alert('更新成功');
+                        });
+                    });
+                });
+            },
+            //------------施工单位用户查询
+            getConstructUser: function () {
+                var callback = function(data){
+                   appcan.logs(JSON.stringify(data))
+                   alert(JSON.stringify(data))
+                }
+                var obj1 = {};
+                localServer.priUser.get(obj1,callback)
+            },
+            
+            
+            //----------------------------域值信息--------------------------
+            //------------同步域值信息
+            downloadSysDomain: function () {
+               var that = this;
+               this.$indicator.open({
+                    text: '正在同步，请稍后...',
+                    spinnerType: 'fading-circle'
+                });
+                dataLoader.sysDomain.request(function (odata) {
+                    // alert(JSON.stringify(odata.rows))
+                    dataLoader.sysDomain.deleteTable(function () {
+                        dataLoader.sysDomain.insertData(odata, function () {
+                            that.$indicator.close();
+							alert('更新成功');
+                        });
+                    });
+                });
+            },
+            //------------域值信息查询
+            getSysDomain: function () {
+                var callback = function(data){
+                   appcan.logs(JSON.stringify(data))
+                   alert(JSON.stringify(data))
+                }
+                var obj1 = {"domainName":"pipe_type_domain"};
+                localServer.sysDomain.get(obj1,callback)
+            },
+            
+            
+            
+            //----------------------------线路物资检查--------------------------
+            //------------防腐管保存
+            saveCheckCoatingPipe: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data))
+                }
+                var postData={
+                    "oid":"c-aaaaaaa",
+                    "project_oid":"c-bbbbb",
+                    "tenders_oid":"c-ccccc",
+                    "pipe_oid":"c-eeeeee",
+                    "attachment":[
+                        {
+                            "oid":"a-aaaaaa",
+                            "fileName":"a-bbbbbb",
+                            "src":"a-ccccccc"
+                        },{
+                            "oid":"a-ddddd",
+                            "fileName":"a-eeeeeee",
+                            "src":"a-ffffff"
+                        }
+                    ]
+                }
+                localServer.checkCoatingPipe.save(postData,callback);
+            },
+            //------------防腐管更新
+            updateCheckCoatingPipe: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data))
+                }
+                var postData={
+                    "oid":"c-aaaaaaa",
+                    "project_oid":"c-ffffffff",
+                    "tenders_oid":"c-ccccc",
+                    "pipe_oid":"c-eeeeee",
+                    "attachment":[
+                        {
+                            "oid":"a-aaaaaa",
+                            "fileName":"a-ffffffff",
+                            "src":"a-ccccccc"
+                        },{
+                            "oid":"a-ddddd",
+                            "fileName":"a-eeeeeee",
+                            "src":"a-ffffff"
+                        }
+                    ]
+                }
+                localServer.checkCoatingPipe.update(postData,callback);
+            },
+            //------------防腐管删除
+            deleteCheckCoatingPipe: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data))
+                }
+                var obj1={
+                    "oid":"c-aaaaaaa"
+                }
+                localServer.checkCoatingPipe.delete(obj1,callback);
+            },
+            //------------防腐管查询
+            selectCheckCoatingPipe: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data,4,4))
+                }
+                var obj1={
+                    "oid":"c-aaaaaaa"
+                }
+                localServer.checkCoatingPipe.query(obj1,callback);
+            },
+            
+            //------------冷弯管保存
+            saveCheckPipeColdBending: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data))
+                }
+                //oid text,pipeColdBendingOid text unique,projectOid text,tendersOid text,postData text,state int
+                var postData={
+                     "oid":"c-aaaaaaa",
+                    "projectOid":"c-bbbbbbb",
+                    "tendersOid":"c-ccccc",
+                    "pipeColdBendingOid":"c-eeeeee",
+                    "attachment":[
+                        {
+                            "oid":"a-aaaaaa",
+                            "fileName":"a-bbbbbb",
+                            "src":"a-ccccccc"
+                        },{
+                            "oid":"a-ddddd",
+                            "fileName":"a-eeeeeee",
+                            "src":"a-ffffff"
+                        }
+                    ]
+                }
+                localServer.checkPipeColdBending.save(postData,callback);
+            },
+            //------------冷弯管更新
+            updateCheckPipeColdBending: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data))
+                }
+                var postData={
+                    "oid":"c-aaaaaaa",
+                    "projectOid":"c-ffffffff",
+                    "tendersOid":"c-ccccc",
+                    "pipeColdBendingOid":"c-eeeeee",
+                    "attachment":[
+                        {
+                            "oid":"a-aaaaaa",
+                            "fileName":"a-ffffffff",
+                            "src":"a-ccccccc"
+                        },{
+                            "oid":"a-ddddd",
+                            "fileName":"a-eeeeeee",
+                            "src":"a-ffffff"
+                        }
+                    ]
+                }
+                localServer.checkPipeColdBending.update(postData,callback);
+            },
+            //------------冷弯管删除
+            deleteCheckPipeColdBending: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data))
+                }
+                var obj1={
+                    "oid":"c-aaaaaaa"
+                }
+                localServer.checkPipeColdBending.delete(obj1,callback);
+            },
+            //------------冷弯管查询
+            selectCheckPipeColdBending: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data))
+                }
+                var obj1={
+                   "oid":"c-aaaaaaa" 
+                }
+                localServer.checkPipeColdBending.query(obj1,callback);
+            },
+            
+            //------------热煨弯管保存
+            saveCheckHotBends: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data))
+                }
+                //oid text,pipeColdBendingOid text unique,projectOid text,tendersOid text,postData text,state int
+                var postData={
+                    "oid":"c-aaaaaaa",
+                    "project_oid":"c-bbbbb",
+                    "tenders_oid":"c-ccccc",
+                    "hot_bends_oid":"c-eeeeee",
+                    "attachment":[
+                        {
+                            "oid":"a-aaaaaa",
+                            "fileName":"a-bbbbbb",
+                            "src":"a-ccccccc"
+                        },{
+                            "oid":"a-ddddd",
+                            "fileName":"a-eeeeeee",
+                            "src":"a-ffffff"
+                        }
+                    ]
+                }
+                localServer.checkHotBends.save(postData,callback);
+            },
+            //------------热煨弯管更新
+            updateCheckHotBends: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data))
+                }
+                var postData={
+                    "oid":"c-aaaaaaa",
+                    "project_oid":"c-ffffffff",
+                    "tenders_oid":"c-ccccc",
+                    "hot_bends_oid":"c-eeeeee",
+                    "attachment":[
+                        {
+                            "oid":"a-aaaaaa",
+                            "fileName":"a-ffffffff",
+                            "src":"a-ccccccc"
+                        },{
+                            "oid":"a-ddddd",
+                            "fileName":"a-eeeeeee",
+                            "src":"a-ffffff"
+                        }
+                    ]
+                }
+                localServer.checkHotBends.update(postData,callback);
+            },
+            //------------热煨弯管删除
+            deleteCheckHotBends: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data))
+                }
+                var obj1={
+                    "oid":"c-aaaaaaa"
+                }
+                localServer.checkHotBends.delete(obj1,callback);
+            },
+            //------------热煨弯管查询
+            selectCheckHotBends: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data))
+                }
+                var obj1={
+                    "projectOid":"c-bbbbb",
+                    "tendersOid":"c-ccccc",
+                    "hotBendOid":"c-eeeeee"
+                }
+                localServer.checkHotBends.query(obj1,callback);
+            },
+            
+            getOfflineUpload: function(){
+                var callback = function(data){
+                    alert(JSON.stringify(data,4,4))
+                }
+                var obj = {};
+                localServer.getOfflineUpload.getOffline(obj,callback);
+            },
+            
+            changeMaterialState: function(){
+                var callback = function(data){
+                    alert(JSON.stringify(data,4,4))
+                }
+                var obj = {
+                    "frontPipeType":"pipe_type_code_001",
+                    "frontPipeOid":"d5084180-a600-402a-8264-d412c2c1ea04",
+                    "backPipeType":"pipe_type_code_0081",
+                    "backPipeOid":"dc0a22d7-1965-45a2-9868-fbf7b66ba211",
+                };
+                changeMaterialState("afterSave",obj,callback);
+            },
+            
+            //------------焊口返修保存
+            saveReworkWeld: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data))
+                }
+                var postData={
+                    "oid":"c-aaaaaaa",
+                    "projectOid":"c-bbbbb",
+                    "tendersOid":"c-ccccc",
+                    "pipelineOid":"c-bbbbb",
+                    "pipeSegmentOrCrossOid":"c-ccccc",
+                    "weldOid":"c-eeeeee",
+                    "attachment":[
+                        {
+                            "oid":"a-aaaaaa",
+                            "fileName":"a-bbbbbb",
+                            "src":"a-ccccccc"
+                        },{
+                            "oid":"a-ddddd",
+                            "fileName":"a-eeeeeee",
+                            "src":"a-ffffff"
+                        }
+                    ]
+                }
+                localServer.reworkWeld.save(postData,callback);
+            },
+            //------------焊口返修更新
+            updateReworkWeld: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data))
+                }
+                var postData={
+                    "oid":"c-aaaaaaa",
+                    "projectOid":"c-fffffffff",
+                    "tendersOid":"c-ccccc",
+                    "pipelineOid":"c-bbbbb",
+                    "pipeSegmentOrCrossOid":"c-ccccc",
+                    "weldOid":"c-eeeeee",
+                    "attachment":[
+                        {
+                            "oid":"a-aaaaaa",
+                            "fileName":"a-ffffffffffff",
+                            "src":"a-ccccccc"
+                        },{
+                            "oid":"a-ddddd",
+                            "fileName":"a-eeeeeee",
+                            "src":"a-ffffff"
+                        }
+                    ]
+                }
+                localServer.reworkWeld.update(postData,callback);
+            },
+            //------------焊口返修删除
+            deleteReworkWeld: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data))
+                }
+                var obj1={
+                    "oid":"c-aaaaaaa"
+                }
+                localServer.reworkWeld.delete(obj1,callback);
+            },
+            //------------焊口返修查询
+            selectReworkWeld: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data,4,4))
+                }
+                var obj1={
+                    "oid":"c-aaaaaaa"
+                }
+                localServer.reworkWeld.query(obj1,callback);
+            },
+            
+            //------------防腐补口保存
+            saveAnticorrosionCheck: function(obj){ 
+                var callback = function(data){
+                    alert(JSON.stringify(data))
+                }
+                //weldOid text unique,projectOid text,tendersOid text,pipelineOid text,pipeSegmentOrCrossOid text,postData text,state int,userId text)
+                var postData={
+                    "oid":"c-aaaaaaa",
+                    "projectOid":"c-bbbbb",
+                    "tendersOid":"c-ccccc",
+                    "pipelineOid":"c-bbbbb",
+                    "pipeSegmentOrCrossOid":"c-ccccc",
+                    "weldOid":"c-eeeeee",
+                    "attachment":[
+                        {
+                            "oid":"a-aaaaaa",
+                            "fileName":"a-bbbbbb",
+                            "src":"a-ccccccc"
+                        },{
+                            "oid":"a-ddddd",
+                            "fileName":"a-eeeeeee",
+                            "src":"a-ffffff"
+                        }
+                    ]
+                }
+                localServer.anticorrosionCheck.save(postData,callback);
+            },
+            //------------防腐补口更新
+            updateAnticorrosionCheck: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data))
+                }
+                var postData={
+                    "oid":"c-aaaaaaa",
+                    "projectOid":"c-fffffffff",
+                    "tendersOid":"c-ccccc",
+                    "pipelineOid":"c-bbbbb",
+                    "pipeSegmentOrCrossOid":"c-ccccc",
+                    "weldOid":"c-eeeeee",
+                    "attachment":[
+                        {
+                            "oid":"a-aaaaaa",
+                            "fileName":"a-ffffffffffff",
+                            "src":"a-ccccccc"
+                        },{
+                            "oid":"a-ddddd",
+                            "fileName":"a-eeeeeee",
+                            "src":"a-ffffff"
+                        }
+                    ]
+                }
+                localServer.anticorrosionCheck.update(postData,callback);
+            },
+            //------------防腐补口删除
+            deleteAnticorrosionCheck: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data))
+                }
+                var obj1={
+                    "oid":"c-aaaaaaa"
+                }
+                localServer.anticorrosionCheck.delete(obj1,callback);
+            },
+            //------------防腐补口查询
+            selectAnticorrosionCheck: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data,4,4))
+                }
+                var obj1={
+                    "oid":"c-aaaaaaa"
+                }
+                localServer.anticorrosionCheck.query(obj1,callback);
+            },
+        }  
 	});
 </script>
 

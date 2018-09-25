@@ -7,23 +7,21 @@
  * @author gf 2018.08.10
  * @description 设定需要撑满剩余空间的div高度
  */
-Vue.directive('setheight', {
-  bind: function (el) {
-    var otherHeight = 0;
-    setTimeout(function () {
-      var arr = el.parentElement.children;
+Vue.directive('setheight', function (el) {
+  var otherHeight = 0;
+  setTimeout(function () {
+    var arr = el.parentElement.children;
 
-      for (var i = 0; i < arr.length; i++) {
-        var item = arr[i];
-        if (item !== el) {
-          otherHeight += item.clientHeight;
-        }
+    for (var i = 0; i < arr.length; i++) {
+      var item = arr[i];
+      if (item !== el) {
+        otherHeight += item.clientHeight;
       }
-      // var otherHeightpx = otherHeight + 'px';
-      el.style.height = 'calc(100% - ' + otherHeight + 'px)';
-      el.style.overflow = 'auto';
-    }, 0);
-  }
+    }
+    // var otherHeightpx = otherHeight + 'px';
+    el.style.height = 'calc(100% - ' + otherHeight + 'px)';
+    el.style.overflow = 'auto';
+  }, 0);
 });
 
 Vue.directive('required', {
@@ -139,7 +137,7 @@ Vue.component('jas-button-footer', {
     '		<mt-button type="primary" @click.native="closePage" size="small" style="width:100%;">返回</mt-button>',
     '	</div>',
     '	<div class="jas-footer-item" v-for="item,index in buttons">',
-    '		<mt-button type="primary" @click.native="clickbtn(index)" :style="bgStyle(buttonsColor[index])" size="small" style="width:100%;">{{item}}</mt-button>',
+    '		<mt-button type="primary" @click.native="clickbtn(item)" :style="bgStyle(buttonsColor[index])" size="small" style="width:100%;">{{item}}</mt-button>',
     '	</div>',
     '</div>',
   ].join(''),
@@ -149,9 +147,9 @@ Vue.component('jas-button-footer', {
         backgroundColor: clr
       } : {};
     },
-    clickbtn: function (index) {
+    clickbtn: function (name) {
       var that = this;
-      this.$emit('click', index);
+      this.$emit('click', name);
     },
     closePage: function () {
       window.appcan && appcan.window.close();
@@ -206,6 +204,7 @@ Vue.component('jas-header', {
 Vue.component('jas-group', {
   props: {
     title: {},
+    btnName: {},
   },
   data: function () {
     return {}
@@ -215,11 +214,18 @@ Vue.component('jas-group', {
     '  <div v-if="title" class="jas-group-title" style="padding:4px 10px;">',
     '    <i style="font-size:12px;border-left:3px solid #26a2ff;padding-left: 4px;"></i>',
     '    <span >{{title}}</span>',
+    '    <span v-if="btnName" style="color:#999;font-size:12px;float:right;" @click="clickBtn">',
+    '       {{btnName}}',
+    '    </span>',
     '  </div>',
     '  <slot></slot>',
     '</div>',
   ].join(''),
-  methods: {}
+  methods: {
+    clickBtn: function () {
+      this.$emit('clickbtn')
+    }
+  }
 });
 
 
@@ -294,10 +300,13 @@ Vue.component('jas-select-field', {
   props: {
     field: {},
     label: {},
+    labelfield: {},
     value: {},
     isMulti: {},
     options: {},
     isSearch: {},
+    placeholder: {},
+    disabled: {},
   },
   data: function () {
     return {
@@ -377,11 +386,11 @@ Vue.component('jas-select-field', {
     '    <div class="mint-cell-title" style="color:#333;padding:8px 0;">',
     '      <span class="mint-cell-text" style="line-height:1.2;">{{label}}</span>',
     '    </div>',
-    '    <div @click="popupVisible=!popupVisible;$emit(\'optionshowed\')" class="mint-cell-value" style=" padding:4px 0 0 10px;line-height:1.4;">',
+    '    <div @click="showOptions" class="mint-cell-value" style=" padding:4px 0 0 10px;line-height:1.4;">',
     '      <span>{{labelvalue}}</span>',
-    '      <span v-show="!labelvalue" style="color:#757575;">{{\'请选择\'+ label}}</span>',
+    '      <span v-show="!labelvalue" style="color:#757575;">{{placeholder || ( \'请选择\'+ label)}}</span>',
     '    </div>',
-    '    <span style="color:#888;" @click="popupVisible=!popupVisible;$emit(\'optionshowed\')">',
+    '    <span v-show="!disabled" style="color:#888;" @click="showOptions">',
     '      <i class="fa fa-angle-down" aria-hidden="true"></i>',
     '    </span>',
     '  </div>',
@@ -391,7 +400,7 @@ Vue.component('jas-select-field', {
     '<mt-popup v-model="popupVisible" position="bottom">',
     '  <div style="width:100vw;">',
     '    <div style="width:100vw;height:44px;text-align:center;line-height:44px;border-bottom: 1px solid #d9d9d9">',
-    '      {{\'选择\'+ label}}',
+    '      {{label}}',
     '      <div v-if="!isSearch" style="float:right;font-size:12px;padding-right:10px;color:#26a2ff;" @click="clearValue">清空</div>   ',
     '    </div>',
     '    <div style="width:100vw;max-height: 40vh;overflow: auto;">',
@@ -407,82 +416,87 @@ Vue.component('jas-select-field', {
   methods: {
     clearValue: function () {
       this._value = undefined;
-    }
-  }
-});
-
-
-/**
- * @author gf 2018.08.27
- * @description 项目字段详情
- */
-Vue.component('jas-select-top-field', {
-  props: {
-    value: {},
-    options: {},
-    tip: {},
-  },
-  data: function () {
-    return {
-      popupVisible: false,
-    }
-  },
-  computed: {
-    _value: {
-      get: function () {
-        var val = this.value;
-        if (this.value === '') {
-          this.options.forEach(function (item) {
-            if (item.value === '') {
-              val = item;
-            }
-          });
-        }
-        return val;
-      },
-      set: function (newval) {
-        if ($.isPlainObject(newval)) {
-          this.$emit('input', '')
-        } else {
-          this.$emit('input', newval)
-        }
-      }
     },
-    labelvalue: function () {
-      var labelvalue = '';
-      var _value = this._value;
-      this.options.forEach(function (item) {
-        if (item.value === _value || item == _value) {
-          labelvalue = item.label;
-        }
-      });
-      return labelvalue;
+    showOptions: function () {
+      if (this.disabled) return;
+      this.popupVisible = !this.popupVisible;
+      this.$emit('optionshowed');
     }
-  },
-  template: [
-    '<div style="width:100%;box-sizing:border-box;padding:0 10px 0 10px;">',
-    '	<div @click="popupVisible=!popupVisible" style="width:100%;text-align: center;line-height:40px;height:40px;">',
-    '		<span style="display:inline-block;max-width:calc(100% - 20px);word-break:keep-all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{labelvalue}}</span>',
-    '		<i style="line-height:40px;vertical-align: top;color:#999;" class="fa fa-caret-down" aria-hidden="true"></i>',
-    '	</div>',
-
-    '<mt-popup v-model="popupVisible" position="bottom">',
-    '  <div style="width:100vw;">',
-    '    <div style="width:100vw;height:44px;text-align:center;line-height:44px;border-bottom: 1px solid #d9d9d9">',
-    '      {{tip||"请选择"}}',
-    '    </div>',
-    '    <div style="width:100vw;max-height: 40vh;overflow: auto;">',
-    '      <mt-radio style="margin-top: -9px;" v-model="_value" :options="options">',
-    '      </mt-radio>',
-    '    </div>',
-    '  </div>',
-    '</mt-popup>',
-    '</div>'
-  ].join(''),
-  methods: {
-
   }
 });
+
+
+// /**
+//  * @author gf 2018.08.27
+//  * @description 项目字段详情
+//  */
+// Vue.component('jas-select-top-field', {
+//   props: {
+//     value: {},
+//     options: {},
+//     tip: {},
+//   },
+//   data: function () {
+//     return {
+//       popupVisible: false,
+//     }
+//   },
+//   computed: {
+//     _value: {
+//       get: function () {
+//         var val = this.value;
+//         if (this.value === '') {
+//           this.options.forEach(function (item) {
+//             if (item.value === '') {
+//               val = item;
+//             }
+//           });
+//         }
+//         return val;
+//       },
+//       set: function (newval) {
+//         if ($.isPlainObject(newval)) {
+//           this.$emit('input', '')
+//         } else {
+//           this.$emit('input', newval)
+//         }
+//       }
+//     },
+//     labelvalue: function () {
+//       var labelvalue = '';
+//       var _value = this._value;
+//       this.options.forEach(function (item) {
+//         if (item.value === _value || item == _value) {
+//           labelvalue = item.label;
+//         }
+//       });
+//       return labelvalue;
+//     }
+//   },
+//   template: [
+//     '<div style="width:100%;box-sizing:border-box;padding:0 10px 0 10px;">',
+//     '	<div @click="popupVisible=!popupVisible" style="width:100%;text-align: center;line-height:40px;height:40px;">',
+//     '		<span style="display:inline-block;max-width:calc(100% - 20px);word-break:keep-all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{labelvalue}}</span>',
+//     '		<i style="line-height:40px;vertical-align: top;color:#999;" class="fa fa-caret-down" aria-hidden="true"></i>',
+//     '	</div>',
+
+//     '<mt-popup v-model="popupVisible" position="bottom">',
+//     '  <div style="width:100vw;">',
+//     '    <div style="width:100vw;height:44px;text-align:center;line-height:44px;border-bottom: 1px solid #d9d9d9">',
+//     '      {{tip||"请选择"}}',
+//     '    </div>',
+//     '    <div style="width:100vw;max-height: 40vh;overflow: auto;">',
+//     '      <mt-radio style="margin-top: -9px;" v-model="_value" :options="options">',
+//     '      </mt-radio>',
+//     '    </div>',
+//     '  </div>',
+//     '</mt-popup>',
+//     '</div>'
+//   ].join(''),
+//   methods: {
+
+//   }
+// });
 
 /**
  * @author gf 2018.08.31
@@ -505,6 +519,7 @@ Vue.component('jas-form-items-group', {
       allFields: [],
       fatherSelectList: [],
       childSelectList: [],
+      isLocal: true,
     }
   },
   template: [
@@ -512,16 +527,16 @@ Vue.component('jas-form-items-group', {
     '  <jas-group v-for="group in fieldsGroup" :title="group.groupName">',
     '    <template v-for="field in group.fields">',
     '      <template v-if="fieldsConfig[field].type===\'select\'">',
-    '        <jas-select-field :ref="field" v-model="form[field]" :disabled="fieldsConfig[field].disabled"  v-required="fieldsConfig[field].required" :label="fieldsConfig[field].name" ',
-    '          @optionshowed=optionshowed(field) @change=fatherSelectChanged(false,field) :options="fieldsConfig[field].options"></jas-select-field>',
+    '        <jas-select-field :labelfield="fieldsConfig[field].labelfield" :ref="field" v-model="form[field]" :disabled="fieldsConfig[field].disabled"  v-required="fieldsConfig[field].required" :label="fieldsConfig[field].name" ',
+    '          :placeholder="fieldsConfig[field].placeholder" @optionshowed=optionshowed(field) @change=fatherSelectChanged(false,field) :options="fieldsConfig[field].options"></jas-select-field>',
     '      </template>',
     '      <template v-else-if="fieldsConfig[field].type===\'multiSelect\'">',
-    '        <jas-select-field :ref="field" v-model="form[field]" :disabled="fieldsConfig[field].disabled"  :is-multi="true" v-required="fieldsConfig[field].required" :label="fieldsConfig[field].name" ',
-    '           @optionshowed=optionshowed(field) :options="fieldsConfig[field].options"></jas-select-field>',
+    '        <jas-select-field :labelfield="fieldsConfig[field].labelfield" :ref="field" v-model="form[field]" :disabled="fieldsConfig[field].disabled"  :is-multi="true" v-required="fieldsConfig[field].required" :label="fieldsConfig[field].name" ',
+    '           :placeholder="fieldsConfig[field].placeholder" @optionshowed=optionshowed(field) :options="fieldsConfig[field].options"></jas-select-field>',
     '      </template>',
     '      <template v-else>',
     '        <mt-field v-model="form[field]" :type="fieldsConfig[field].type" :disabled="fieldsConfig[field].disabled" v-required="fieldsConfig[field].required" :label="fieldsConfig[field].name" ',
-    '          :placeholder="\'请输入\'+fieldsConfig[field].name" rows="4" v-fieldicon="fieldsConfig[field].type"></mt-field>',
+    '          :placeholder="fieldsConfig[field].placeholder || (\'请输入\'+fieldsConfig[field].name)" rows="4" v-fieldicon="fieldsConfig[field].type"></mt-field>',
     '      </template>',
     '    </template>',
     '  </jas-group>',
@@ -556,6 +571,39 @@ Vue.component('jas-form-items-group', {
     }
   },
   methods: {
+    getSelectLabelValues: function () {
+      var that = this;
+      var obj = {};
+      this.allFields.forEach(function (item) {
+        var ofield = that.fieldsConfig[item];
+        // appcan.logs(ofield.labelfield)
+        // appcan.logs(111111111111111111 + JSON.stringify(that.$refs[item]))
+        // appcan.logs(item + that.$refs[item][0].labelvalue)
+        if (ofield.labelfield) {
+          // alert(JSON.stringify(that.$refs[item]))
+          obj[ofield.labelfield] = that.$refs[item][0].labelvalue;
+        }
+      });
+      return obj;
+    },
+    validate: function () {
+      var that = this;
+      var aTip = [];
+
+      that.allFields.forEach(function (item) {
+        if (!that.form[item] && that.fieldsConfig[item].required) {
+          aTip.push(that.fieldsConfig[item].name + '不能为空');
+        }
+      });
+
+      if (aTip.length > 0) {
+        window.Vue && Vue.prototype.$toast(aTip.join('，\r\n'));
+        // window.Vue && Vue.prototype.$toast(('实打实地方是打发 \n 是打发是打发'));
+        return false;
+      } else {
+        return true;
+      }
+    },
     triggerFatherSelectsChange: function (fatherSelectList) {
       var that = this;
       var SelectList = fatherSelectList || that.fatherSelectList;
@@ -590,9 +638,29 @@ Vue.component('jas-form-items-group', {
         /* 请求阈值 */
         if (config.domainName) {
           (function (field, config) {
-            that.requestDomainFromDomainTable(config.domainName, function (options) {
-              config.options = options;
-            });
+            if (that.isLocal) {
+              localServer.sysDomain.get({
+                domainName: config.domainName
+              }, function (data) {
+                if (data.status == 1) {
+                  if (data.rows.length == 0) {
+                    window.Vue && Vue.prototype.$toast("本地数据为空，请进行数据同步");
+                  }
+                  config.options = data.rows.map(function (item) {
+                    return {
+                      label: item.value,
+                      value: item.key,
+                    }
+                  });
+                } else {
+                  window.Vue && Vue.prototype.$toast("本地数据出错，请同步本地数据");
+                }
+              });
+            } else {
+              that.requestDomainFromDomainTable(config.domainName, function (options) {
+                config.options = options;
+              });
+            }
           })(field, config)
         }
         if (config.optionUrl) {
@@ -601,14 +669,34 @@ Vue.component('jas-form-items-group', {
             if (config.requestParams) {
               obj = jasTools.base.extend(obj, config.requestParams);
             }
-            jasTools.ajax.post("/" + config.optionUrl, obj, function (data) {
-              config.options = data.rows.map(function (item) {
-                return {
-                  label: item.value,
-                  value: item.key,
+            if (that.isLocal) {
+
+              localServer[config.optionTable].get(obj, function (data) {
+                if (data.status == 1) {
+                  if (data.rows.length == 0) {
+                    window.Vue && Vue.prototype.$toast("本地数据为空，请进行数据同步");
+                  } else {
+                    config.options = data.rows.map(function (item) {
+                      return {
+                        label: item.value,
+                        value: item.key,
+                      }
+                    });
+                  }
+                } else {
+                  window.Vue && Vue.prototype.$toast("本地数据出错，请同步本地数据");
                 }
               });
-            });
+            } else {
+              jasTools.ajax.post("/" + config.optionUrl, obj, function (data) {
+                config.options = data.rows.map(function (item) {
+                  return {
+                    label: item.value,
+                    value: item.key,
+                  }
+                });
+              });
+            }
           })(field, config)
         }
       });
@@ -644,7 +732,7 @@ Vue.component('jas-form-items-group', {
         // that.$refs[childField][0].$emit('change', isInit);
       };
 
-      var getAndSet = function (fatherField, fatherValue, childField, requestUrl) {
+      var getAndSet = function (fatherField, fatherValue, childField, requestUrl, requestTable) {
         if (fatherValue) { //进行子级的查找 后台请求
           var obj = {
             "rows": 100,
@@ -656,14 +744,35 @@ Vue.component('jas-form-items-group', {
           }
 
           obj[jasTools.base.switchToCamelCase(fatherField)] = fatherValue;
-          jasTools.ajax.post("/" + requestUrl, obj, function (data) {
-            setChildOptionsAndValue(childField, data.rows.map(function (item) {
-              return {
-                label: item.value,
-                value: item.key,
+
+          if (that.isLocal) {
+
+            localServer[requestTable].get(obj, function (data) {
+              if (data.status == 1) {
+                if (data.rows.length == 0) {
+                  window.Vue && Vue.prototype.$toast("本地数据为空，请进行数据同步");
+                }
+                setChildOptionsAndValue(childField, data.rows.map(function (item) {
+                  return {
+                    label: item.value,
+                    value: item.key,
+                  }
+                }));
+              } else {
+                window.Vue && Vue.prototype.$toast("本地数据出错，请同步本地数据");
               }
-            }))
-          });
+            });
+          } else {
+            jasTools.ajax.post("/" + requestUrl, obj, function (data) {
+              setChildOptionsAndValue(childField, data.rows.map(function (item) {
+                return {
+                  label: item.value,
+                  value: item.key,
+                }
+              }))
+            });
+          }
+
         } else {
           setChildOptionsAndValue(childField, []);
         }
@@ -672,7 +781,8 @@ Vue.component('jas-form-items-group', {
       fieldConfig.childSelect && fieldConfig.childSelect.forEach(function (childField, index) {
         if (!fieldConfig.childUrl || fieldConfig.childUrl.length === 0) return;
         var url = fieldConfig.childUrl[index] || fieldConfig.childUrl[0];
-        getAndSet(fatherField, form[fatherField], childField, url);
+        var table = fieldConfig.childTable[index] || fieldConfig.childTable[0];
+        getAndSet(fatherField, form[fatherField], childField, url, table);
       });
 
       fieldConfig.childText && fieldConfig.childText.forEach(function (childField, index) {
@@ -757,7 +867,9 @@ Vue.component('jas-file-group', {
     '        </mt-cell-swipe>',
     '        <mt-cell-swipe v-else  is-link :title="item.fileName" @click.native="downloadFile(item)"',
     '          :right="isEdit && [{content: \'刪除\',style: {background: \'red\',color: \'#fff\'},handler: function () {deleteItem(item)}}]">',
-    '          <span>下载附件</span>',
+    '          <span v-show="!item.isDowbloaded&&!item.isDowbloading">下载附件</span>',
+    '          <span v-show="item.isDowbloaded&&!item.isDowbloading">打开附件</span>',
+    '          <mt-spinner v-show="item.isDowbloading" type="fading-circle"></mt-spinner>',
     '          <div slot="icon" style="margin:4px;height:40px;width:40px;display: inline-block;vertical-align: middle;text-align: center;">',
     '            <i class="fa fa-file-text-o" style="font-size:24px;color:#666;line-height: 40px;" aria-hidden="true"></i>',
     '          </div>',
@@ -777,7 +889,11 @@ Vue.component('jas-file-group', {
         businessType: 'file',
         businessId: bizId || '1f4dea6c-0ae2-487c-8151-4e52bc7a20a7',
       }, function (data) {
-        that.files = data.rows;
+        that.files = data.rows.map(function (item) {
+          item.isDowbloaded = false;
+          item.isDowbloading = false;
+          return item;
+        });
         that.fileListlength = that.files.length;
       });
     },
@@ -801,7 +917,7 @@ Vue.component('jas-file-group', {
         backgroundSize: 'cover',
         backgroundPosition: 'center center',
       };
-      if (item.oid) {
+      if (item.oid && !item.src) {
         var src = [
           jasTools.ajax.serverURL,
           // 'DAQProject/attachment/download.do?oid=',
@@ -836,75 +952,55 @@ Vue.component('jas-file-group', {
       });
     },
     downloadFile: function (item) {
-      var src = "wgt://data/down/" + item.fileName;
-      try {
-
-        appcan.file.open({
-          filePath: src,
-          mode: 1,
+      var that = this;
+      var url = jasTools.ajax.completeURL + '/attachment/download.do?oid=' + item.oid + '&token=' + localStorage.getItem("token");
+      var localPath = "wgt://data/down/" + item.oid + item.fileName;
+      if (item.isDowbloading) return;
+      if (item.isDowbloaded) {
+        uexDocumentReader.openDocumentReader(localPath) //打开
+      } else {
+        item.isDowbloading = true;
+        item.isDowbloaded = false;
+        appcan.file.exists({
+          filePath: localPath,
           callback: function (err, data, dataType, optId) {
-            alert(JSON.stringify(data, 4, 4))
-            if (err) {
-              //获取文件信息出错了
-              return;
-            }
-            if (data.isFile) {
-              //该路径是文件
-            }
-            if (data.isDirectory) {
-              //该路径是一个文件夹
-            }
-          }
-        });
-      } catch (e) {
-        alert(e)
-      }
-      return
-
-      var downloader = uexDownloaderMgr.create();
-      if (!downloader) {
-        alert("创建失败!");
-      }
-      var headJson = '{"Content-type":"application/json;charset=utf-8"}';
-      uexDownloaderMgr.setHeaders(downloader, headJson);
-      uexDownloaderMgr.download(downloader,
-        jasTools.ajax.completeURL + '/attachment/download.do?oid=' + item.oid + '&token=' + localStorage.getItem("token"),
-        "wgt://data/down/" + item.fileName,
-        0,
-        function (fileSize, percent, status) {
-          switch (status) {
-            case 0:
-              window.Vue && Vue.prototype.$toast("文件大小:" + fileSize + "字节<br>下载进度:" + percent);
-              return;
-              break;
-            case 1:
-              window.Vue && Vue.prototype.$toast("下载完成");
-              appcan.file.open("wgt://data/down/" + item.fileName, 1, function (err, data, dataType, optId) {
-                if (err) {
-                  //出错了
-                  alert(err);
-                  return;
-                }
-                if (data == 0) {
-                  //打开成功了
-                } else {
-                  //打开失败
+            if (err) return;
+            if (data == 1) {
+              setTimeout(function () {
+                item.isDowbloading = false;
+                item.isDowbloaded = true;
+              }, 400);
+              // uexDocumentReader.openDocumentReader(localPath) //打开
+              // alert(JSON.stringify(that.files, 4, 4));
+            } else {
+              var downloader = uexDownloaderMgr.create();
+              uexDownloaderMgr.setHeaders(downloader, '{"Content-type":"application/json;charset=utf-8"}');
+              uexDownloaderMgr.download(downloader, url, localPath, 0, function (fileSize, percent, status) {
+                switch (status) {
+                  case 0:
+                    item.isDowbloading = true;
+                    item.isDowbloaded = false;
+                    // window.Vue && Vue.prototype.$toast("文件大小:" + fileSize + "字节<br>下载进度:" + percent);
+                    break;
+                  case 1:
+                    // window.Vue && Vue.prototype.$toast("下载完成");
+                    setTimeout(function () {
+                      item.isDowbloading = false;
+                      item.isDowbloaded = true;
+                    }, 400);
+                    // uexDocumentReader.openDocumentReader(localPath) //打开成功了
+                    break;
+                  case 2:
+                    item.isDowbloading = false;
+                    item.isDowbloaded = false;
+                    alert("下载失败");
+                    break;
                 }
               });
-              // var file = uexFileMgr.open({
-              //   path: "wgt://data/down/" + item.fileName,
-              //   mode: 3
-              // });
-              // if (!file) {
-              //   alert("打开失败!");
-              // }
-
-              break;
-            case 2:
-              alert("下载失败");
-              break;
+            }
           }
         });
+      }
     },
     takePhoto: function () {
       var that = this;
@@ -924,7 +1020,7 @@ Vue.component('jas-file-group', {
         quality: 0.5,
         detailedInfo: false
       }, function (error, info) {
-        info.data.forEach(function (picPath) {
+        info.data && info.data.forEach(function (picPath) {
           var arr = picPath.split('/');
           that.files.push({
             fileName: arr[arr.length - 1],
@@ -983,51 +1079,7 @@ Vue.component('jas-file-group', {
 
 
 
-/**
- * @author dx 2018.08.28
- * @description 复选框组件封装
- */
-Vue.component('jas-checkbox', {
-  props: {
-    checked: {
-      type: [Boolean],
-      default: false,
-    },
-    itemdate: {
-      default: {},
-      type: [String, Object, Array]
-    },
-    isAll: {
-      default: false,
-      type: [Boolean]
-    }
-  },
-  data: function () {
-    return {
 
-    }
-  },
-  template: [
-    '<div class="ub" style="width:100%">',
-    '<label class="mint-checklist-label" style="padding:0px 10px 0px 0px ">',
-    '<span class="mint-checkbox" style="padding-top:15px;display:inline-block">',
-    '<input type="checkbox" class="mint-checkbox-input" :checked="checked" @click="clickItem">',
-    '<span class="mint-checkbox-core"></span> <span style="padding-left:5px;" v-if="isAll">全选</span>',
-    '</span>',
-    '</label>',
-    '<slot  name="options"> </slot>',
-    '</div>'
-  ].join(''),
-  methods: {
-    clickItem: function () {
-      if (JSON.stringify(this.itemdate) == "{}") {
-        this.$emit("clickitem", this.checked);
-      } else {
-        this.$emit("clickitem", this.itemdate);
-      }
-    }
-  }
-})
 
 /**
  * @author dx 2018.08.13
@@ -1053,4 +1105,64 @@ Vue.component('jas-check-detail-field-group', {
     '</div>',
   ].join(''),
   methods: {}
+});
+
+
+/**
+ * @author dx 2018.08.28
+ * @description 复选框组件封装
+ */
+Vue.component('jas-checkbox', {
+  props: {
+    checked: {
+      type: [Boolean],
+      default: false,
+    },
+    itemdate: {
+      default: {},
+      type: [String, Object, Array]
+    },
+    isAll: {
+      default: false,
+      type: [Boolean]
+    }
+  },
+  data: function () {
+    return {
+
+    }
+  },
+  computed: {
+    isPadding: function () {
+      if (this.isAll) {
+        return {
+          "paddingTop": "15px"
+        }
+      } else {
+        return {
+          "paddingTop": "25px"
+        }
+      }
+    }
+  },
+  template: [
+    '<div class="ub" style="width:100%">',
+    '<label class="mint-checklist-label" style="padding:0px 10px 0px 0px ">',
+    '<span class="mint-checkbox" style="display:inline-block" :style="isPadding">',
+    '<input type="checkbox" class="mint-checkbox-input" :checked="checked" @click="clickItem">',
+    '<span class="mint-checkbox-core"></span> <span style="padding-left:5px;" v-if="isAll">全选</span>',
+    '</span>',
+    '</label>',
+    '<slot  name="options"> </slot>',
+    '</div>'
+  ].join(''),
+  methods: {
+    clickItem: function () {
+      if (JSON.stringify(this.itemdate) == "{}") {
+        this.$emit("clickitem", this.checked);
+      } else {
+        this.$emit("clickitem", this.itemdate);
+      }
+    }
+  }
 });

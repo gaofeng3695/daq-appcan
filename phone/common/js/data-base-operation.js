@@ -22,11 +22,11 @@ DataBaseOperation.prototype = {
 	//数据库查询的方法
 	dbSelect: function (sql, callback) {
 		uexDataBaseMgr.select(dbObj, sql, function (error, data) {
-			uexDataBaseMgr.close(dbObj);
+			// uexDataBaseMgr.close(dbObj);
 			if (error) {
 				alert("select查询失败！");
 			} else {
-				var result = JSON.parse(data);
+				var result = JSON.stringify(data);
 				if (appcan.isFunction(callback)) {
 					callback(error, result);
 				}
@@ -36,7 +36,7 @@ DataBaseOperation.prototype = {
 	//数据库创建Table的方法
 	dbCreateTable: function (sql, callback) {
 		uexDataBaseMgr.sql(dbObj, sql, function (error) {
-			uexDataBaseMgr.close(dbObj);
+			// uexDataBaseMgr.close(dbObj);
 			if (error) {
 				alert("创建数据库表失败！");
 
@@ -49,9 +49,9 @@ DataBaseOperation.prototype = {
 	//数据库执行的方法（insert、update、delete）
 	dbExec: function (sql, callback) {
 		uexDataBaseMgr.sql(dbObj, sql, function (error) {
-			uexDataBaseMgr.close(dbObj);
+			// uexDataBaseMgr.close(dbObj);
 			if (error) {
-				alert("执行失败！");
+				// alert("执行失败！");
 			}
 			if (appcan.isFunction(callback)) {
 				callback(error); //0:表示成功  1:表示失败 2：表示重复
@@ -61,12 +61,12 @@ DataBaseOperation.prototype = {
 	//数据库批量事务执行
 	dbTrans: function (sqls, callback) {
 		uexDataBaseMgr.transactionEx(dbObj, JSON.stringify(sqls), function (error) {
-			uexDataBaseMgr.close(dbObj);
+			// uexDataBaseMgr.close(dbObj);
 			if (error) {
-				alert("执行失败！");
+				// alert("执行失败！");
 			}
 			if (appcan.isFunction(callback)) {
-				callback(error); //0:表示成功  1:表示失败 
+				callback(error); //0:表示成功  1:表示失败
 			}
 		});
 	}

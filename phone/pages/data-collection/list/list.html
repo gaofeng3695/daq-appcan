@@ -6,25 +6,152 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 	<link rel="stylesheet" href="./../../../lib/mint-ui/style.css">
+	<link rel="stylesheet" href="./../../../appcan/css/ui-box.css">
 	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
 	<link rel="stylesheet" href="./../../../common/css/jas-main.css">
 </head>
 <style>
+	* {
+		margin: 0px;
+		padding: 0px;
+	}
+
+	ul li {
+		list-style: none;
+	}
+
+	li {
+		padding: 10px;
+		background: #fff;
+		box-shadow: 0px 0px 12px #fafafa;
+		margin-top: 10px;
+	}
+
+	.type {
+		/*padding-top: 5px;*/
+		height: 35px;
+		line-height: 35px;
+	}
+
+	.content {
+		height: 35px;
+		line-height: 35px;
+
+	}
+
+	.content div {
+		display: inline-block;
+	}
+
+	.ulim100 {
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+	}
+
+	.w40 {
+		width: 45vw;
+	}
+
+	.txt-r {
+		text-align: right;
+	}
+
+	.btns {
+		/*padding: 10px 0px;*/
+		text-align: right;
+		height: 35px;
+		line-height: 35px;
+	}
+
+	.btns .mint-button--small {
+		height: 26px;
+		line-height: 26px;
+	}
+
+	.mint-button--yellow {
+		color: #fff;
+		background-color: yellow
+	}
+
+	.bg {
+		/*background: #ed9028;*/
+		border: 1px solid #ed9028;
+	}
+
+	.bage {
+		padding: 3px 5px;
+		border-radius: 5px;
+	}
+
+	.clr333 {
+		color: #333;
+	}
+
+	.clr999 {
+		color: #999;
+	}
 </style>
 
 <body>
 	<div class="_outer-wrapper " v-cloak>
 
 		<jas-header title="数据采集列表"></jas-header>
-
-		<!-- tab-container -->
-		<div v-setheight style="overflow: auto;">
-			<div style="margin-bottom: 10px;overflow: hidden;background: #fff;">
-				<jas-select-field style="width:50vw;float:left;" label="数据分类" :is-search="true" v-model="topSearchForm.module" :options="modules"></jas-select-field>
-				<jas-select-field style="width:50vw;float:left;" label="数据状态" :is-search="true" v-model="topSearchForm.status" :options="statuses"></jas-select-field>
-			</div>
+		<div style="overflow: hidden;background: #fff;">
+			<jas-select-top-field style="width:50vw;float:left;" tip="请选择数据分类" v-model="topSearchForm.module" :options="modules"></jas-select-top-field>
+			<jas-select-top-field style="width:50vw;float:left;" tip="请选择数据状态" v-model="topSearchForm.status" :options="statusArry"></jas-select-top-field>
 		</div>
-		<jas-button-footer :is-return="true" :buttons="['上传','上报']" @click="clickbtn"></jas-button-footer>
+		<div v-setheight style="overflow: auto;">
+			<mt-loadmore ref="loadmore" :top-method="refresh" :auto-fill="false" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded">
+				<ul>
+					<!--<li>
+						<div class="type ub bottomLine">
+							<div class="ub-f1 ulim100 clr999">少时诵诗书</div>
+							<div class="clrfff">
+								<span class=" bg bage">审核中	</span>
+							</div>
+						</div>
+						<div class="content ">
+							<div class="w40  ulim100">学习嘻嘻嘻嘻嘻嘻嘻嘻嘻寻寻寻寻</div>
+							<div class="w40 ulim100 txt-r">额呃呃额鹅鹅鹅鹅鹅鹅鹅鹅鹅鹅鹅鹅</div>
+						</div>
+						<div class="btns ub">
+							<div>
+							2018-08-29 05:00:06
+							</div>
+							<div class="ub-f1">
+								<mt-button v-show="topSearchForm.status=='3'" size="small" type="primary" @click="approve(item)">上传</mt-button>
+								<mt-button v-show="topSearchForm.status!='0,1,-1,2'" size="small" type="danger" @click="submit(item)">上报</mt-button>
+								<mt-button size="small" type="primary" @click="add">再来一条</mt-button>
+							</div>
+						</div>
+					</li>-->
+					<li v-for="item in typeList">
+						<div class="type ub bottomLine">
+							<div class="ub-f1 ulim100 clr999">{{item.code}}</div>
+							<div class="clr333">
+								<span class=" bg bage">	审核中</span>
+							</div>
+						</div>
+						<div class="content ">
+							<div class="w40  ulim100">{{item.tenders_name||item.tendersName}}</div>
+							<div class="w40 ulim100  txt-r">{{item.construct_unit_name||item.constructUnitName||item.unitName}}</div>
+						</div>
+						<div class="btns ub">
+							<div>
+								{{item.createDatetime||item.create_datetime}}
+							</div>
+							<div class="ub-f1">
+								<mt-button v-show="topSearchForm.status=='3'" size="small" type="primary" @click="approve(item)">上传</mt-button>
+								<mt-button v-show="topSearchForm.status!='0,1,-1,2'" size="small" type="danger" @click="submit(item)">上报</mt-button>
+								<mt-button size="small" type="primary" @click="add">再来一条</mt-button>
+							</div>
+						</div>
+					</li>
+				</ul>
+			</mt-loadmore>
+		</div>
+		<!--<jas-button-footer :is-return="true" :buttons="['上传','上报']" @click="clickbtn"></jas-button-footer>-->
 	</div>
 </body>
 <script src="./../../../appcan/js/appcan.js"></script>
@@ -36,70 +163,233 @@
 	window.vm = new Vue({
 		el: '._outer-wrapper',
 		data: function () {
+			var that = this;
 			return {
 				topSearchForm: {
-					module: '',
+					module: 'coating_pipe',
 					status: '0',
 				},
-				modules: [ //
-					{
-						value: '',
-						label: '不限'
-					}, {
-						value: 'antiseptic',
-						label: '防腐管检查'
-					}, {
-						value: 'hotBend',
-						label: '热煨弯管检查'
-					}, {
-						value: 'coldBend',
-						label: '冷弯管检查'
-					}, {
-						value: 'weldRecord',
-						label: '焊口记录'
-					}, {
-						value: 'weldRework',
-						label: '焊口返修'
-					}, {
-						value: 'weldMeasure',
-						label: '焊口测量'
-					}, {
-						value: 'patchRecord',
-						label: '补口记录'
-					},
-				],
+				modules: [{
+					value: 'coating_pipe',
+					label: '防腐管检查'
+				}, {
+					value: 'hot_bends',
+					label: '热煨弯管检查'
+				}, {
+					value: 'pipe_cold_bending',
+					label: '冷弯管检查'
+				}, {
+					value: 'construction_weld',
+					label: '焊口记录'
+				}, {
+					value: 'rework_weld',
+					label: '焊口返修'
+				}, {
+					value: 'measured_result',
+					label: '焊口测量'
+				}, {
+					value: 'anticorrosion_check',
+					label: '补口记录'
+				}, ],
 				statuses: [ //
 					{
-						value: '0',
+						value: '0,1,-1,2',
 						label: '已录入'
 					}, {
-						value: '1',
+						value: '3',
 						label: '待上传'
 					}, {
-						value: '2',
+						value: '0',
 						label: '待上报'
 					}, {
-						value: '3',
+						value: '-1',
 						label: '被驳回'
 					}
 				],
+				statuses1: [{
+					value: '0,1,-1,2',
+					label: '已录入'
+				}, {
+					value: '3',
+					label: '待上传'
+				}],
+				typeUrl: {
+					coating_pipe: {
+						url: "/map/commonData/F000030/getPage.do",
+						chooseStatues: "statuses1",
+						type: "防腐管检查",
+						code: "pipe_code",
+						searchObj: {
+							page: 1,
+							rows: 10
+						}
+					},
+					hot_bends: {
+						url: "/map/commonData/F000031/getPage.do",
+						chooseStatues: "statuses1",
+						type: "热煨弯管检查",
+						code: "hot_bends_code",
+						searchObj: {
+							page: 1,
+							rows: 10
+						}
+					},
+					pipe_cold_bending: {
+						url: "/jdbc/commonData/checkPipeColdBending/getPage.do",
+						chooseStatues: "statuses1",
+						code: "pipeColdBendingCode",
+						type: "冷弯管检查"
+					},
+					construction_weld: {
+						url: "/jdbc/commonData/constructionWeld/getPage.do",
+						chooseStatues: "statuses",
+						code: "weldCode",
+						type: "焊口记录"
+					},
+					rework_weld: {
+						url: "/jdbc/commonData/reworkWeld/getPage.do",
+						chooseStatues: "statuses",
+						code: "weldCode",
+						type: "焊口返修"
+					},
+					measured_result: {
+						url: "/jdbc/commonData/weldMeasuredResult/getPage.do",
+						chooseStatues: "statuses",
+						code: "medianStakeCode",
+						type: "焊口测量"
+					},
+					anticorrosion_check: {
+						url: "/jdbc/commonData/weldAnticorrosionCheck/getPage.do",
+						chooseStatues: "statuses",
+						type: "补口记录",
+						code: "weld_code",
+						searchObj: {
+							page: 1,
+							rows: 10
+						}
+					}
+				},
+				statusArry: [],
+				typeList: [],
+				url: "",
+				searchObj: {
+					"pageNo": 1,
+					"pageSize": 10,
+					"approveStatus": "-1"
+				},
+				allLoaded: false,
+				type: "",
+				code: "",
 			}
 		},
 		created: function () {
+
+		},
+		mounted: function () {
 			var that = this;
 			appcan.ready(function () {
 				var params = jasTools.base.getParamsInUrl();
 				that.topSearchForm.module = params.id;
 				that.topSearchForm.status = params.type;
+				that.statusArry = that[that.typeUrl[params.id].chooseStatues];
+				that.url = that.typeUrl[params.id].url;
+				that.type = that.typeUrl[params.id].type;
+				that.code = that.typeUrl[params.id].code;
+				if (that.typeUrl[params.id].searchObj) {
+					that.searchObj = that.typeUrl[params.id].searchObj
+				} else {
+					that.searchObj.approveStatus = params.type;
+				}
+				that.requestList(); //请求数据列表
 			});
 		},
-		mounted: function () {
-			var that = this;
-
-		},
 		methods: {
+			refresh: function () {
+				var that = this;
+				if (that.searchObj.pageNo) {
+					that.searchObj.pageNo = 1;
+				} else {
+					that.searchObj.page = 1;
+				}
+				that.typeList = [];
+				that.allLoaded = false;
+				that.requestList();
+			},
+			requestList: function () {
+				var that = this;
+				appcan.logs(that.searchObj)
+				jasTools.ajax.post(that.url, that.searchObj, function (data) {
+
+					if (data.status == 1) {
+						if (that.searchObj.pageNo == 1 || that.searchObj.page == 1) {
+							if (data.rows.length > 0) {
+								data.rows.forEach(function (item) {
+									item.code = item[that.code];
+								});
+								that.typeList = data.rows;
+
+							} else {
+								that.typeList = [];
+								that.$toast('暂无数据');
+								that.allLoaded = true;
+							}
+							if (that.searchObj.pageNo) {
+								that.searchObj.pageNo++;
+							} else {
+								that.searchObj.page++;
+							}
+						} else {
+							if (data.rows.length > 0) {
+								data.rows.forEach(function (item, index) {
+									item.code = item[that.code];
+									that.typeList.push(item);
+								});
+								if (that.searchObj.pageNo) {
+									that.searchObj.pageNo++;
+								} else {
+									that.searchObj.page++;
+								}
+							} else {
+								that.allLoaded = true;
+								that.$toast('没有更多数据');
+							}
+						}
+					} else {
+						that.$toast("网络异常，请稍候尝试")
+					}
+					that.$refs.loadmore.onTopLoaded();
+					that.$refs.loadmore.onBottomLoaded();
+				}, function () {
+					that.$refs.loadmore.onTopLoaded();
+					that.$refs.loadmore.onBottomLoaded();
+				});
+			},
+			loadBottom: function () {
+				if (this.allLoaded) {
+					return;
+				}
+				this.requestList();
+			},
 			clickbtn: function (index) {
 				this.$toast('您点击了第' + index + '个按钮')
+			},
+			approve: function (obj) {
+				//上报接口
+				this.$toast("上报接口");
+			},
+			submit: function (obj) {
+				//提交接口
+				this.$toast("提交接口");
+			},
+			edit: function (obj) {
+				//编辑
+				this.$toast("编辑接口");
+			},
+			viewDetail: function (obj) {
+				this.$toast("详情接口"); //详情
+			},
+			add: function () {
+				this.$toast("录入一条接口"); //重新录入一条
 			}
 
 		},

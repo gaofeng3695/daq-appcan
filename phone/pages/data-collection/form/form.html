@@ -14,63 +14,12 @@
 
 <body>
 	<div class="_outer-wrapper " v-cloak>
-
 		<jas-header :title="title"></jas-header>
-
-		<!-- tab-container -->
 		<div v-setheight style="overflow: auto;">
-
 			<jas-form-items-group ref="mainForm" :fields-group="fieldsGroup" :fields-config="fieldsConfig" :form="form"></jas-form-items-group>
-
-			<jas-file-group is-edit="true" ref="files" @success="uploadSuccess"></jas-file-group>
-
-			<!-- <jas-group title="附件信息">
-				<div>
-					<div v-if="isEdit" class="topLine" style="padding:10px;overflow: hidden;">
-						<span style="line-height: 33px;font-size: 12px;color:#666;">最上传{{max}}个附件</span>
-						<div style="float:right;overflow: hidden;">
-							<mt-button type="primary" size="small" :disabled="files.length>=max" @click.native="takePhoto">拍照</mt-button>
-							<mt-button type="primary" size="small" :disabled="files.length>=max" @click.native="selectPhoto">选择图片</mt-button>
-						</div>
-					</div>
-					<div>
-						<template v-for="item in files">
-							<mt-cell-swipe v-if="isPhoto(item.fileName)" :right="isEdit && [{
-								content: '刪除',
-								style: {
-									background: 'red',
-									color: '#fff'
-								},
-								handler: function () {
-									deleteItem(item)
-								}
-							}]" :title="item.fileName" is-link @click.native="seeDetail(item)">
-								<span>预览图片</span>
-								<div slot="icon" style="margin:4px;height:40px;width:40px;display: inline-block;vertical-align: middle;" :style="styleBgImg(item)"></div>
-							</mt-cell-swipe>
-							<mt-cell-swipe v-else :title="item.fileName" :right="isEdit && [{
-								content: '刪除',
-								style: {
-									background: 'red',
-									color: '#fff'
-								},
-								handler: function () {
-									deleteItem(item)
-								}
-							}]" is-link>
-								<span>下载附件</span>
-								<div slot="icon" style="margin:4px;height:40px;width:40px;display: inline-block;vertical-align: middle;text-align: center;">
-									<i class="fa fa-file-text-o" style="font-size:24px;color:#666;line-height: 40px;" aria-hidden="true"></i>
-								</div>
-							</mt-cell-swipe>
-						</template>
-					</div>
-				</div>
-
-			</jas-group> -->
-
+			<jas-file-group is-edit="true" ref="files"></jas-file-group>
 		</div>
-		<jas-button-footer :is-return="true" :buttons="['保存','在录一条']" :buttons-color="['','#f90']" @click="clickbtn"></jas-button-footer>
+		<jas-button-footer :is-return="true" :buttons="['保存']" :buttons-color="['']" @click="saveBtn"></jas-button-footer>
 	</div>
 </body>
 <script src="./../../../appcan/js/appcan.js"></script>
@@ -78,6 +27,8 @@
 <script src="./../../../lib/mint-ui/index.js"></script>
 <script src="./../../../common/js/jas-tools.js"></script>
 <script src="./../../../common/components/jas-components.js"></script>
+<script src="./../../../common/js/data-base-operation.js"></script>
+<script src="./../../user-center/data-sync/local-server.js"></script>
 <script src="./fields-config.js"></script>
 
 
@@ -88,79 +39,295 @@
 			var that = this;
 			return {
 				title: '数据录入',
+				formStatus: '本地新增',
 				value: '',
 				fieldsGroup: [],
 				fieldsConfig: {},
 				form: {},
+				isOnline: false,
+				isAgain: false,
 			}
 		},
 		created: function () {
-			var that = this;
-			appcan.ready(function () {
-				var params = jasTools.base.getParamsInUrl();
-				var config = FieldsConfig[params.title];
-				that.title = config.title;
-				that.fieldsGroup = config.fieldsGroup;
-				that.fieldsConfig = config.fieldsConfig;
-				that.form = FieldsConfig.methods.formatForms(that.fieldsGroup);
-				// that.getDetailByObjectId('dfe088c3-de1d-454e-85f3-6b131681d65b');
-				// that.getDetailByObjectId('b1ec91d9-5443-4f04-8d85-22014aa5a707', config.detailUrl); // 汉口信息
-			});
-			// var config = FieldsConfig['weldRework'];
-			// that.title = config.title;
-			// that.fieldsGroup = config.fieldsGroup;
-			// that.fieldsConfig = config.fieldsConfig;
-			// that.form = FieldsConfig.methods.formatForms(that.fieldsGroup);
+
 		},
 		mounted: function () {
 			var that = this;
+
+
 			appcan.ready(function () {
-				that.$refs.files.requestFile('1f4dea6c-0ae2-487c-8151-4e52bc7a20a7');
+				var oParam = jasTools.base.getParamsInUrl();
+				that.setFormStatus(oParam);
+				that.setVueConfigData(oParam, FieldsConfig);
+				that.$nextTick(function () { // 在表单项加载完成后进行，数据装载
+					if (that.formStatus !== '本地新增') {
+						that.getDetail(that.oid);
+					} else {
+						that.resetForm();
+					}
+				});
 			});
 		},
+
 		methods: {
-
-			clickbtn: function (index) {
-				// this.$toast('您点击了第' + index + '个按钮');
-				this.$refs.files.uploadFiles('1f4dea6c-0ae2-487c-8151-4e52bc7a20a7');
-
-			},
-			getDetailByObjectId: function (oid, url) {
+			resetForm: function () {
 				var that = this;
-				// var url = '/map/commonData/F000030/get.do';
-				// var url = '/jdbc/commonData/constructionWeld/getPage.do';
-				jasTools.ajax.post(url, {
-					oid: oid
+				for (var key in this.form) {
+					if (this.fieldsConfig[key] && this.fieldsConfig[key].placeholder === '请选择是否合格') {
+						this.form[key] = this.fieldsConfig[key].options[0].value;
+					}
+				}
+				if (status == '本地新增') {
+					that.oid = that.form.oid = jasTools.base.createuuid();
+				}
+				that.form.project_oid = localStorage.getItem("defaultProject");
+				that.form.projectOid = localStorage.getItem("defaultProject");
+			},
+			setFormStatus: function (oParam) { // 获取当前表单的操作类型
+				// oid	isOnline	isAgain	分类					保存
+				//1 空			              本地新增			 -------，新增本地，有无网络，新增服务器，是否删除本地，再录一条
+				//2 有	  0  	      1  	  本地再来一条	 本地查询，新增本地，有无网络，新增服务器，是否删除本地，再录一条
+				//3 有	  1  	      1  	  网上再来一条	 网上查询，新增本地，有无网络，新增服务器，是否删除本地，再录一条
+				//4 有	  0  	      0  	  本地编辑			 本地查询，更新本地，有无网络，新增服务器，是否删除本地，再录一条
+				//5 有	  1  	      0  	  网上编辑			 网上查询，-------，-------，更新服务器
+
+				if (!oParam.oid) this.formStatus = '本地新增';
+				if (oParam.oid && oParam.isOnline == 0 && oParam.isAgain == 1) this.formStatus = '本地再来一条';
+				if (oParam.oid && oParam.isOnline == 1 && oParam.isAgain == 1) this.formStatus = '网上再来一条';
+				if (oParam.oid && oParam.isOnline == 0 && oParam.isAgain == 0) this.formStatus = '本地编辑';
+				if (oParam.oid && oParam.isOnline == 1 && oParam.isAgain == 0) this.formStatus = '网上编辑';
+				this.$toast(this.formStatus);
+				return this.formStatus;
+			},
+			setVueConfigData: function (oParam, FieldsConfig) {
+				var tableMap = {
+					coating_pipe: 'checkCoatingPipe',
+					hot_bends: 'checkHotBends',
+					pipe_cold_bending: 'checkPipeColdBending',
+					construction_weld: '',
+					rework_weld: '',
+					measured_result: '',
+					anticorrosion_check: '',
+				};
+				this.table = tableMap[oParam.title];
+				var config = FieldsConfig[oParam.title];
+
+				this.module = oParam.title;
+				this.title = config.title;
+				// 请求路径
+				this.detailUrl = config.detailUrl;
+				this.addUrl = config.addUrl;
+				this.updateUrl = config.updateUrl;
+
+				this.fieldsGroup = config.fieldsGroup;
+				this.fieldsConfig = FieldsConfig.methods.formatConfig(config.fieldsConfig);
+				this.form = FieldsConfig.methods.formatForms(this.fieldsGroup);
+				this.oid = this.form.oid = oParam.oid;
+			},
+			getDetail: function (oid) { //本地查询,网上查询
+				var that = this;
+				var status = this.formStatus;
+
+				if (status == '本地再来一条' || status == '本地编辑') {
+					localServer[this.table].query({
+						oid: oid
+					}, function (data) {
+						if (data.status == 1 && data.rows.length > 0) {
+							// alert(JSON.stringify(data.rows[0], 4, 4))
+							that.form = data.rows[0];
+							if (status == '本地编辑') {
+								that.$refs.files.files = that.form.attachment;
+							}
+							if (status == '本地再来一条') {
+								that.oid = that.form.oid = jasTools.base.createuuid();
+							}
+						}
+					})
+				}
+				if (status == '网上再来一条' || status == '网上编辑') {
+					// var url = '/map/commonData/F000030/get.do';
+					// var url = '/jdbc/commonData/constructionWeld/getPage.do';
+
+					jasTools.ajax.post(this.detailUrl, {
+						oid: oid
+					}, function (data) {
+						that.form = data.data || data.rows[0];
+						if (status == '网上编辑') {
+							that.$refs.files.requestFile(oid);
+						}
+						if (status == '网上再来一条') {
+							that.oid = that.form.oid = jasTools.base.createuuid();
+						}
+					});
+				}
+			},
+			saveToLocal: function (fnSuccess, fnfail) { // 新增本地，更新本地
+				var that = this;
+				that.form.attachment = that.$refs.files.files;
+				that.form.oid = that.form.oid ? that.form.oid : jasTools.base.createuuid();
+				var operation = this.formStatus === '本地编辑' ? 'update' : 'save';
+
+				that._formatForm();
+				var obj = that.$refs.mainForm.getSelectLabelValues();
+				jasTools.base.extend(that.form, obj);
+				localServer[that.table][operation](that.form, function (data) {
+					if (data.status == 1) {
+						fnSuccess && fnSuccess();
+					} else {
+						fnfail && fnfail();
+					}
+				});
+			},
+			saveToServer: function (fnSuccess, fnfail) {
+				var that = this;
+
+				var uploadToServer = function () {
+					var url = that.formStatus == '网上编辑' ? that.updateUrl : that.addUrl;
+					that._formatForm();
+					jasTools.ajax.post(url, that.form, function (data) {
+						var sBizId = data.data || that.oid;
+						that.UploadOid = data.data;
+						var aFiles = that.form.attachment && that.form.attachment.map(function (item) {
+							return item.src
+						});
+						if (aFiles && aFiles.length > 0) {
+							jasTools.ajax.uploadFiles(sBizId, {
+								file: aFiles
+							}, function () {
+								fnSuccess && fnSuccess();
+							}, function () {
+								fnSuccess && fnSuccess(); // 附件上传失败依然执行成功方法
+							});
+						} else {
+							fnSuccess && fnSuccess();
+						}
+					}, function () {
+						fnfail && fnfail();
+					});
+				};
+
+				if (this.formStatus == '网上编辑') {
+					uploadToServer();
+				} else {
+					appcan.device.getInfo(13, function (err, data, dataType, optId) { // -1 网络不可用 0  WIFI网络 1  3G网络 2  2G网络
+						if (JSON.parse(data).connectStatus > -1) { // 有网
+							uploadToServer();
+						} else { // 无网
+							fnfail && fnfail();
+						}
+					})
+				}
+			},
+			deleteLocalForm: function (callback) {
+
+				localServer[this.table].delete({
+					oid: this.oid
 				}, function (data) {
-					that.form = data.data || data.rows[0];
-					// that.$refs['mainForm'].triggerFatherSelectsChange();
-					// that.form
+					callback && callback();
 				});
 			},
-			uploadSuccess: function (isSuccess) {
-				if (isSuccess) {
-					window.Vue && Vue.prototype.$toast('上传成功');
-				} else {
-					window.Vue && Vue.prototype.$toast('上传失败');
 
-				}
-			},
-			save: function () { //
+			saveBtn: function (index) {
 				var that = this;
-				var msg = "";
-				if (!this.isEdit) {
-					msg = "增加成功";
-					url = jasTools.base.rootPath + "/jdbc/commonData/detectionFaUltrasonic/save.do";
-				} else {
-					msg = "修改成功";
-					url = jasTools.base.rootPath + "/jdbc/commonData/detectionFaUltrasonic/update.do";
-				}
-
-				jasTools.ajax.post(url, that.form, function (data) {
-					that.$refs.upload.uploadFile(data.data || that.oid);
+				var result = this.$refs.mainForm.validate();
+				if (!result) return;
+				that.$indicator.open({
+					text: '正在保存数据...',
+					spinnerType: 'fading-circle'
 				});
-
+				if (this.formStatus == '网上编辑') {
+					that.saveToServer(function () { //server success
+						that.handleResult('网上编辑成功');
+					});
+				} else {
+					this.saveToLocal(function () { // local success
+						that.saveToServer(function () { //server success
+							that.deleteLocalForm();
+							that.handleResult('网上新增成功');
+						}, function () { //server fail
+							that.handleResult('本地成功');
+						});
+					}, function () { // local fail
+						that.handleResult('本地失败');
+					});
+				}
 			},
+			handleResult: function (type) { // 本地失败,本地成功,网上新增成功,网上编辑成功,网上编辑失败
+				var that = this;
+				that.$indicator.close();
+				if (type == '本地失败') {
+					that.$messagebox({
+						title: '保存失败',
+						message: '与本地数据冲突，请检查相关选项是否被重复录入',
+					});
+				}
+				if (type == '网上编辑成功') {
+					that.$indicator.close();
+					that.$toast('保存成功');
+					that._closePage(300);
+				}
+				if (type == '网上新增成功') {
+					this.$messagebox({
+						title: '保存到服务器',
+						message: '数据已经保存到服务器，是否再录一条?',
+						confirmButtonText: '再录一条',
+						cancelButtonText: '返回',
+						showCancelButton: true,
+						closeOnClickModal: false
+					}).then(function (action) {
+						if (action === 'confirm') {
+							var url = jasTools.base.setParamsToUrl('form.html', {
+								title: that.module,
+								oid: that.UploadOid || that.oid,
+								isAgain: 1,
+								isOnline: 1
+							});
+							appcan.window.open('form' + new Date().getTime(), url, 10, 16, 0, 0, 0);
+							that._closePage(300);
+						} else {
+							that._closePage(300);
+						}
+					});
+				}
+				if (type == '本地成功') {
+					this.$messagebox({
+						title: '保存到本地',
+						message: '数据已经保存到手机本地，是否再录一条?',
+						confirmButtonText: '再录一条',
+						cancelButtonText: '返回',
+						showCancelButton: true,
+						closeOnClickModal: false
+					}).then(function (action) {
+						if (action === 'confirm') {
+							var url = jasTools.base.setParamsToUrl('form.html', {
+								title: that.module,
+								oid: that.oid,
+								isAgain: 1,
+								isOnline: 0
+							});
+							appcan.window.open('form' + new Date().getTime(), url, 10, 16, 0, 0, 0);
+							that._closePage(300);
+						} else {
+							that._closePage(300);
+						}
+					});
+				}
+			},
+			_closePage: function (time) {
+				time = time || 0;
+				setTimeout(function () {
+					appcan.window.close();
+				}, time);
+			},
+			_formatForm: function () {
+				for (var key in this.form) {
+					if (this.form[key] === '') {
+						this.form[key] = null;
+					}
+				}
+			},
+
+
 
 		},
 	});

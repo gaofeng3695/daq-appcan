@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title></title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<link rel="stylesheet" href="../../lib/mint-ui/style.css">
+	<link rel="stylesheet" href="../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+
+	<link rel="stylesheet" href="../../common/css/jas-main.css">
+</head>
+
+<body>
+	<div class="_outer-wrapper">
+		<jas-header title="服务器配置" :is-return="true"></jas-header>
+		<div class="" v-setheight>
+
+			<jas-select-field label="协议类型" v-model="form.protocolConfig" :options="options"></jas-select-field>
+			<!-- <mt-radio title="协议名称" v-model="form.protocolConfig" :options="['http://', 'https://']"></mt-radio> -->
+			<!-- <mt-field label="协议名称" placeholder="请输入用户名" v-model="form.protocolConfig"></mt-field> -->
+			<mt-field label="ip地址" placeholder="请输入ip地址" type="text" v-model="form.host"></mt-field>
+			<mt-field label="端口" placeholder="请输入端口号" type="text" v-model="form.portConfig"></mt-field>
+
+			<div style="margin:10px;text-align: center;">
+				<div>您的服务器地址是： {{serverURL}}
+				</div>
+			</div>
+
+			<div style="margin:10px;">
+				<mt-button type="primary" @click.native="confirm" size="large">确 定</mt-button>
+			</div>
+
+
+		</div>
+	</div>
+</body>
+<script src="../../appcan/js/appcan.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/mint-ui/index.js"></script>
+<script src="../../common/js/jas-tools.js"></script>
+<script src="../../common/components/jas-components.js"></script>
+
+
+<script>
+	var protocolConfig = appcan.locStorage.getVal('serverProtocol') || 'http://'; //协议
+	var host = appcan.locStorage.getVal('serverIP') || '192.168.100.43'; //主机
+	var portConfig = appcan.locStorage.getVal('serverPort') || ''; //端口号
+
+	var vm = new Vue({
+		el: '._outer-wrapper',
+		data: function () {
+			return {
+				form: {
+					protocolConfig: jasTools.ajax.protocolConfig,
+					host: jasTools.ajax.host,
+					portConfig: jasTools.ajax.portConfig,
+				},
+				options: [{
+						label: 'http://',
+						value: 'http://',
+					},
+					{
+						label: 'https://',
+						value: 'https://',
+					},
+				],
+			}
+		},
+		computed: {
+			serverURL: function () {
+				return this.form.protocolConfig + this.form.host + (this.form.portConfig ? ':' : '') + this.form.portConfig +
+					'/';
+			}
+		},
+		created: function () {},
+		mounted: function () {},
+		methods: {
+			confirm: function () {
+				appcan.locStorage.setVal('serverProtocol', this.form.protocolConfig);
+				appcan.locStorage.setVal('serverIP', this.form.host);
+				appcan.locStorage.setVal('serverPort', this.form.portConfig);
+				this.$toast('修改成功');
+				setTimeout(function () {
+					appcan.window.close();
+				}, 600);
+			},
+		},
+	});
+</script>
+
+</html>

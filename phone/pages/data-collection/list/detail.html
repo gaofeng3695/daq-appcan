@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <link rel="stylesheet" href="./../../../lib/mint-ui/style.css">
+  <link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="./../../../common/css/jas-main.css">
+</head>
+<style>
+</style>
+
+<body>
+  <div class="_outer-wrapper">
+    <jas-header title="数据采集"></jas-header>
+    <div v-setheight style="overflow: auto;" class="heightContent">
+      <div v-for="item in fieldConfig">
+        <jas-group :title="item.groupName" v-if="!item.groupS">
+          <jas-check-detail-field-group :fields="item.fileds" :form="form">
+          </jas-check-detail-field-group>
+        </jas-group>
+        <jas-group v-else v-for="(values,index) in form[item.groupS]" :title="item.groupName+(index+1)">
+          <div v-for="child in item.fileds">
+            <jas-detail-field :label="child.name" :value="values[child.field]"></jas-detail-field>
+          </div>
+        </jas-group>
+      </div>
+      <jas-file-group ref="files"></jas-file-group>
+    </div>
+    <!--<jas-button-footer v-if="approveStatus=='0'" :buttons="['上报', '编辑', '再来一条', '删除']" :buttons-color="['#FF5722', '#FFB800',  '#1E9FFF','#009688']"
+      @click="clickbtn"></jas-button-footer>
+    <jas-button-footer v-if="approveStatus=='-1'" :buttons="['上报', '编辑',  '删除']" :buttons-color="['#FF5722', '#FFB800', '#009688']"
+      @click="clickbtn3"></jas-button-footer>
+    <jas-button-footer v-else-if="approveStatus=='2'||approveStatus=='1'||approveStatus==''" :buttons="['再来一条']" :buttons-color="['#1E9FFF']"
+      @click="clickbtn1"></jas-button-footer>-->
+    <jas-button-footer :buttons="btns" :buttons-color="btnsColr" @click="clickbtn"></jas-button-footer>
+    <!--<jas-button-footer v-else :buttons="['编辑', '再来一条', '删除']" :buttons-color="['#FFB800', '#1E9FFF', '#009688']" @click="clickbtn4"></jas-button-footer>-->
+
+    <!--状态不同控制显示按钮-->
+  </div>
+</body>
+<script src="./../../../appcan/js/appcan.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/mint-ui/index.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script src="./../../../common/js/common_device.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./../../../common/js/data-base-operation.js"></script>
+<script src="../../user-center/data-sync/local-server.js"></script>
+<script src="formDetail.js"></script>
+<script>
+  window.vm = new Vue({
+    el: '._outer-wrapper',
+    data: function () {
+      return {
+        oid: "",
+        form: {},
+        currentURL: {},
+        fieldConfig: {}, //字段配置
+        approveStatus: "", //表示当前这条记录的状态
+        currentStatus: "", //表示从那个状态进入
+        btns: ['上传', '编辑', '再来一条', '删除'],
+        btnsColr: ['#FF5722', '#FFB800', '#1E9FFF', '#009688']
+      }
+    },
+    created: function () {
+
+    },
+    mounted: function () {
+      var that = this;
+      appcan.ready(function () {
+        that.$indicator.open({
+          spinnerType: 'fading-circle'
+        });
+        var params = jasTools.base.getParamsInUrl();
+        that.oid = JSON.parse(params.obj).oid;
+        that.currentURL = JSON.parse(params.currentRequestUrl);
+        that.approveStatus = JSON.parse(params.obj).approveStatus;
+        that.currentStatus = params.currentStatus;
+        try {
+          fieldConfigs.forEach(function (item, index) {
+            if (item.name == that.currentURL.type) {
+              that.fieldConfig = item.fields;
+              foreach.break = new Error("StopIteration");
+            }
+          });
+        } catch (e) {
+
+        }
+        if (that.currentStatus != '3') {
+          that.$refs.files.requestFile(that.oid);
+          if (that.approveStatus == '2' || that.approveStatus == '1') { //表示通过与审核中按钮   只有再来一条
+            that.btns = ['再来一条'];
+            that.btnsColr = ['#1E9FFF'];
+          }
+          if (that.approveStatus == '0') { //未上报
+            that.btns = ['上报', '编辑', '再来一条', '删除'],
+              that.btnsColr = ['#FF5722', '#FFB800', '#1E9FFF', '#009688']
+          }
+          if (that.approveStatus == '-1') { //表示驳回
+            that.btns = ['上报', '编辑', '删除'],
+              that.btnsColr = ['#FF5722', '#FFB800', '#009688']
+          }
+          if (!that.approveStatus) {
+            that.btns = ['编辑', '再来一条', '删除'],
+              that.btnsColr = ['#FFB800', '#1E9FFF', '#009688']
+          }
+        }
+        that.requestDetail();
+        appcan.window.on('resume', function () {
+          that.requestDetail();
+        });
+      });
+    },
+    methods: {
+      clickbtn: function (index) {
+        var that = this;
+        if (index == '上传') {
+          that.submitToServer(); //上传
+          return;
+        }
+        if (index == '上报') {
+          that.approvesToServer();
+          return;
+        }
+        if (index == '编辑') {
+          that.editForm();
+          return;
+        }
+        if (index == '再来一条') {
+          that.copyobject();
+          return;
+        }
+        if (index == '删除') {
+          that.delete();
+          return;
+        }
+      },
+      submitToServer: function () { //上传
+        var that = this;
+        JasDevice.getConnectStatus(function (status) {
+          if (status != -1) { //表示当前无网络
+            that.submitBusData(function (data) {
+              that.deleteLocalForm();
+            }, function (data) {
+
+            });
+          }else{
+            that.$toast("请在有网的情况下上传");
+          }
+        });
+      },
+      submitBusData: function (fnSuccess, fnfail) {
+        var that = this;
+        jasTools.ajax.post(that.currentURL.addURL, that.form, function (data) {
+          var sBizId = that.form.oid;
+          var aFiles = that.form.attachment.map(function (item) {
+            return item.src
+          });
+          if (aFiles && aFiles.length > 0) {
+            jasTools.ajax.uploadFiles(sBizId, {
+              file: aFiles
+            }, function () {
+              fnSuccess && fnSuccess();
+            }, function () {
+              fnSuccess && fnSuccess(); // 附件上传失败依然执行成功方法
+            });
+          } else {
+            fnSuccess && fnSuccess();
+          }
+        }, function (data) {
+          fnfail && fnfail(data);
+        });
+      },
+      deleteLocalForm: function () {
+        var that = this;
+        localServer[that.currentURL.localURl].delete({
+          oid: that.form.oid
+        }, function (data) {
+          appcan.window.close(-1); //关闭页面
+        });
+      },
+      editForm: function () {
+        var that = this;
+        var isOnline = 1;
+        if (that.currentStatus == '3') {
+          isOnline = 0;
+        }
+        appcan.window.open('form', '../form/form.html?isOnline=' + isOnline + '&isAgain=0&oid=' +
+          that.form.oid +
+          '&title=' + that.currentURL.id, 10, 16, 0, 0, 0);
+      },
+      copyobject: function () {
+        var that = this;
+        var isOnline = 1;
+        if (that.currentStatus == '3') {
+          isOnline = 0;
+        }
+        appcan.window.open('form', '../form/form.html?isOnline=' + isOnline + '&isAgain=1&oid=' +
+          that.form.oid +
+          '&title=' + that.currentURL.id, 10, 16, 0, 0, 0);
+      },
+      approvesToServer: function () {
+        var that = this;
+        var obj = {
+          businessOid: [],
+          approveStatus: 1,
+        };
+        obj.businessOid[0] = that.oid;
+        if (that.currentURL.className) {
+          obj.className = that.currentURL.className;
+        }
+        if (that.currentURL.functionCode) {
+          obj.functionCode = that.currentURL.functionCode;
+        }
+        jasTools.ajax.post('/daq/dataApprove/save.do', obj, function (data) {
+          if (data.status == 1) {
+            appcan.window.close(-1);
+          } else {
+            that.$toast("网络异常，请稍候尝试");
+          }
+        });
+      },
+      delete: function () {
+        var that = this;
+        that.$messagebox({
+          title: '删除',
+          message: '确定删除该条数据?',
+          showCancelButton: true
+        }, function (value) {
+          if (value == 'confirm') {
+            //需要判断是本地删除韩式服务器删除
+            if (that.currentStatus != '3') {
+              that.deleteByServer();
+            } else {
+              that.deleteByLocal();
+            }
+          } else {
+            that.$toast("取消删除");
+          }
+        });
+      },
+      deleteByLocal: function () {
+        var that = this;
+        localServer[that.currentURL.localURl].delete({
+          oid: that.form.oid
+        }, function (data) {
+          if (data.status == 1) {
+            appcan.window.close(-1);
+            that.$toast("删除成功");
+          }
+        });
+      },
+      deleteByServer: function () {
+        var that = this;
+        jasTools.ajax.post(that.currentURL.deleteURL, that.form, function (data) {
+          if (data.status == 1) {
+            appcan.window.close(-1);
+            that.$toast("删除成功");
+          }
+        });
+      },
+      requestDetail: function () {
+        var that = this;
+        if (that.currentStatus != '3') {
+          jasTools.ajax.post(that.currentURL.detailURL, {
+            oid: that.oid
+          }, function (data) {
+            that.$indicator.close();
+            that.form = data.data || data.rows[0];
+          });
+        } else { //查询本地详情
+          localServer[that.currentURL.localURl].query({
+            oid: that.oid
+          }, function (data) {
+            if (data.status == 1) {
+              that.$indicator.close();
+              that.form = data.rows[0];
+              that.$refs.files.files = that.form.attachment;
+            } else {
+              that.$toast("网络异常，请稍候尝试")
+            }
+
+          });
+        }
+      }
+    },
+  });
+</script>
+
+</html>

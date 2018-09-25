@@ -20,12 +20,10 @@
 
 <script>
 	appcan.ready(function () {
+
 		var dbOperation = new DataBaseOperation();
 		dbOperation.dbTrans(init_sql, function (err) {
 			appcan.window.open('login', 'login.html', 0, 16, 0, 0, 0);
-			setTimeout(function () {
-				// appcan.window.close(0);
-			}, 800);
 		});
 
 	});

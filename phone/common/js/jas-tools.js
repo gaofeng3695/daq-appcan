@@ -243,7 +243,7 @@
 		var routeURL = 'DAQProject';
 		var completeURL = serverURL + routeURL;
 
-		var ajax = function (sType, sUrl, oData, fnSuccess, fnFail) {
+		var ajax = function (sType, sUrl, oData, fnSuccess, fnFail, defaultToast) { //defaultToast boolean 默认false，
 			if (!sType) {
 				alert('请传入类型！');
 				return;
@@ -275,8 +275,10 @@
 						return fnSuccess && fnSuccess(oData, status, requestCode, response, xhr);
 					} else {
 						//baseOperation.alertToast('网络繁忙，请稍后再试');
-						Vue && Vue.prototype.$indicator.close();
-						Vue && Vue.prototype.$toast(oData.msg || '网络繁忙，请稍后再试');
+						if (!defaultToast) {
+							Vue && Vue.prototype.$indicator.close();
+							Vue && Vue.prototype.$toast(oData.msg || '网络繁忙，请稍后再试');
+						}
 						return fnFail && fnFail(oData);
 					}
 				},
@@ -289,11 +291,28 @@
 			});
 		};
 		return {
+			protocolConfig: protocolConfig,
+			host: host,
+			portConfig: portConfig,
 			serverURL: serverURL,
 			completeURL: completeURL,
-			get: function (sUrl, oData, fnSuccess, fnFail) {
+			refreshIpConfig: function () {
+				protocolConfig = appcan.locStorage.getVal('serverProtocol') || 'http://'; //协议
+				host = appcan.locStorage.getVal('serverIP') || '192.168.100.214'; //主机
+				portConfig = appcan.locStorage.getVal('serverPort') || ''; //端口号
+				serverURL = protocolConfig + host + (portConfig ? ':' : '') + portConfig + '/';
+				completeURL = serverURL + routeURL;
+
+				this.protocolConfig = protocolConfig;
+				this.host = host;
+				this.portConfig = portConfig;
+				this.serverURL = serverURL;
+				this.completeURL = completeURL;
+
+			},
+			get: function (sUrl, oData, fnSuccess, fnFail, defaultToast) {
 				try {
-					ajax.call(this, 'GET', sUrl, oData, fnSuccess, fnFail);
+					ajax.call(this, 'GET', sUrl, oData, fnSuccess, fnFail, defaultToast);
 				} catch (e) {
 					Vue && Vue.prototype.$indicator.close();
 					Vue && Vue.prototype.$toast('系统故障，网络已中断');
@@ -301,9 +320,9 @@
 					return fnFail && fnFail(e);
 				}
 			},
-			post: function (sUrl, oData, fnSuccess, fnFail) {
+			post: function (sUrl, oData, fnSuccess, fnFail, defaultToast) {
 				try {
-					ajax.call(this, 'POST', sUrl, oData, fnSuccess, fnFail);
+					ajax.call(this, 'POST', sUrl, oData, fnSuccess, fnFail, defaultToast);
 				} catch (e) {
 					Vue && Vue.prototype.$indicator.close();
 					Vue && Vue.prototype.$toast('系统故障，网络已中断');

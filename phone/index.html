@@ -46,17 +46,18 @@
 		el: '._outer-wrapper',
 		data: function () {
 			return {
-				selectedTab: '数据录入',
+				selectedTab: '个人中心',
+				isInitResume: false,
 				tabs: [ //
-					{
-						name: '代码例子',
-						icon: 'fa fa-home',
-						url: 'pages/_demo/_demo.html',
-					},
+					// {
+					// 	name: '代码例子',
+					// 	icon: 'fa fa-home',
+					// 	url: 'pages/_demo/_demo.html',
+					// },
 					{
 						name: '数据统计',
-						icon: 'fa fa-home',
-						url: '',
+						icon: 'fa fa-pie-chart',
+						url: 'pages/data-statistics/data-statistics.html',
 					}, {
 						name: '数据录入',
 						icon: 'fa fa-pencil-square',
@@ -77,28 +78,67 @@
 				],
 			}
 		},
+
+		created: function () {
+			this.initTabs();
+		},
 		watch: {
 			selectedTab: function () {
-				this.openCurrentPage();
+				this.isAppcanReady && this.openCurrentPage();
 			}
 		},
-		created: function () {},
 		mounted: function () {
 			var that = this;
 			appcan.ready(function () {
+				that.isAppcanReady = true;
 				that.openCurrentPage();
+				appcan.window.on('resume', function () {
+					if (!that.isInitResume) {
+						that.isInitResume = true;
+						return;
+					}
+					if (that.selectedTab === '个人中心') {
+						var scriptContent = 'vm.initPage()';
+					}
+					if (that.selectedTab === '数据录入') {
+						var scriptContent = 'vm.initPage()';
+					}
+					scriptContent && appcan.window.evaluatePopoverScript('index', that.openCurrentPageId, scriptContent);
+				});
+				//监听退出键
+				// that.checkOut();
 			});
 		},
 		methods: {
+			initTabs: function () {
+				var userBo = JSON.parse(localStorage.getItem('user'));
+				var userName = userBo.loginName;
+				if (userName === 'zhangyi') { // 施工单位
+					this.tabs.splice(0, 1);
+					this.tabs.splice(1, 1);
+				}
+				if (userName === 'liyi') { // 监理单位
+					this.tabs.splice(0, 2);
+				}
+				if (userName === 'leifeng') { // 建设单位
+					this.tabs.splice(1, 2);
+				}
+				this.selectedTab = this.tabs[0].name;
+			},
+			afterProjectChanged: function () { // 供 切换项目界面 调用的方法
+				appcan.window.evaluatePopoverScript('index', 'pages/data-collection/data-collection.html', 'vm.initPage()');
+				appcan.window.evaluatePopoverScript('index', 'pages/data-review/index.html', 'vm.requestUnit()');
+				appcan.window.evaluatePopoverScript('index', 'pages/user-center/index.html', 'vm.initPage()');
+			},
 			openCurrentPage: function () {
 				var that = this;
 				var src = '';
 				this.tabs.forEach(function (item) {
 					if (item.name === that.selectedTab) {
 						src = item.url;
+						that.openCurrentPageId = src;
 					}
 				});
-
 				var top = Math.floor($('#content').offset().top * (window.devicePixelRatio || 1));
 				var height = Math.floor($('#content').height() * (window.devicePixelRatio || 1));
 				var width = Math.floor($('#content').width() * (window.devicePixelRatio || 1));
@@ -117,6 +157,23 @@
 					});
 				}
 			},
+			checkOut: function () { //退出应用
+				//监听手机物理返回键
+				uexWindow.setReportKey(0, 1);
+				uexWindow.onKeyPressed = function (keyCode) {
+					var _msg = "您是否要退出施工数据采集？";
+					appcan.window.confirm({
+						title: '提示',
+						content: _msg,
+						buttons: ['确定', '取消'],
+						callback: function (err, data, dataType, optId) {
+							if (data == 0) {
+								uexWidgetOne.exit(0);
+							}
+						}
+					});
+				};
+			}
 		},
 	});
 </script>

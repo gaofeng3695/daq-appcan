@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title></title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<link rel="stylesheet" href="./../../../lib/mint-ui/style.css">
+	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../common/css/jas-main.css">
+</head>
+<style>
+</style>
+
+<body>
+	<div class="_outer-wrapper " v-cloak>
+
+		<jas-header title="数据同步"></jas-header>
+
+		<!-- tab-container -->
+		<div v-setheight style="overflow: auto;">
+			<div>
+				<mt-cell title="基础数据" :label="tips(basic)">
+					<mt-button size="small" type="primary" @click.native="downloadBasic">同步</mt-button>
+				</mt-cell>
+				<mt-cell title="物资数据" :label="tips(material)">
+					<mt-button size="small" type="primary" @click.native="downloadMaterial">同步</mt-button>
+				</mt-cell>
+				<mt-cell title="施工人员机组数据" :label="tips(workPersonAndUnit)">
+					<mt-button size="small" type="primary" @click.native="downloadWorkPersonAndUnit">同步</mt-button>
+				</mt-cell>
+				<mt-cell title="施工单位用户数据" :label="tips(constructUser)">
+					<mt-button size="small" type="primary" @click.native="downloadConstructUser">同步</mt-button>
+				</mt-cell>
+				<mt-cell title="域值信息" :label="tips(domain)">
+					<mt-button size="small" type="primary" @click.native="downloadSysDomain">同步</mt-button>
+				</mt-cell>
+			</div>
+
+		</div>
+		<jas-button-footer :is-return="false" :buttons="footerBtns" @click="clickBtn"></jas-button-footer>
+	</div>
+</body>
+<script src="./../../../appcan/js/appcan.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/mint-ui/index.js"></script>
+<script src="./../../../common/js/data-base-operation.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./local-server.js"></script>
+<script src="./data-loader.js"></script>
+
+
+<script>
+	window.vm = new Vue({
+		el: '._outer-wrapper',
+		data: function () {
+			return {
+				isInit: 0,
+				isSynced: false,
+				footerBtns: [],
+				basic: {
+					qtty: 0,
+					time: '',
+				},
+				material: {
+					qtty: 0,
+					time: '',
+				},
+				workPersonAndUnit: {
+					qtty: 0,
+					time: '',
+				},
+				constructUser: {
+					qtty: 0,
+					time: '',
+				},
+				domain: {
+					qtty: 0,
+					time: '',
+				},
+			}
+		},
+		created: function () {
+			var that = this;
+			appcan.ready(function () {
+				that.getLocalDataInfo();
+				var oParam = jasTools.base.getParamsInUrl();
+				if (oParam.isInit == 1) {
+					that.footerBtns = ['下一步'];
+				}
+				appcan.window.on('pause', function () {
+					appcan.window.close(0);
+				});
+			});
+		},
+		mounted: function () {
+			var that = this;
+
+		},
+		methods: {
+			clickBtn: function (btn) {
+				if (btn == '下一步') {
+					if (!this.isSynced) {
+						this.$toast('请先进行数据同步');
+						return;
+					}
+					var url = '../setting/setting_project.html?isInit=1';
+					appcan.window.open('setting_project', url, 10, 16, 0, 0, 0);
+				}
+			},
+			getLocalDataInfo: function () {
+				var that = this;
+				dataLoader.basic.getCount(function (data) {
+					data.total > 0 && data.lastUpdateTime && (that.isSynced = true);
+					that.basic.qtty = data.total;
+					that.basic.time = data.lastUpdateTime;
+				});
+				dataLoader.material.getCount(function (data) {
+					that.material.qtty = data.total;
+					that.material.time = data.lastUpdateTime;
+				});
+				dataLoader.workPersonAndUnit.getCount(function (data) {
+					that.workPersonAndUnit.qtty = data.total;
+					that.workPersonAndUnit.time = data.lastUpdateTime;
+				});
+				dataLoader.offlineUser.getCount(function (data) {
+					that.constructUser.qtty = data.total;
+					that.constructUser.time = data.lastUpdateTime;
+				});
+				dataLoader.sysDomain.getCount(function (data) {
+					that.domain.qtty = data.total;
+					that.domain.time = data.lastUpdateTime;
+				});
+			},
+			tips: function (obj) {
+				// alert(JSON.stringify(obj))
+				if (!obj.time) return '-';
+				return obj.time + ' 已同步' + obj.qtty + '条数据';
+			},
+			_getQtty: function (odata) {
+				var qtty = 0;
+				for (var key in odata) {
+					if (odata.hasOwnProperty(key)) {
+						var arr = odata[key];
+						qtty += arr.length;
+					}
+				}
+				return qtty;
+			},
+			//----------------------------基础数据--------------------------
+			//------------同步基础数据
+			downloadBasic: function () {
+				var that = this;
+				that.toast && that.toast.close();
+				this.$indicator.open({
+					text: '正在同步，请稍后...',
+					spinnerType: 'fading-circle'
+				});
+				dataLoader.basic.request(function (odata) {
+					dataLoader.basic.deleteTable(function () {
+						dataLoader.basic.insertData(odata, function () {
+							dataLoader.basic.getCount(function (data) {
+								// alert(JSON.stringify(data,4,4))
+								that.isSynced = true;
+								that.$indicator.close();
+								that.toast = that.$toast('同步成功');
+								that.basic.qtty = data.total;
+								that.basic.time = data.lastUpdateTime;
+							});
+						});
+					});
+				});
+			},
+			//----------------------------线路物资--------------------------
+			//------------同步线路物资
+			downloadMaterial: function () {
+				var that = this;
+				this.$indicator.open({
+					text: '正在同步，请稍后...',
+					spinnerType: 'fading-circle'
+				});
+				dataLoader.material.request(function (odata) {
+					dataLoader.material.deleteTable(function () {
+						dataLoader.material.insertData(odata, function () {
+							dataLoader.material.getCount(function (data) {
+								// alert(JSON.stringify(data,4,4))
+								that.$indicator.close();
+								that.toast = that.$toast('同步成功');
+								that.material.qtty = data.total;
+								that.material.time = data.lastUpdateTime;
+							});
+						});
+					});
+				});
+			},
+			//----------------------------施工机组人员--------------------------
+			//------------同步施工人员机组
+			downloadWorkPersonAndUnit: function () {
+				var that = this;
+				this.$indicator.open({
+					text: '正在同步，请稍后...',
+					spinnerType: 'fading-circle'
+				});
+				dataLoader.workPersonAndUnit.request(function (odata) {
+					dataLoader.workPersonAndUnit.deleteTable(function () {
+						dataLoader.workPersonAndUnit.insertData(odata, function () {
+							dataLoader.workPersonAndUnit.getCount(function (data) {
+								// alert(JSON.stringify(data,4,4))
+								that.$indicator.close();
+								that.toast = that.$toast('同步成功');
+								that.workPersonAndUnit.qtty = data.total;
+								that.workPersonAndUnit.time = data.lastUpdateTime;
+							});
+						});
+					});
+				});
+			},
+			//----------------------------施工单位用户--------------------------
+			//------------同步施工单位用户
+			downloadConstructUser: function () {
+				var that = this;
+				this.$indicator.open({
+					text: '正在同步，请稍后...',
+					spinnerType: 'fading-circle'
+				});
+				dataLoader.offlineUser.request(function (odata) {
+					dataLoader.offlineUser.deleteTable(function () {
+						dataLoader.offlineUser.insertData(odata, function () {
+							dataLoader.offlineUser.getCount(function (data) {
+								// alert(JSON.stringify(data,4,4))
+								that.$indicator.close();
+								that.toast = that.$toast('同步成功');
+								that.constructUser.qtty = data.total;
+								that.constructUser.time = data.lastUpdateTime;
+							});
+						});
+					});
+				});
+			},
+			//----------------------------域值信息--------------------------
+			//------------同步域值信息
+			downloadSysDomain: function () {
+				var that = this;
+				this.$indicator.open({
+					text: '正在同步，请稍后...',
+					spinnerType: 'fading-circle'
+				});
+				dataLoader.sysDomain.request(function (odata) {
+					dataLoader.sysDomain.deleteTable(function () {
+						dataLoader.sysDomain.insertData(odata, function () {
+							dataLoader.sysDomain.getCount(function (data) {
+								// alert(JSON.stringify(data,4,4))
+								that.$indicator.close();
+								that.toast = that.$toast('同步成功');
+								that.domain.qtty = data.total;
+								that.domain.time = data.lastUpdateTime;
+							});
+						});
+					});
+				});
+			},
+
+
+		}
+	});
+</script>
+
+</html>

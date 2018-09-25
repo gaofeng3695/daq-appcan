@@ -21,8 +21,13 @@
 		<div v-setheight style="overflow: auto;">
 			<mt-cell v-for="item in setList" :title="item.name" :is-link="item.isLink" @click.native="goto(item)">
 				<span v-show="item.value">{{item.value}}</span>
-				<img :src="item.icon" v-show="item.icon" style="height:12vw;width:12vw">
+				<!-- <img :src="item.icon" v-show="item.icon" style="height:12vw;width:12vw"> -->
+				<div v-if="item.icon" style="padding:3px;">
+
+					<div :style="styleBgImg" style="height:12vw;width:12vw;border-radius: 50%;"></div>
+				</div>
 			</mt-cell>
+			<mt-actionsheet :actions="actions" v-model="sheetVisible"></mt-actionsheet>
 		</div>
 	</div>
 </body>
@@ -35,8 +40,22 @@
 	var vm = new Vue({
 		el: '._outer-wrapper',
 		data: function () {
+			var that = this;
+			var userBo = JSON.parse(localStorage.getItem("user"));
 			return {
-
+				photoOid: '',
+				sheetVisible: false,
+				actions: [{
+					name: '拍照',
+					method: function () {
+						that.takePhoto();
+					}
+				}, {
+					name: '从相册中选择',
+					method: function () {
+						that.selectPhoto();
+					}
+				}, ],
 				setList: [{
 					name: '头像',
 					isLink: true,
@@ -44,12 +63,11 @@
 				}, {
 					name: '账号',
 					isLink: false,
-					value: JSON.parse(localStorage.getItem("user")).userName
+					value: userBo ? userBo.userName : ''
 				}, {
 					name: '单位',
 					isLink: false,
-					value: JSON.parse(localStorage.getItem("user")).unitName.split("->")[JSON.parse(localStorage.getItem("user"))
-						.unitName.split("->").length - 1]
+					value: userBo ? userBo.unitName.split("->")[userBo.unitName.split("->").length - 1] : ''
 				}, {
 					name: '密码修改',
 					isLink: true,
@@ -57,88 +75,103 @@
 				}]
 			}
 		},
-		created: function () {
-
+		computed: {
+			styleBgImg: function () {
+				var obj = {
+					backgroundImage: '', //url(' + sUrl + ')
+					backgroundSize: 'cover',
+					backgroundPosition: 'center center',
+				};
+				if (this.photoOid) {
+					var src = [
+						jasTools.ajax.serverURL,
+						'DAQProject/attachment/app/getImageBySize.do?oid=',
+						this.photoOid,
+						'&token=',
+						localStorage.getItem("token")
+					].join('');
+				} else {
+					var src = '../../../common/images/girl.png ';
+				}
+				obj.backgroundImage = 'url(' + src + ')';
+				return obj;
+			},
 		},
 		mounted: function () {
 			var that = this;
 			appcan.ready(function () {
-				uexCamera.cbOpenInternal = function (opId, dataType, data) {
-					var imgpic = data;
-					appcan.logs(data);
-					that.setList[0].icon = data;
-					// upload(imgpic);
-				};
-				uexImage.onPickerClosed = function (info) {
-					var objData = JSON.parse(info);
-					if (!objData.isCancelled) {
-						var imgPaths = objData.data;
-						for (var i = 0; i < imgPaths.length; i++) {
-							that.setList[0].icon  = imgPaths[i];
-							// upload(imgPaths[i]);
-						}
-					}
-				};
-			})
+				that.requestFile();
+			});
 		},
 		methods: {
 			goto: function (item) {
 				if (item.link) {
-					appcan.window.open("config", item.link, 10, 16, 0, 0, 0);
-				} else {
-					this.choosePhoto();
+					appcan.window.open("updatePass", item.link, 10, 16, 0, 0, 0);
+				}
+				if (item.name == '头像') {
+					this.sheetVisible = true;
 				}
 			},
-			choosePhoto: function () {
+			takePhoto: function () {
 				var that = this;
-				var x = 0;
-				var y = 0;
-				var width = 0;
-				var height = 0;
-				var JsonData = {
-					"actionSheet_style": {
-						"frameBgColor": "#00000000",
-						"frameBroundColor": "#00000000",
-						"frameBgImg": "",
-						"btnSelectBgImg": "res://btn.png",
-						"btnUnSelectBgImg": "res://btn.png",
-						"cancelBtnSelectBgImg": "res://btn.png",
-						"cancelBtnUnSelectBgImg": "res://btn.png",
-						"textSize": "17",
-						"textNColor": "#333",
-						"textHColor": "#333",
-						"cancelTextNColor": "#333",
-						"cancelTextHColor": "#333",
-						"actionSheetList": [{
-							"name": "拍照"
-						}, {
-							"name": "从相册选择"
-						}]
-					}
-				};
-				uexActionSheet.open(x, y, width, height, JSON.stringify(JsonData));
-				uexActionSheet.onClickItem = function (data) {
-					if (data == 1) {
-						that.openAlbum();
-						//打开相册
-					} else if (data == 0) {
-						that.openCarme();
-						//打开照相机
-					}
-				}
+				uexCamera.openInternal(0, 75, function (picPath) {
+					picPath && that.uploadPhoto(picPath);
+				});
 			},
-			openAlbum: function () {
-				var data = {
+			selectPhoto: function () {
+				var that = this;
+				uexImage.openPicker({
 					min: 1,
 					max: 1,
 					quality: 0.5,
 					detailedInfo: false
-				};
-				var json = JSON.stringify(data);
-				uexImage.openPicker(json);
+				}, function (error, info) {
+					info.data && info.data.forEach(function (picPath) {
+						picPath && that.uploadPhoto(picPath);
+					});
+				});
 			},
-			openCarme: function () {
-				uexCamera.openInternal(0, 75);
+			requestFile: function (bizId) {
+				var that = this;
+				var url = "/attachment/getInfo.do";
+				var sBizId = JSON.parse(localStorage.getItem('user')).oid;
+				jasTools.ajax.get(url, {
+					businessType: 'photo',
+					businessId: sBizId,
+				}, function (data) {
+					// alert(JSON.stringify(data, 4, 4));
+					var arr = data.rows;
+					data.rows.length > 0 && (that.photoOid = arr[arr.length - 1].oid);
+					// that.deleteFile(data.rows.map(function (item) {
+					// 	return item.oid;
+					// }).join(','));
+				});
+			},
+			deleteFile: function (oid) {
+				jasTools.ajax.get("/attachment/delete.do", {
+					oids: oid
+				}, function (data) {});
+			},
+			uploadPhoto: function (picPath) {
+				var that = this;
+				that.$indicator.open({
+					text: '正在上传图片...',
+					spinnerType: 'fading-circle'
+				});
+
+				var sBizId = JSON.parse(localStorage.getItem('user')).oid;
+				var sUrl = "/attachment/upload.do?businessId=" + sBizId + "&businessType=photo";
+
+				jasTools.ajax.uploadFile(sUrl, picPath, function (data) {
+					// alert(JSON.stringify(data))
+					that.photoOid && that.deleteFile(that.photoOid);
+					that.photoOid = data.rows[0];
+					that.$indicator.close();
+					window.Vue && Vue.prototype.$toast('上传成功');
+				}, function () {
+					that.$indicator.close();
+					window.Vue && Vue.prototype.$toast('网络连接失败，请检查您的网络');
+				});
 			}
 		},
 	});
