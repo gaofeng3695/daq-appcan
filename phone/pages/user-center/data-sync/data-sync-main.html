@@ -35,6 +35,15 @@
 				<mt-cell title="域值信息" :label="tips(domain)">
 					<mt-button size="small" type="primary" @click.native="downloadSysDomain">同步</mt-button>
 				</mt-cell>
+				<mt-cell title="中线桩数据" :label="tips(median)">
+					<mt-button size="small" type="primary" @click.native="synMedianStakeData">同步</mt-button>
+				</mt-cell>
+				<mt-cell title="焊口返修数据" :label="tips(reworkWeld)">
+					<mt-button size="small" type="primary" @click.native="synReworkWeldData">同步</mt-button>
+				</mt-cell>
+				<mt-cell title="焊口数据" :label="tips(constructionWeld)">
+                    <mt-button size="small" type="primary" @click.native="synConstructionWeldData">同步</mt-button>
+                </mt-cell>
 			</div>
 
 		</div>
@@ -79,6 +88,18 @@
 					qtty: 0,
 					time: '',
 				},
+				median: {
+					qtty: 0,
+					time: ''
+				},
+				reworkWeld: {
+					qtty: 0,
+					time: ''
+				},
+				constructionWeld:{
+				 qtty: 0,
+                 time: ''   
+				}
 			}
 		},
 		created: function () {
@@ -132,6 +153,43 @@
 					that.domain.qtty = data.total;
 					that.domain.time = data.lastUpdateTime;
 				});
+				that.getMedianStakeInfo();
+				that.getReworkWeldInfo();
+				that.getConstructionWeldInfo();
+			},
+			getMedianStakeInfo: function () {
+				var that = this;
+				try {
+					uexArcGisRuntime.getMedianStakeSynInfo(function (err, info) {
+						that.median.qtty = info.data.count;
+						that.median.time = info.data.lastUpdateTime;
+					});
+				} catch (e) {
+					alert(e);
+				}
+			},
+			getReworkWeldInfo: function () {
+				var that = this;
+				try {
+					uexArcGisRuntime.getReworkWeldSynInfo(function (err, info) {
+						that.reworkWeld.qtty = info.data.count;
+						that.reworkWeld.time = info.data.lastUpdateTime;
+					});
+				} catch (e) {
+					alert(e);
+				}
+			},
+			getConstructionWeldInfo:function(){
+			    
+			   var that = this;
+                try {
+                    uexArcGisRuntime.getConstructionWeldSynInfo(function (err, info) {
+                        that.constructionWeld.qtty = info.data.count;
+                        that.constructionWeld.time = info.data.lastUpdateTime;
+                    });
+                } catch (e) {
+                    alert(e);
+                }
 			},
 			tips: function (obj) {
 				// alert(JSON.stringify(obj))
@@ -260,8 +318,69 @@
 					});
 				});
 			},
+			//----------------------------空间数据同步--------------------------
+			//中线桩数据同步
+			synMedianStakeData: function () {
+				var that = this;
+				that.$indicator.open({
+					text: '正在同步，请稍后...',
+					spinnerType: 'fading-circle'
+				});
 
+				try {
+					uexArcGisRuntime.synMedianStakeData(function (err, info) {
+					     that.$indicator.close();
+						if (err == 1) {
+							that.toast = that.$toast('同步成功');
+							that.getMedianStakeInfo();
+						} else {
+							that.toast = that.$toast('同步失败');
+						}
+					});
+				} catch (e) {
+					alert(e);
+				}
+			},
+			//返修口编号
+			synReworkWeldData: function () {
+				var that = this;
+				that.$indicator.open({
+					text: '正在同步，请稍后...',
+					spinnerType: 'fading-circle'
+				});
 
+				try {
+					uexArcGisRuntime.synReworkWeldData(function (err, info) {
+					    that.$indicator.close();
+						if (err == 1) {
+							
+							that.toast = that.$toast('同步成功');
+							that.getReworkWeldInfo();
+						} else {
+							that.toast = that.$toast('同步失败');
+						}
+					});
+				} catch (e) {
+					alert(e);
+				}
+			},
+			synConstructionWeldData:function(){//焊口信息
+			    var that=this;
+			      try {
+                uexArcGisRuntime.synConstructionWeldData(function(err, info) {
+                     that.$indicator.close();
+                if (err == 1) {
+                           
+                            that.toast = that.$toast('同步成功');
+                            that.getConstructionWeldInfo();
+                        } else {
+                            that.toast = that.$toast('同步失败');
+                        }
+                });
+            } catch(e) {
+                alert(e);
+            }
+			}
 		}
 	});
 </script>

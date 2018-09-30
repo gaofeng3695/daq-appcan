@@ -434,9 +434,9 @@ var FieldsConfig = (function () {
             'weldType', //	焊口类型
             'weldMethod', //	焊接方式
             'frontPipeType', //	前管件类型
-            'frontPipeCode', //	前管件编号
+            'frontPipeOid', //	前管件编号
             'backPipeType', //	后管件类型
-            'backPipeCode', //	后管件编号
+            'backPipeOid', //	后管件编号
             'weldRodBatchNum', //	焊条批号
             'weldWireBatchNum', //	焊丝批号
             'weldProduce', //	焊接工艺规程
@@ -489,13 +489,15 @@ var FieldsConfig = (function () {
           type: 'select',
           labelfield: 'pipeSegmentOrCrossName',
           childSelect: ['medianStakeOid'],
-          childUrl: ['/daq/privilege/getMedianStakeList.do'],
+          childOptionFrom: 'uexArcGisRuntime',
+          childUrl: ['getMedianStakeList'],
           required: true,
         },
         'medianStakeOid': {
           name: '桩号',
           type: 'select',
           labelfield: 'medianStakeCode',
+          required: true,
         },
         'workUnitOid': {
           name: '施工机组代号',
@@ -543,22 +545,36 @@ var FieldsConfig = (function () {
           type: 'select',
           labelfield: 'frontPipeTypeName',
           domainName: 'pipe_type_domain',
+          childSelect: ['frontPipeOid'],
+          childUrl: ['queryPipeFittingList'],
+          required: true,
         },
-        'frontPipeCode': {
+        'frontPipeOid': {
           name: '前管件编号',
           type: 'select',
           labelfield: 'frontPipeCode',
+          Params: {
+            pipeSegmentOrCrossOid: ""
+          },
+          required: true,
         },
         'backPipeType': {
           name: '后管件类型',
           type: 'select',
           labelfield: 'backPipeTypeName',
-          domainName: 'pipe_type_domain',
+          domainName: 'back_pipe_type_domain',
+          childSelect: ['backPipeOid'],
+          childUrl: ['queryPipeFittingList'],
+          required: true,
         },
-        'backPipeCode': {
+        'backPipeOid': {
           name: '后管件编号',
           type: 'select',
           labelfield: 'backPipeCode',
+          Params: {
+            pipeSegmentOrCrossOid: "",
+          },
+          required: true,
         },
         'constructDate': {
           name: '施工日期',
@@ -580,6 +596,7 @@ var FieldsConfig = (function () {
         'relativeMileage': {
           name: '相对桩位置',
           type: 'number',
+          required: true,
         },
         'weldCode': {
           name: '焊口编号',
@@ -602,19 +619,19 @@ var FieldsConfig = (function () {
         'surfaceCheck': {
           name: '外观质量检查',
           type: 'select',
-          labelfield: 'surfaceCheck',
+          labelfield: 'surfaceCheckName',
           options: checkOptionForNumber
         },
         'isGoldeJoint': {
           name: '是否金口',
           type: 'select',
-          labelfield: 'isGoldeJoint',
+          labelfield: 'isGoldeJointName',
           options: booleanOption
         },
         'isPipeHead': {
           name: '是否连头口',
           type: 'select',
-          labelfield: 'isPipeHead',
+          labelfield: 'isPipeHeadName',
           options: booleanOption
         },
         'remarks': {
@@ -625,9 +642,9 @@ var FieldsConfig = (function () {
     },
     'rework_weld': {
       title: '焊口返修',
-      detailUrl: '/jdbc/commonData/constructionWeld/getPage.do',
-      addUrl: '/jdbc/commonData/constructionWeld/save.do',
-      updateUrl: '/jdbc/commonData/constructionWeld/update.do',
+      detailUrl: '/jdbc/commonData/reworkWeld/getPage.do',
+      addUrl: '/jdbc/commonData/reworkWeld/save.do',
+      updateUrl: '/jdbc/commonData/reworkWeld/update.do',
 
       fieldsGroup: [ //
         {
@@ -710,7 +727,9 @@ var FieldsConfig = (function () {
           type: 'select',
           labelfield: 'pipeSegmentOrCrossName',
           childSelect: ['weldOid'],
-          childUrl: ['/daq/weld/getOnlyWeldList.do'],
+          childOptionFrom: 'uexArcGisRuntime',
+          childUrl: ['getWeldList'],
+          childType: "1", ////1只查询焊口，2查询焊口和返修
           required: true,
         },
         'workUnitOid': {
@@ -795,9 +814,9 @@ var FieldsConfig = (function () {
     },
     'measured_result': {
       title: '焊口测量',
-      detailUrl: '/jdbc/commonData/constructionWeld/getPage.do',
-      addUrl: '/jdbc/commonData/constructionWeld/save.do',
-      updateUrl: '/jdbc/commonData/constructionWeld/update.do',
+      detailUrl: '/jdbc/commonData/weldMeasuredResult/getPage.do',
+      addUrl: '/jdbc/commonData/weldMeasuredResult/save.do',
+      updateUrl: '/jdbc/commonData/weldMeasuredResult/update.do',
 
       fieldsGroup: [ //
         {
@@ -887,7 +906,9 @@ var FieldsConfig = (function () {
           type: 'select',
           labelfield: 'pipeSegmentOrCrossName',
           childSelect: ['weldOid', 'medianStakeOid'],
-          childUrl: ['/daq/weld/getOnlyWeldList.do', '/daq/privilege/getMedianStakeList.do'],
+          childOptionFrom: 'uexArcGisRuntime',
+          childUrl: ['getWeldList', 'getMedianStakeList'],
+          childType: "2", ////1只查询焊口，2查询焊口和返修
           required: true,
         },
         'weldOid': {
@@ -970,7 +991,7 @@ var FieldsConfig = (function () {
       }
     },
     'anticorrosion_check': {
-      title: '防腐管检查',
+      title: '补口记录',
       detailUrl: '/map/commonData/F000036/get.do',
       addUrl: '/map/commonData/F000036/save.do',
       updateUrl: '/map/commonData/F000036/update.do',
@@ -1046,8 +1067,11 @@ var FieldsConfig = (function () {
           name: '线路段/穿跨越',
           type: 'select',
           labelfield: 'pipe_segment_or_cross_name',
+          labelfield: 'pipeSegmentOrCrossName',
           childSelect: ['weld_oid'],
-          childUrl: ['/daq/weld/getOnlyWeldList.do'],
+          childOptionFrom: 'uexArcGisRuntime',
+          childUrl: ['getWeldList'],
+          childType: "2", ////1只查询焊口，2查询焊口和返修
           required: true,
         },
         'construct_unit': {
@@ -1112,55 +1136,55 @@ var FieldsConfig = (function () {
           name: '管口清理',
           type: 'select',
           labelfield: 'pipe_mouth_clean_name',
-          options: checkOption,
+          options: checkOptionForNumber,
         },
         'sandblasting_and_derusting': {
           name: '喷砂除绣',
           type: 'select',
           labelfield: 'sandblasting_and_derusting_name',
-          options: checkOption,
+          options: checkOptionForNumber,
         },
         'pipe_mouth_preheat': {
           name: '管口预热',
           type: 'select',
           labelfield: 'pipe_mouth_preheat_name',
-          options: checkOption,
+          options: checkOptionForNumber,
         },
         'epoxy_primer': {
           name: '环氧底漆',
           type: 'select',
           labelfield: 'epoxy_primer_name',
-          options: checkOption,
+          options: checkOptionForNumber,
         },
         'baking_check': {
           name: '喷烤',
           type: 'select',
           labelfield: 'baking_check_name',
-          options: checkOption,
+          options: checkOptionForNumber,
         },
         'overlap_check': {
           name: '轴向搭接',
           type: 'select',
           labelfield: 'overlap_check_name',
-          options: checkOption,
+          options: checkOptionForNumber,
         },
         'appearance_check': {
           name: '外观检查',
           type: 'select',
           labelfield: 'appearance_check_name',
-          options: checkOption,
+          options: checkOptionForNumber,
         },
         'electric_spark_leak_detection': {
           name: '电火花检漏',
           type: 'select',
           labelfield: 'electric_spark_leak_detection_name',
-          options: checkOption,
+          options: checkOptionForNumber,
         },
         'buckle_conclusion': {
           name: '补口结论',
           type: 'select',
           labelfield: 'buckle_conclusion_name',
-          options: checkOption,
+          options: checkOptionForNumber,
         },
         'anticorrosion': {
           name: '防腐工',
@@ -1191,7 +1215,9 @@ var FieldsConfig = (function () {
           '/daq/privilege/getPipelineListByTendersOid.do': 'pipeline',
           '/daq/privilege/getPipeSegmentOrCrossList.do': 'pipeSegmentOrCross',
           '/daq/privilege/getSupervisionUnitByTendersOid.do': 'supervisionUnit',
-          '/daq/weld/getOnlyWeldList.do' :'',
+          'getMedianStakeList': 'getMedianStakeList',
+          'getWeldList': 'getWeldList',
+          '/daq/privilege/getMedianStakeList.do': '',
 
 
           'materialPipe': 'materialPipe',
@@ -1206,6 +1232,7 @@ var FieldsConfig = (function () {
           '/daq/weldProduct/getListByCondition.do': 'weldProduct',
           '/daq/workPerson/getWorkPersonList.do': 'workPersonnel',
           'priUser': 'priUser',
+          'queryPipeFittingList': 'queryPipeFittingList'
         };
         for (var item in oConfig) {
           if (oConfig.hasOwnProperty(item)) {

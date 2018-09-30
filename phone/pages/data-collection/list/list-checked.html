@@ -126,7 +126,7 @@
 			</div>
 		</div>
 		<div class="heightContent">
-			<div style="height:100%;overflow: scroll">
+			<div style="height:100%;overflow: scroll" class="listWrapper">
 				<mt-loadmore ref="loadmore" :top-method="refresh" :auto-fill="false" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded">
 					<ul>
 						<li v-for="item in typeList" v-show="topSearchForm.status=='0,1,-1,2'">
@@ -314,6 +314,7 @@
 					construction_weld: {
 						id: "construction_weld",
 						url: "/jdbc/commonData/constructionWeld/getPage.do",
+						localURl: "constructWeld", //待上传
 						deleteBatchURL: "/jdbc/commonData/constructionWeld/deleteBatch.do",
 						deleteURL: "/jdbc/commonData/constructionWeld/delete.do",
 						detailURL: "/jdbc/commonData/constructionWeld/getPage.do",
@@ -339,6 +340,7 @@
 					measured_result: {
 						id: "measured_result",
 						url: "/jdbc/commonData/weldMeasuredResult/getPage.do",
+						localURl: "weldMeasured", //待上传
 						deleteBatchURL: "/jdbc/commonData/weldMeasuredResult/deleteBatch.do",
 						detailURL: "/jdbc/commonData/weldMeasuredResult/getPage.do",
 						deleteURL: "/jdbc/commonData/weldMeasuredResult/delete.do",
@@ -359,10 +361,12 @@
 						chooseStatues: "statuses",
 						type: "补口记录",
 						functionCode: "F000036",
-						code: "weld_code",
+						code: "weldCode",
+						code1: "weld_code",
 						searchObj: {
 							page: 1,
-							rows: 10
+							rows: 10,
+							approveStatus: "-1"
 						}
 					}
 				},
@@ -399,7 +403,8 @@
 					that.code = that.typeUrl[that.topSearchForm.module].code;
 					if (that.typeUrl[that.topSearchForm.module].searchObj) {
 						that.searchObj = that.typeUrl[that.topSearchForm.module].searchObj
-					} else {
+					}
+					if (that.searchObj.approveStatus) {
 						that.searchObj.approveStatus = that.topSearchForm.status;
 					}
 					var isExit = 0;
@@ -432,10 +437,10 @@
 					}
 				});
 				appcan.window.on("resume", function () {
-				  if(that.firestRequest) {
-					  that.firestRequest=false;
-					  return;
-					 }
+					if (that.firestRequest) {
+						that.firestRequest = false;
+						return;
+					}
 					that.refresh();
 				});
 			});
@@ -451,14 +456,14 @@
 				that.typeList = [];
 				that.allLoaded = false;
 				that.allchecked = false;
-				that.requestList();
+				that.requestList(true);
 			},
-			requestList: function () {
+			requestList: function (isFresh) {
 				var that = this;
 				if (that.topSearchForm.status == '3') { //待上传
 					that.requestByLoacl(); //请求本地列表
 				} else {
-					that.requestByServer(); //请求服务器数据
+					that.requestByServer(isFresh); //请求服务器数据
 				}
 			},
 			requestByLoacl: function () {
@@ -469,9 +474,7 @@
 					}, function (data) {
 						if (data.status == 1) {
 							data.rows.forEach(function (item, index) {
-								item.code = item[that.code];
-								// var time = item.createDatetime || item.create_datetime;
-								// item.createTime = time.split(" ")[0];
+								item.code = item[that.code] || item[that.code1];
 								item.checked = false;
 								that.typeList.push(item);
 							});
@@ -484,13 +487,16 @@
 					that.$toast("暂无接口");
 				}
 			},
-			requestByServer: function () {
+			requestByServer: function (isFresh) {
 				var that = this;
-
 				that.searchObj.projectOid = localStorage.getItem("defaultProject");
 				that.searchObj.project_oid = localStorage.getItem("defaultProject");
+				// alert(JSON.stringify(that.searchObj));
 				jasTools.ajax.post(that.currentUrl.url, that.searchObj, function (data) {
 					if (data.status == 1) {
+						setTimeout(function () {
+							isFresh && ($('.listWrapper')[0].scrollTop = 0);
+						}, 10);
 						if (that.searchObj.pageNo == 1 || that.searchObj.page == 1) {
 							if (data.rows.length > 0) {
 								that.typeList = [];
@@ -660,8 +666,10 @@
 			deletes: function () {
 				var that = this;
 				var idList = [];
+				var objList=[];
 				that.typeList.forEach(function (item) {
 					if (item.checked) {
+						objList.push(item);
 						idList.push(item.oid);
 					}
 				});
@@ -676,14 +684,14 @@
 				}, function (value) {
 					if (value == 'confirm') {
 						if (that.topSearchForm.status == '3') {
-							that.deleteByLocal(idList);
+							that.deleteByLocal(idList,objList);
 						} else {
 							that.deleteByServer(idList);
 						}
 					}
 				});
 			},
-			deleteByLocal: function (ids) { //本地批量删除
+			deleteByLocal: function (ids,objList) { //本地批量删除
 				var that = this;
 				var id = '';
 				ids.forEach(function (item) {
@@ -691,7 +699,8 @@
 				});
 				id = id.substring(0, id.length - 1);
 				localServer[that.currentUrl.localURl].deleteBatch({
-					"ids": id
+					"ids": id,
+					"objectList":objList
 				}, function (data) {
 					if (data.status == 1) {
 						that.$toast("删除成功");

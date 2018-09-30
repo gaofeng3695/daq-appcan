@@ -36,7 +36,11 @@ Vue.directive('fieldicon', {
   bind: function (el, binding) {
     if (!binding.value) return;
     if (binding.value === 'date') {
-      var html = '<i class="fa fa-calendar" style="color:#666;padding-left:6px;" aria-hidden="true"></i>';
+      var html = '<i class="fa fa-calendar" style="color:#666;padding: 6px 0 6px 6px;" aria-hidden="true"></i>';
+      $(el).find('.mint-cell-wrapper').eq(0).append(html);
+    }
+    if (binding.value === 'barcode') {
+      var html = '<i class="fa fa-barcode" style="color:#666;padding: 6px 0 6px 6px;" aria-hidden="true"></i>';
       $(el).find('.mint-cell-wrapper').eq(0).append(html);
     }
   }

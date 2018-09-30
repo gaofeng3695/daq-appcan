@@ -288,14 +288,14 @@ var fieldConfigs = [{
           "field": "weldProduceCode"
         }, {
           "name": "外观质量检查",
-          "field": "surfaceCheck"
+          "field": "surfaceCheckName"
         },
         {
           "name": "是否金口",
-          "field": "isGoldeJoint"
+          "field": "isGoldeJointName"
         }, {
           "name": "是否连头口",
-          "field": "isPipeHead"
+          "field": "isPipeHeadName"
         }
       ]
     }]

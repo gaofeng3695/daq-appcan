@@ -224,6 +224,7 @@
 				if (defaultProjectId) {
 					that.requestLocal();
 					that.requestStatistics();
+					that.weldMeasuredResult();
 				} else {
 					appcan.window.confirm({
 						title: '提示',
@@ -308,6 +309,24 @@
 						});
 					}
 				});
+			},
+			weldMeasuredResult: function () {
+				var that = this;
+				that.projectOid = localStorage.getItem("defaultProject");
+				var params={
+				    projectOid:that.projectOid
+				};
+				try {
+					uexArcGisRuntime.getLocalCount(JSON.stringify(params),function (err, info) {
+					  if(err==1){
+					   for(var key in info.data){
+							 	that.statistics[key].toUpload=info.data[key].toUpload;
+						 }
+						}
+					});
+				} catch (e) {
+					alert(e);
+				}
 			}
 		}
 	});

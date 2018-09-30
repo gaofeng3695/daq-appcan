@@ -180,6 +180,7 @@
 		</div>
 
 		<div v-setheight style="overflow: auto;">
+			<div v-show="isData" style="color:#999;font-size:14px;padding:10px;height:26px;text-align: center">没有需要审核的数据 </div>
 			<div class="item-line " v-for="item in reviewList">
 				<div @click="item.isShow=!item.isShow">
 					<div class="line ub">
@@ -275,38 +276,22 @@
 				firestRequest: true,
 				unitName: "",
 				units: [],
-				reviewList: [{
-					cnName: "管道焊接/补口",
-					unit: "111111111111",
-					total: 100,
-					unaudited: 20,
-					dataApproveSubBoList: {
-						cnName: "dfghj",
-						total: 100,
-						unaudited: 20,
-					}
-				}, {
-					cnName: "管道焊接/补口",
-					unit: "111111111111",
-					total: 100,
-					unaudited: 20,
-					dataApproveSubBoList: {
-						cnName: "dfghj",
-						total: 100,
-						unaudited: 20,
-					}
-				}]
+				reviewList: [],
+				isData: false
 			}
 		},
 		watch: {
 			'searchObj.unit': function () {
 				var that = this;
-				that.units.forEach(function (item) {
-					if (item.value == that.searchObj.unit) {
-						that.unitName = item.label;
-					}
-				});
-				that.requestTotalNum();
+				if (!that.isData) {
+					that.units.forEach(function (item) {
+						if (item.value == that.searchObj.unit) {
+							that.unitName = item.label;
+							that.type = item.type;
+						}
+					});
+					that.requestTotalNum();
+				}
 			}
 		},
 		mounted: function () {
@@ -344,30 +329,51 @@
 			requestUnit: function () { //获取施工单位
 				var that = this;
 				var url = "/daq/privilege/getConstructAndDetectionUnitList.do";
-				jasTools.ajax.post(url, {
-
-				}, function (data) {
-					data.rows.forEach(function (item) {
+				var obj = {
+					projectOid: localStorage.getItem("defaultProject")
+				};
+				that.units = [];
+				jasTools.ajax.post(url, obj, function (data) {
+					if (data.rows.length > 0) {
+						that.isData = false;
+						data.rows.forEach(function (item) {
+							that.units.push({
+								label: item.value,
+								value: item.key,
+								type: item.type
+							});
+						});
+						that.searchObj.unit = that.units[0].value;
+						that.unitName = that.units[0].label;
+						that.type = that.units[0].type;
+					} else {
 						that.units.push({
-							label: item.value,
-							value: item.key
-						})
-					});
-					that.searchObj.unit = that.units[0].value;
-					that.unitName = that.units[0].label;
+							label: "暂无任何单位",
+							value: 0,
+						});
+						that.searchObj.unit = 0;
+						that.isData = true;
+					}
 				});
 			},
 			requestTotalNum: function () {
 				var that = this;
 				var url = "/statistics/dataAuditing.do";
 				jasTools.ajax.get(url, {
-					'constructUnit': that.searchObj.unit,
+					'unitId': that.searchObj.unit,
 					'projectOid': localStorage.getItem("defaultProject")
 				}, function (data) {
+					that.reviewList = [];
 					data.data.forEach(function (item) {
-						item.isShow = false;
+						if (that.type == 2 && item.code == "pipe_inspection") {
+							item.isShow = true;
+							that.reviewList.push(item);
+						}
+						if (that.type == 1 && item.code != "pipe_inspection") {
+							item.isShow = false;
+							that.reviewList.push(item);
+						}
 					});
-					that.reviewList = data.data;
 				});
 			}, //请求数据审核页面的数据统计
 			goToDetail: function (obj) {

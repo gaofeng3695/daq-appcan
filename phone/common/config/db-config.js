@@ -4,14 +4,14 @@ init_sql = ["create table if not exists DaqProject (id INTEGER PRIMARY KEY AUTOI
             "create table if not exists DaqPipeSegmentOrCross (id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,name text,pipelineOid text,userId text)",//线路段和穿跨越列表
             "create table if not exists DaqSupervisionUnit (id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,name text,tendersOid text,userId text)",//监理单位
             //"create table if not exists DaqMedianStake (id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,stakeCode text,pipeSegmentOrCrossOid text,userId text)",//中线桩列表
-            "create table if not exists DaqMaterialPipe (id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,pipeCode text,userId text,backIsUse integer,frontIsUse integer,isColdBend integer,lastUpdateTime text)",//钢管表
-            "create table if not exists DaqClodBendingPipe (id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,clodBendingPipeCode text,userId text,tendersOid text,pipeSegmentOrCrossOid text,backIsUse integer,frontIsUse integer,approveStatus integer)",//冷弯管表
-            "create table if not exists DaqMaterialHotBends (id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,hotBendsCode text,userId text,backIsUse integer,frontIsUse integer)",//热煨弯管表
-            "create table if not exists DaqMaterialTee (id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,teeCode text,userId text,isUse integer)",//三通表
-            "create table if not exists DaqMaterialJnsulatedJoint (id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,manufacturerCode text,userId text,isUse integer)",//绝缘接头
-            "create table if not exists DaqMaterialReducer (id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,reducerCode text,userId text,isUse integer)",//大小头
-            "create table if not exists DaqMaterialClosure (id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,closureCode text,userId text,isUse integer)",//封堵物
-            "create table if not exists DaqMaterialValve (id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,valveName text,userId text,isUse integer)",//阀门
+            "create table if not exists DaqMaterialPipe (id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,pipeCode text,userId text,backIsUse integer,frontIsUse integer,isColdBend integer,lastUpdateTime text,projectOid text)",//钢管表
+            "create table if not exists DaqClodBendingPipe (id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,clodBendingPipeCode text,userId text,tendersOid text,pipeSegmentOrCrossOid text,backIsUse integer,frontIsUse integer,approveStatus integer,projectOid text)",//冷弯管表
+            "create table if not exists DaqMaterialHotBends (id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,hotBendsCode text,userId text,backIsUse integer,frontIsUse integer,projectOid text)",//热煨弯管表
+            "create table if not exists DaqMaterialTee (id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,teeCode text,userId text,isUse integer,projectOid text)",//三通表
+            "create table if not exists DaqMaterialJnsulatedJoint (id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,manufacturerCode text,userId text,isUse integer,projectOid text)",//绝缘接头
+            "create table if not exists DaqMaterialReducer (id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,reducerCode text,userId text,isUse integer,projectOid text)",//大小头
+            "create table if not exists DaqMaterialClosure (id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,closureCode text,userId text,isUse integer,projectOid text)",//封堵物
+            "create table if not exists DaqMaterialValve (id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,valveName text,userId text,isUse integer,projectOid text)",//阀门
             "create table if not exists DaqWorkUnit(id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,workUnitName text,projectOid text,workUnitType text,userId text,lastUpdateTime text)",//施工机组表
             "create table if not exists DaqWeldProduceSpecification(id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,weldProduceCode text,projectOid text,userId text)",//焊接工艺表
             "create table if not exists DaqWorkPersonnel(id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,personnelName text,workUnitOid text,personnelType text,userId text)",//机组人员表
@@ -25,7 +25,6 @@ init_sql = ["create table if not exists DaqProject (id INTEGER PRIMARY KEY AUTOI
             "create table if not exists DaqCheckHotBends(id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,hotBendOid text unique,projectOid text,tendersOid text,postData text,state int,userId text)",//热煨弯管检查
             "create table if not exists DaqCheckPipeColdBending(id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,pipeColdBendingOid text unique,projectOid text,tendersOid text,postData text,state int,userId text)",//冷弯管检查
             
-            "create table if not exists DaqWeldReworkWeld(id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,weldOid text unique,projectOid text,tendersOid text,pipelineOid text,pipeSegmentOrCrossOid text,postData text,state int,userId text)",//焊口返修
             "create table if not exists DaqWeldAnticorrosionCheck(id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,weldOid text unique,projectOid text,tendersOid text,pipelineOid text,pipeSegmentOrCrossOid text,postData text,state int,userId text)",//防腐补口
             "create table if not exists DaqSysAttachment(id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,fileName text, businessId text,src text,state int)"//附件表
 ];

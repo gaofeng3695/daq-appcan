@@ -5,7 +5,7 @@
  * @param {Function} cb 插入成功后的回掉函数
  */
 function insertData(type, baseData, cb) {
-    if(!baseData) return;
+    if (!baseData) return;
     var dbOperation = new DataBaseOperation();
     var index = 0;
     var addItem = function (baseData, index) {
@@ -33,39 +33,34 @@ function insertData(type, baseData, cb) {
                     case ("supervisionUnit"):
                         Sqls[index] = "insert into DaqSupervisionUnit (oid,name,userId,tendersOid) values ('" + item.key + "','" + item.value + "','" + userId + "','" + item.tenders_oid + "')";
                         break;
-
-
                     case ("materialPipe"):
-                        Sqls[index] = "insert into DaqMaterialPipe (oid,pipeCode,userId,backIsUse,frontIsUse,isColdBend,lastUpdateTime) values ('" + item.key + "','" + item.value + "','" + userId + "'," + item.frontIsUse + "," + item.backIsUse + "," + item.isColdBend + ",'" + localDatetime + "')";
+                        Sqls[index] = "insert into DaqMaterialPipe (oid,pipeCode,userId,backIsUse,frontIsUse,isColdBend,lastUpdateTime,projectOid) values ('" + item.key + "','" + item.value + "','" + userId + "'," + item.frontIsUse + "," + item.backIsUse + "," + item.isColdBend + ",'" + localDatetime + "','" + item.projectOid + "')";
                         break;
                     case ("coldBending"):
-                        Sqls[index] = "insert into DaqClodBendingPipe (oid,clodBendingPipeCode,userId,backIsUse,frontIsUse,tendersOid,approveStatus) values ('" + item.key + "','" + item.value + "','" + userId + "'," + item.frontIsUse + "," + item.backIsUse + ",'" + item.tendersOid + "'," + item.approveStatus + ")";
+                        Sqls[index] = "insert into DaqClodBendingPipe (oid,clodBendingPipeCode,userId,backIsUse,frontIsUse,tendersOid,approveStatus,projectOid,pipeSegmentOrCrossOid) values ('" + item.key + "','" + item.value + "','" + userId + "'," + item.frontIsUse + "," + item.backIsUse + ",'" + item.tendersOid + "'," + item.approveStatus + ",'" + item.projectOid + "','" + item.pipeSegmentOrCrossOid + "')";
                         break;
                     case ("materialHotBends"):
-                        Sqls[index] = "insert into DaqMaterialHotBends (oid,hotBendsCode,userId,backIsUse,frontIsUse) values ('" + item.key + "','" + item.value + "','" + userId + "'," + item.frontIsUse + "," + item.backIsUse + ")";
+                        Sqls[index] = "insert into DaqMaterialHotBends (oid,hotBendsCode,userId,backIsUse,frontIsUse,projectOid) values ('" + item.key + "','" + item.value + "','" + userId + "'," + item.frontIsUse + "," + item.backIsUse + ",'" + item.projectOid + "')";
                         break;
                     case ("materialTee"):
-                        Sqls[index] = "insert into DaqMaterialTee (oid,teeCode,userId,isUse) values ('" + item.key + "','" + item.value + "','" + userId + "'," + item.isUse + ")";
+                        Sqls[index] = "insert into DaqMaterialTee (oid,teeCode,userId,isUse,projectOid) values ('" + item.key + "','" + item.value + "','" + userId + "'," + item.isUse + ",'" + item.projectOid + "')";
                         break;
                     case ("materialJnsulatedJoint"):
-                        Sqls[index] = "insert into DaqMaterialJnsulatedJoint (oid,manufacturerCode,userId,isUse) values ('" + item.key + "','" + item.value + "','" + userId + "'," + item.isUse + ")";
+                        Sqls[index] = "insert into DaqMaterialJnsulatedJoint (oid,manufacturerCode,userId,isUse,projectOid) values ('" + item.key + "','" + item.value + "','" + userId + "'," + item.isUse + ",'" + item.projectOid + "')";
                         break;
                     case ("materialReducer"):
-                        Sqls[index] = "insert into DaqMaterialReducer (oid,reducerCode,userId,isUse) values ('" + item.key + "','" + item.value + "','" + userId + "'," + item.isUse + ")";
+                        Sqls[index] = "insert into DaqMaterialReducer (oid,reducerCode,userId,isUse,projectOid) values ('" + item.key + "','" + item.value + "','" + userId + "'," + item.isUse + ",'" + item.projectOid + "')";
                         break;
                     case ("materialClosure"):
-                        Sqls[index] = "insert into DaqMaterialClosure (oid,closureCode,userId,isUse) values ('" + item.key + "','" + item.value + "','" + userId + "'," + item.isUse + ")";
+                        Sqls[index] = "insert into DaqMaterialClosure (oid,closureCode,userId,isUse,projectOid) values ('" + item.key + "','" + item.value + "','" + userId + "'," + item.isUse + ",'" + item.projectOid + "')";
                         break;
                     case ("materialValve"):
-                        Sqls[index] = "insert into DaqMaterialValve (oid,valveName,userId,isUse) values ('" + item.key + "','" + item.value + "','" + userId + "'," + item.isUse + ")";
+                        Sqls[index] = "insert into DaqMaterialValve (oid,valveName,userId,isUse,projectOid) values ('" + item.key + "','" + item.value + "','" + userId + "'," + item.isUse + ",'" + item.projectOid + "')";
                         break;
 
 
                     case ("workUnit"):
                         Sqls[index] = "insert into DaqWorkUnit (oid,workUnitName,userId,projectOid,workUnitType,lastUpdateTime) values ('" + item.key + "','" + item.value + "','" + userId + "','" + item.project_oid + "','" + item.work_unit_type + "','" + localDatetime + "')";
-                        break;
-                    case ("workUnit"):
-                        Sqls[index] = "insert into DaqWorkUnit (oid,workUnitName,userId,projectOid,workUnitType) values ('" + item.key + "','" + item.value + "','" + userId + "','" + item.project_oid + "','" + item.work_unit_type + "')";
                         break;
                     case ("weldProduct"):
                         Sqls[index] = "insert into DaqWeldProduceSpecification (oid,weldProduceCode,userId,projectOid) values ('" + item.key + "','" + item.value + "','" + userId + "','" + item.project_oid + "')";
@@ -150,6 +145,7 @@ function singleOperate(type, sqls, callback) {
     } else {
         resultData.msg = "删除成功";
     };
+    // alert(JSON.stringify(sqls,4,4))
     var dbOperation = new DataBaseOperation();
     dbOperation.dbTrans(sqls, function (err, data) {
         if (err == 0) {
@@ -585,6 +581,8 @@ var localServer = (function (jasTools, DataBaseOperation) {
             save: function (obj, callback) {
                 var sqls = [];
                 var userId = JSON.parse(localStorage.getItem("user")).oid;
+                // obj.userId = userId;
+                alert(JSON.stringify(obj, 4, 4))
                 sqls[0] = "insert into DaqCheckCoatingPipe (oid,pipeOid,projectOid,tendersOid,postData,state,userId) values " +
                     "('" + obj.oid + "','" + obj.pipe_oid + "','" + obj.project_oid + "','" + obj.tenders_oid + "','" + JSON.stringify(obj) + "',1,'" + userId + "')";
                 var attachments = obj.attachment;
@@ -597,6 +595,8 @@ var localServer = (function (jasTools, DataBaseOperation) {
             },
             update: function (obj, callback) {
                 var sqls = [];
+                var userId = JSON.parse(localStorage.getItem("user")).oid;
+                obj.userId = userId;
                 sqls[0] = "update DaqCheckCoatingPipe set pipeOid='" + obj.pipe_oid + "',projectOid='" + obj.project_oid + "'," +
                     "tendersOid='" + obj.tenders_oid + "',postData='" + JSON.stringify(obj) + "' where oid='" + obj.oid + "'";
                 sqls[1] = "delete from DaqSysAttachment where businessId='" + obj.oid + "'";
@@ -626,7 +626,7 @@ var localServer = (function (jasTools, DataBaseOperation) {
                 if (obj.oid != null && obj.oid != "") {
                     querySql = "select * from DaqCheckCoatingPipe where oid='" + obj.oid + "'";
                 } else {
-                    querySql = "select * from DaqCheckCoatingPipe where state=1 and userId='" + userId + "' and projectOid='"+obj.projectOid+"'";
+                    querySql = "select * from DaqCheckCoatingPipe where state=1 and userId='" + userId + "' and projectOid='" + obj.projectOid + "'";
                 }
                 doubleQuery(querySql, callback)
             },
@@ -635,6 +635,7 @@ var localServer = (function (jasTools, DataBaseOperation) {
             save: function (obj, callback) {
                 var sqls = [];
                 var userId = JSON.parse(localStorage.getItem("user")).oid;
+                obj.userId = userId;
                 sqls[0] = "insert into DaqCheckPipeColdBending (oid,pipeColdBendingOid,projectOid,tendersOid,postData,state,userId) values " +
                     "('" + obj.oid + "','" + obj.pipeColdBendingOid + "','" + obj.projectOid + "','" + obj.tendersOid + "','" + JSON.stringify(obj) + "',1,'" + userId + "')";
                 var attachments = obj.attachment;
@@ -647,6 +648,8 @@ var localServer = (function (jasTools, DataBaseOperation) {
             },
             update: function (obj, callback) {
                 var sqls = [];
+                var userId = JSON.parse(localStorage.getItem("user")).oid;
+                obj.userId = userId;
                 sqls[0] = "update DaqCheckPipeColdBending set pipeColdBendingOid='" + obj.pipeColdBendingOid + "',projectOid='" + obj.projectOid + "'," +
                     "tendersOid='" + obj.tendersOid + "',postData='" + JSON.stringify(obj) + "' where oid='" + obj.oid + "'";
                 sqls[1] = "delete from DaqSysAttachment where businessId='" + obj.oid + "'";
@@ -662,7 +665,6 @@ var localServer = (function (jasTools, DataBaseOperation) {
                 var sqls = [];
                 sqls[0] = "delete from DaqCheckPipeColdBending where oid in (" + obj.ids + ")";
                 sqls[1] = "delete from DaqSysAttachment where businessId in (" + obj.ids + ")";
-                appcan.logs(sqls);
                 singleOperate("delete", sqls, callback)
             },
             delete: function (obj, callback) {
@@ -677,7 +679,7 @@ var localServer = (function (jasTools, DataBaseOperation) {
                 if (obj.oid != null && obj.oid != "") {
                     querySql = "select * from DaqCheckPipeColdBending where oid='" + obj.oid + "'";
                 } else {
-                    querySql = "select * from DaqCheckPipeColdBending where  state=1 and userId='" + userId + "' and projectOid='"+obj.projectOid+"'";
+                    querySql = "select * from DaqCheckPipeColdBending where  state=1 and userId='" + userId + "' and projectOid='" + obj.projectOid + "'";
                 };
                 doubleQuery(querySql, callback)
             },
@@ -686,6 +688,7 @@ var localServer = (function (jasTools, DataBaseOperation) {
             save: function (obj, callback) {
                 var sqls = [];
                 var userId = JSON.parse(localStorage.getItem("user")).oid;
+                obj.userId = userId;
                 sqls[0] = "insert into DaqCheckHotBends (oid,hotBendOid,projectOid,tendersOid,postData,state,userId) values " +
                     "('" + obj.oid + "','" + obj.hot_bends_oid + "','" + obj.project_oid + "','" + obj.tenders_oid + "','" + JSON.stringify(obj) + "',1,'" + userId + "')";
                 var attachments = obj.attachment;
@@ -698,6 +701,8 @@ var localServer = (function (jasTools, DataBaseOperation) {
             },
             update: function (obj, callback) {
                 var sqls = [];
+                var userId = JSON.parse(localStorage.getItem("user")).oid;
+                obj.userId = userId;
                 sqls[0] = "update DaqCheckHotBends set hotBendOid='" + obj.hot_bends_oid + "',projectOid='" + obj.project_oid + "'," +
                     "tendersOid='" + obj.tenders_oid + "',postData='" + JSON.stringify(obj) + "' where oid='" + obj.oid + "'";
                 sqls[1] = "delete from DaqSysAttachment where businessId='" + obj.oid + "'";
@@ -727,7 +732,7 @@ var localServer = (function (jasTools, DataBaseOperation) {
                 if (obj.oid != null && obj.oid != "") {
                     querySql = "select * from DaqCheckHotBends where oid='" + obj.oid + "'";
                 } else {
-                    querySql = "select * from DaqCheckHotBends where  state=1 and userId='" + userId + "' and projectOid='"+obj.projectOid+"'";
+                    querySql = "select * from DaqCheckHotBends where  state=1 and userId='" + userId + "' and projectOid='" + obj.projectOid + "'";
                 }
                 doubleQuery(querySql, callback)
             },
@@ -773,9 +778,10 @@ var localServer = (function (jasTools, DataBaseOperation) {
                 var userId = JSON.parse(localStorage.getItem("user")).oid;
                 var sqls = [];
                 var index = 0;
-                sqls[0] = "select count(*) as coating_pipe from DaqCheckCoatingPipe where userId='" + userId + "' and projectOid='"+obj.projectOid+"'";
-                sqls[1] = "select count(*) as hot_bends from DaqCheckHotBends where userId='" + userId + "' and projectOid='"+obj.projectOid+"'";
-                sqls[2] = "select count(*) as pipe_cold_bending from DaqCheckPipeColdBending where userId='" + userId + "' and projectOid='"+obj.projectOid+"'";
+                sqls[0] = "select count(*) as coating_pipe from DaqCheckCoatingPipe where userId='" + userId + "' and projectOid='" + obj.projectOid + "'";
+                sqls[1] = "select count(*) as hot_bends from DaqCheckHotBends where userId='" + userId + "' and projectOid='" + obj.projectOid + "'";
+                sqls[2] = "select count(*) as pipe_cold_bending from DaqCheckPipeColdBending where userId='" + userId + "' and projectOid='" + obj.projectOid + "'";
+                sqls[3] = "select count(*) as anticorrosion_check from DaqWeldAnticorrosionCheck where userId='" + userId + "' and projectOid='" + obj.projectOid + "'";
                 sqls.forEach(function (item, index) {
                     dbOperation.dbSelect(item, function (err, data) {
                         resultData.rows.push(JSON.parse(data)[0]);
@@ -840,7 +846,7 @@ var localServer = (function (jasTools, DataBaseOperation) {
                     "rows": []
                 };
                 var user = JSON.parse(localStorage.getItem("user"));
-                sql = "insert into userAndProjectRelation (projectOid,projectName,userId,userName) values ('" + obj.projectOid + "','" + obj.projectName + "','"+ user.oid + "','" + user.userName + "')";
+                sql = "insert into userAndProjectRelation (projectOid,projectName,userId,userName) values ('" + obj.projectOid + "','" + obj.projectName + "','" + user.oid + "','" + user.userName + "')";
                 dbOperation.dbExec(sql, function (err) {
                     if (err == 0) {
                         callback(resultData)
@@ -854,6 +860,7 @@ var localServer = (function (jasTools, DataBaseOperation) {
                 });
             },
             updateDefaultProject: function (obj, callback) {
+
                 var dbOperation = new DataBaseOperation();
                 var resultData = {
                     "status": "1",
@@ -862,7 +869,8 @@ var localServer = (function (jasTools, DataBaseOperation) {
                     "rows": []
                 };
                 var user = JSON.parse(localStorage.getItem("user"));
-                sql = "update userAndProjectRelation set projectOid ='" + obj.projectOid + "' and projectName ='"+obj.projectName+"' where userId='" + user.oid + "'";
+                var sql = "update userAndProjectRelation set projectOid = '" + obj.projectOid + "', projectName ='" + obj.projectName + "' where userId='" + user.oid + "'";
+
                 dbOperation.dbExec(sql, function (err) {
                     if (err == 0) {
                         callback(resultData)
@@ -877,62 +885,13 @@ var localServer = (function (jasTools, DataBaseOperation) {
         },
 
 
-        // ------------------------------------------焊口返修---------------------------------------------------------
-        reworkWeld: {
-            save: function (obj, callback) {
-                var sqls = [];
-                var userId = JSON.parse(localStorage.getItem("user")).oid;
-                sqls[0] = "insert into DaqWeldReworkWeld (oid,weldOid,projectOid,tendersOid,pipelineOid,pipeSegmentOrCrossOid,postData,state,userId) values " +
-                    "('" + obj.oid + "','" + obj.weldOid + "','" + obj.projectOid + "','" + obj.tendersOid + "','" + obj.pipelineOid + "','" + obj.pipeSegmentOrCrossOid + "','" + JSON.stringify(obj) + "',1,'" + userId + "')";
-                var attachments = obj.attachment;
-                if (attachments.length - 1 >= 0) {
-                    attachments.forEach(function (item, index) {
-                        sqls[index + 1] = "insert into DaqSysAttachment (oid,fileName,businessId,src,state) values ('" + item.oid + "','" + item.fileName + "','" + obj.oid + "','" + item.src + "',1)";
-                    })
-                };
-                singleOperate("insert", sqls, callback);
-            },
-            update: function (obj, callback) {
-                var sqls = [];
-                sqls[0] = "update DaqWeldReworkWeld set weldOid='" + obj.weldOid + "',projectOid='" + obj.projectOid + "',tendersOid='" + obj.tendersOid + "'"
-                            +",pipelineOid='" + obj.pipelineOid + "',pipeSegmentOrCrossOid='" + obj.pipeSegmentOrCrossOid + "',postData='" + JSON.stringify(obj) + "' where oid='" + obj.oid + "'";
-                sqls[1] = "delete from DaqSysAttachment where businessId='" + obj.oid + "'";
-                var attachments = obj.attachment;
-                if (attachments.length - 1 >= 0) {
-                    attachments.forEach(function (item, index) {
-                        sqls[index + 2] = "insert into DaqSysAttachment (oid,fileName,businessId,src,state) values ('" + item.oid + "','" + item.fileName + "','" + obj.oid + "','" + item.src + "',1)";
-                    })
-                };
-                singleOperate("update", sqls, callback)
-            },
-            delete: function (obj, callback) {
-                var sqls = [];
-                sqls[0] = "delete from DaqWeldReworkWeld where oid='" + obj.oid + "'";
-                sqls[1] = "delete from DaqSysAttachment where businessId='" + obj.oid + "'";
-                singleOperate("delete", sqls, callback)
-            },
-            deleteBatch: function (obj, callback) {
-                var sqls = [];
-                sqls[0] = "delete from DaqWeldReworkWeld where oid in (" + obj.ids + ")";
-                sqls[1] = "delete from DaqSysAttachment where businessId in (" + obj.ids + ")";
-                singleOperate("delete", sqls, callback)
-            },
-            query: function (obj, callback) {
-                var userId = JSON.parse(localStorage.getItem("user")).oid;
-                var querySql = "";
-                if (obj.oid != null && obj.oid != "") {
-                    querySql = "select * from DaqWeldReworkWeld where oid='" + obj.oid + "'";
-                } else {
-                    querySql = "select * from DaqWeldReworkWeld where  state=1 and  userId='" + userId + "' and projectOid='" + obj.projectOid + "'";
-                }
-                doubleQuery(querySql, callback)
-            },
-        },
         // ------------------------------------------防腐补口---------------------------------------------------------
         anticorrosionCheck: {
+
             save: function (obj, callback) {
                 var sqls = [];
                 var userId = JSON.parse(localStorage.getItem("user")).oid;
+                obj.userId = userId;
                 sqls[0] = "insert into DaqWeldAnticorrosionCheck (oid,weldOid,projectOid,tendersOid,pipelineOid,pipeSegmentOrCrossOid,postData,state,userId) values " +
                     "('" + obj.oid + "','" + obj.weldOid + "','" + obj.projectOid + "','" + obj.tendersOid + "','" + obj.pipelineOid + "','" + obj.pipeSegmentOrCrossOid + "','" + JSON.stringify(obj) + "',1,'" + userId + "')";
                 var attachments = obj.attachment;
@@ -941,12 +900,23 @@ var localServer = (function (jasTools, DataBaseOperation) {
                         sqls[index + 1] = "insert into DaqSysAttachment (oid,fileName,businessId,src,state) values ('" + item.oid + "','" + item.fileName + "','" + obj.oid + "','" + item.src + "',1)";
                     })
                 };
-                singleOperate("insert", sqls, callback);
+                singleOperate("insert", sqls, callback)
+                // singleOperate("insert", sqls, function (data) {
+                //     changeWelOidIsUseState(obj, 1, function (data) {
+                //         alert("成功" + data);
+                //         if (data == 1) {
+                //             callback(resultData);
+                //         }
+
+                //     });
+                // });
             },
             update: function (obj, callback) {
                 var sqls = [];
-                sqls[0] = "update DaqWeldAnticorrosionCheck set weldOid='" + obj.weldOid + "',projectOid='" + obj.projectOid + "',tendersOid='" + obj.tendersOid + "'"
-                            +",pipelineOid='" + obj.pipelineOid + "',pipeSegmentOrCrossOid='" + obj.pipeSegmentOrCrossOid + "',postData='" + JSON.stringify(obj) + "' where oid='" + obj.oid + "'";
+                var userId = JSON.parse(localStorage.getItem("user")).oid;
+                obj.userId = userId;
+                sqls[0] = "update DaqWeldAnticorrosionCheck set weldOid='" + obj.weldOid + "',projectOid='" + obj.projectOid + "',tendersOid='" + obj.tendersOid + "'" +
+                    ",pipelineOid='" + obj.pipelineOid + "',pipeSegmentOrCrossOid='" + obj.pipeSegmentOrCrossOid + "',postData='" + JSON.stringify(obj) + "' where oid='" + obj.oid + "'";
                 sqls[1] = "delete from DaqSysAttachment where businessId='" + obj.oid + "'";
                 var attachments = obj.attachment;
                 if (attachments.length - 1 >= 0) {
@@ -955,18 +925,50 @@ var localServer = (function (jasTools, DataBaseOperation) {
                     })
                 };
                 singleOperate("update", sqls, callback)
+                // singleOperate("update", sqls, function (data) {
+                //     changeWelOidIsUseState(obj.history, 0, function () {
+                //         changeWelOidIsUseState(obj, 1, function () {
+                //             callback(data);
+                //         });
+                //     });
+                // });
             },
             delete: function (obj, callback) {
                 var sqls = [];
                 sqls[0] = "delete from DaqWeldAnticorrosionCheck where oid='" + obj.oid + "'";
                 sqls[1] = "delete from DaqSysAttachment where businessId='" + obj.oid + "'";
                 singleOperate("delete", sqls, callback)
+                // if (obj.object) {
+                //     alert("删除操作");
+                //     singleOperate("delete", sqls, function (data) {
+                //         changeWelOidIsUseState(obj.object, 0, function () {
+                //             callback(data);
+                //         });
+                //     });
+                // } else {
+                //     singleOperate("delete", sqls, callback);
+                // }
+
             },
             deleteBatch: function (obj, callback) {
                 var sqls = [];
                 sqls[0] = "delete from DaqWeldAnticorrosionCheck where oid in (" + obj.ids + ")";
                 sqls[1] = "delete from DaqSysAttachment where businessId in (" + obj.ids + ")";
                 singleOperate("delete", sqls, callback)
+                // singleOperate("delete", sqls, function (data) {
+                //     var i = 0;
+                //     obj.objectList.forEach(function (item, index) {
+                //         changeWelOidIsUseState(item, 0, function () {
+                //             if (i == obj.objectList.length) {
+                //                 callback(data);
+                //             }
+                //             i++;
+                //         })
+                //     });
+                //     // changeWelOidIsUseState(obj.objectList, 0, function () {
+                //     //     callback(data);
+                //     // });
+                // });
             },
             query: function (obj, callback) {
                 var userId = JSON.parse(localStorage.getItem("user")).oid;
@@ -976,12 +978,596 @@ var localServer = (function (jasTools, DataBaseOperation) {
                 } else {
                     querySql = "select * from DaqWeldAnticorrosionCheck where  state=1 and userId='" + userId + "' and projectOid='" + obj.projectOid + "'";
                 }
-                doubleQuery(querySql, callback)
+                doubleQuery(querySql, function (data) {
+                    appcan.logs(data);
+                    callback(data);
+                })
+            },
+
+        },
+        // ------------------------------------------焊口记录---------------------------------------------------------
+        constructWeld: {
+            pipeFittingInfo: [{
+                "frontPipeType": "pipe_type_code_001",
+                "frontPipeOid": "d5084180-a600-402a-8264-d412c2c1ea04",
+                "backPipeType": "pipe_type_code_0081",
+                "backPipeOid": "dc0a22d7-1965-45a2-9868-fbf7b66ba211",
+            }],
+            // pipeFittingInfo:[
+            // {
+            // "frontPipeType":"pipe_type_code_001",
+            // "frontPipeOid":"4269f71d-9069-408f-8bd0-f7092d43716c",
+            // "backPipeType":"pipe_type_code_0081",
+            // "backPipeOid":"00ececcb-0a1d-40f5-b33d-61349631eb82",
+            // }
+            // ],
+            save: function (obj, callback) {
+                var sqls = [];
+                var userId = JSON.parse(localStorage.getItem("user")).oid;
+                obj.userId = userId;
+                try {
+                    uexArcGisRuntime.addConstructionWeld(JSON.stringify(obj), function (err, info) {
+                        if (err == 1) {
+                            var attachments = obj.attachment;
+                            if (attachments.length - 1 >= 0) {
+                                attachments.forEach(function (item, index) {
+                                    sqls[index] = "insert into DaqSysAttachment (oid,fileName,businessId,src,state) values ('" + item.oid + "','" + item.fileName + "','" + obj.oid + "','" + item.src + "',1)";
+                                })
+                            };
+                            singleOperate("insert", sqls, function (data) {
+                                changeIsUseState(obj, 1, 1, function () {
+                                    callback(data)
+                                });
+                            });
+                        };
+                    });
+                } catch (e) {
+                    alert(e);
+                }
+            },
+            update: function (obj, callback) {
+                var that = this
+                var sqls = [];
+                var userId = JSON.parse(localStorage.getItem("user")).oid;
+                obj.userId = userId;
+                try {
+                    uexArcGisRuntime.updateConstructionWeld(JSON.stringify(obj), function (err, info) {
+                        if (err == 1) {
+                            var attachments = obj.attachment;
+                            sqls[0] = "delete from DaqSysAttachment where businessId='" + obj.oid + "'";
+                            if (attachments.length - 1 >= 0) {
+                                attachments.forEach(function (item, index) {
+                                    sqls[index + 1] = "insert into DaqSysAttachment (oid,fileName,businessId,src,state) values ('" + item.oid + "','" + item.fileName + "','" + obj.oid + "','" + item.src + "',1)";
+                                })
+                            };
+                            singleOperate("update", sqls, function (data) {
+                                changeIsUseState(that.pipeFittingInfo[0], 0, 0, function () {
+                                    changeIsUseState(obj, 1, 1, function () {
+                                        callback(data);
+                                    });
+                                });
+                            })
+                        };
+                    });
+                } catch (e) {
+                    alert(e);
+                }
+            },
+            delete: function (obj, callback) {
+                var that = this
+                var sqls = [];
+                try {
+                    uexArcGisRuntime.deleteConstructionWeld(obj.oid, function (err, info) {
+                        if (err == 1) {
+                            sqls[0] = "delete from DaqSysAttachment where businessId='" + obj.oid + "'";
+                            singleOperate("delete", sqls, function (data) {
+                                changeIsUseState(that.pipeFittingInfo[0], 0, 0, function () {
+                                    callback(data);
+                                });
+                            })
+                        };
+                    });
+                } catch (e) {
+                    alert(e);
+                }
+            },
+            deleteBatch: function (obj, callback) {
+                var that = this
+                var sqls = [];
+                var ids = obj.ids.split(',');
+                ids.forEach(function (oid, index) {
+                    try {
+                        oid = oid.substring(1, oid.length - 1);
+                        uexArcGisRuntime.deleteConstructionWeld(oid, function (err, info) {
+                            if (err == 1) {
+                                sqls[0] = "delete from DaqSysAttachment where businessId='" + obj.oid + "'";
+                                singleOperate("delete", sqls, function (data) {
+                                    changeIsUseState(that.pipeFittingInfo[index], 0, 0, function () {
+                                        if (index == ids.length - 1) {
+                                            callback(data);
+                                        };
+                                    });
+                                })
+                            };
+                        });
+                    } catch (e) {
+                        alert(e);
+                    }
+                })
+            },
+            query: function (obj, callback) {
+                var that = this;
+                var resultData = {
+                    "status": 1,
+                    "code": 200,
+                    "msg": "ok",
+                    "rows": []
+                };
+                var userId = JSON.parse(localStorage.getItem("user")).oid;
+                if (obj.oid != null && obj.oid != "") {
+                    var param = {};
+                    param.oid = obj.oid;
+                    try {
+                        uexArcGisRuntime.queryConstructionWeld(JSON.stringify(param), function (err, info) {
+                            if (err == 1) {
+                                var weldInfo = JSON.parse(info.data);
+                                that.pipeFittingInfo[0].frontPipeOid = weldInfo[0].frontPipeOid;
+                                that.pipeFittingInfo[0].frontPipeType = weldInfo[0].frontPipeType;
+                                that.pipeFittingInfo[0].backPipeOid = weldInfo[0].backPipeOid;
+                                that.pipeFittingInfo[0].backPipeType = weldInfo[0].backPipeType;
+                                resultData.rows = weldInfo;
+                                callback(resultData);
+                            };
+                        });
+                    } catch (e) {
+                        alert(e);
+                    }
+                } else {
+                    obj.userId = userId;
+                    try {
+                        uexArcGisRuntime.queryConstructionWeld(JSON.stringify(obj), function (err, info) {
+                            if (err == 1) {
+                                if (info.data != "" && info.data != null) {
+                                    var weldsInfo = JSON.parse(info.data);
+                                    weldsInfo.forEach(function (weldInfo, index) {
+                                        var pipeFitting = [];
+                                        pipeFitting.frontPipeOid = weldInfo.frontPipeOid;
+                                        pipeFitting.frontPipeType = weldInfo.frontPipeType;
+                                        pipeFitting.backPipeOid = weldInfo.backPipeOid;
+                                        pipeFitting.backPipeType = weldInfo.backPipeType;
+                                        that.pipeFittingInfo.push(pipeFitting);
+                                        resultData.rows.push(weldInfo);
+                                        if (index == weldsInfo.length - 1) {
+                                            callback(resultData);
+                                        };
+                                    })
+                                } else {
+                                    callback(resultData);
+                                }
+                            } else {
+                                resultData.status = -1;
+                                resultData.code = 406;
+                                resultData.msg = "查询失败";
+                                callback(resultData);
+                            }
+                        });
+                    } catch (e) {
+                        alert(e);
+                    }
+                }
+            },
+        },
+
+        /**
+         * ---------------------------------------------------------------------------------------------------------------------------------
+         */
+
+
+        // -------------------------------------------------------焊口测量--------------------------------------------------------------------------
+        weldMeasured: {
+            result: {
+                "status": -1,
+                "code": 406,
+                "msg": "error"
+            },
+            save: function (obj, callback) {
+                var that = this;
+                var sqls = [];
+                var userId = JSON.parse(localStorage.getItem("user")).oid;
+                obj.userId = userId;
+                try {
+                    uexArcGisRuntime.addWeldMeasured(JSON.stringify(obj), function (err, info) {
+                        if (err == 1) {
+                            var attachments = obj.attachment;
+                            if (attachments.length - 1 >= 0) {
+                                attachments.forEach(function (item, index) {
+                                    sqls[index] = "insert into DaqSysAttachment (oid,fileName,businessId,src,state) values ('" + item.oid + "','" + item.fileName + "','" + obj.oid + "','" + item.src + "',1)";
+                                })
+                            };
+                            singleOperate("insert", sqls, function (data) {
+                                callback(data);
+                            });
+                        } else {
+                            callback(that.result);
+                        }
+                    });
+                } catch (e) {
+                    alert(e);
+                }
+            },
+            update: function (obj, callback) {
+                var that = this;
+                var sqls = [];
+                var userId = JSON.parse(localStorage.getItem("user")).oid;
+                obj.userId = userId;
+                try {
+                    uexArcGisRuntime.updateWeldMeasured(JSON.stringify(obj), function (err, info) {
+                        if (err == 1) {
+                            var attachments = obj.attachment;
+                            sqls[0] = "delete from DaqSysAttachment where businessId='" + obj.oid + "'";
+                            if (attachments.length - 1 >= 0) {
+                                attachments.forEach(function (item, index) {
+                                    sqls[index + 1] = "insert into DaqSysAttachment (oid,fileName,businessId,src,state) values ('" + item.oid + "','" + item.fileName + "','" + obj.oid + "','" + item.src + "',1)";
+                                })
+                            };
+                            singleOperate("update", sqls, function (data) {
+                                callback(data);
+                            })
+                        } else {
+                            callback(that.result);
+                        }
+                    });
+                } catch (e) {
+                    alert(e);
+                }
+            },
+            delete: function (obj, callback) {
+                var that = this;
+                var sqls = [];
+                try {
+                    uexArcGisRuntime.deleteWeldMeasured(obj.oid, function (err, info) {
+                        if (err == 1) {
+                            sqls[0] = "delete from DaqSysAttachment where businessId='" + obj.oid + "'";
+                            singleOperate("delete", sqls, function (data) {
+                                callback(data);
+                            })
+                        } else {
+                            callback(that.result);
+                        }
+                    });
+                } catch (e) {
+                    alert(e);
+                }
+            },
+            deleteBatch: function (obj, callback) {
+                var that = this;
+                var sqls = [];
+                var ids = obj.ids.split(',');
+                ids.forEach(function (oid, index) {
+                    try {
+                        oid = oid.substring(1, oid.length - 1);
+                        uexArcGisRuntime.deleteWeldMeasured(oid, function (err, info) {
+                            if (err == 1) {
+                                sqls[0] = "delete from DaqSysAttachment where businessId='" + oid + "'";
+                                singleOperate("delete", sqls, function (data) {
+                                    if (index == ids.length - 1) {
+                                        callback(data);
+                                    };
+                                })
+                            } else {
+                                callback(that.result);
+                            }
+                        });
+                    } catch (e) {
+                        alert(e);
+                    }
+                })
+            },
+            query: function (obj, callback) {
+                var resultData = {
+                    "status": 1,
+                    "code": 200,
+                    "msg": "ok",
+                    "rows": []
+                };
+                var userId = JSON.parse(localStorage.getItem("user")).oid;
+                if (obj.oid != null && obj.oid != "") {
+                    var param = {};
+                    param.oid = obj.oid;
+                    try {
+                        uexArcGisRuntime.queryWeldMeasured(JSON.stringify(param), function (err, info) {
+                            if (err == 1) {
+                                if (info.data != "" && info.data != null) {
+                                    var weldInfo = JSON.parse(info.data);
+                                    resultData.rows = weldInfo;
+                                    callback(resultData);
+                                } else {
+                                    callback(resultData);
+                                };
+                            } else {
+                                resultData.status = -1;
+                                resultData.code = 406;
+                                resultData.msg = "查询失败";
+                                callback(resultData);
+                            };
+                        });
+                    } catch (e) {
+                        alert(e);
+                    }
+                } else {
+                    obj.userId = userId;
+                    try {
+                        uexArcGisRuntime.queryWeldMeasured(JSON.stringify(obj), function (err, info) {
+                            if (err == 1) {
+                                if (info.data != "" && info.data != null) {
+                                    var weldsInfo = JSON.parse(info.data);
+                                    weldsInfo.forEach(function (weldInfo, index) {
+                                        resultData.rows.push(weldInfo);
+                                        if (index == weldsInfo.length - 1) {
+                                            callback(resultData);
+                                        };
+                                    })
+                                } else {
+                                    callback(resultData);
+                                }
+                            } else {
+                                resultData.status = -1;
+                                resultData.code = 406;
+                                resultData.msg = "查询失败";
+                                callback(resultData);
+                            }
+                        });
+                    } catch (e) {
+                        alert(e);
+                    }
+                }
             },
         },
 
 
+        // --------------------------------------------------------焊口返修-------------------------------------------------------------------------------------
+        reworkWeld: {
+            result: {
+                "status": -1,
+                "code": 406,
+                "msg": "error"
+            },
+            save: function (obj, callback) {
+                var that = this;
+                var sqls = [];
+                var userId = JSON.parse(localStorage.getItem("user")).oid;
+                obj.userId = userId;
+                try {
+                    uexArcGisRuntime.addReworkWeld(JSON.stringify(obj), function (err, info) {
+                        if (err == 1) {
+                            var attachments = obj.attachment;
+                            if (attachments.length - 1 >= 0) {
+                                attachments.forEach(function (item, index) {
+                                    sqls[index] = "insert into DaqSysAttachment (oid,fileName,businessId,src,state) values ('" + item.oid + "','" + item.fileName + "','" + obj.oid + "','" + item.src + "',1)";
+                                })
+                            };
+                            singleOperate("insert", sqls, function (data) {
+                                callback(data);
+                            });
+                        } else {
+                            callback(that.result);
+                        }
+                    });
+                } catch (e) {
+                    alert(e);
+                }
+            },
+            update: function (obj, callback) {
+                var that = this;
+                var sqls = [];
+                var userId = JSON.parse(localStorage.getItem("user")).oid;
+                obj.userId = userId;
+                try {
+                    uexArcGisRuntime.updateReworkWeld(JSON.stringify(obj), function (err, info) {
+                        if (err == 1) {
+                            var attachments = obj.attachment;
+                            sqls[0] = "delete from DaqSysAttachment where businessId='" + obj.oid + "'";
+                            if (attachments.length - 1 >= 0) {
+                                attachments.forEach(function (item, index) {
+                                    sqls[index + 1] = "insert into DaqSysAttachment (oid,fileName,businessId,src,state) values ('" + item.oid + "','" + item.fileName + "','" + obj.oid + "','" + item.src + "',1)";
+                                })
+                            };
+                            singleOperate("update", sqls, function (data) {
+                                callback(data);
+                            })
+                        } else {
+                            callback(that.result);
+                        }
+                    });
+                } catch (e) {
+                    alert(e);
+                }
+            },
+            delete: function (obj, callback) {
+                var that = this;
+                var sqls = [];
+                try {
+                    uexArcGisRuntime.deleteReworkWeld(obj.oid, function (err, info) {
+                        if (err == 1) {
+                            sqls[0] = "delete from DaqSysAttachment where businessId='" + obj.oid + "'";
+                            singleOperate("delete", sqls, function (data) {
+                                callback(data);
+                            })
+                        } else {
+                            callback(that.result);
+                        }
+                    });
+                } catch (e) {
+                    alert(e);
+                }
+            },
+            deleteBatch: function (obj, callback) {
+                var that = this;
+                var sqls = [];
+                var ids = obj.ids.split(',');
+                ids.forEach(function (oid, index) {
+                    try {
+                        oid = oid.substring(1, oid.length - 1);
+                        uexArcGisRuntime.deleteReworkWeld(oid, function (err, info) {
+                            if (err == 1) {
+                                sqls[0] = "delete from DaqSysAttachment where businessId='" + oid + "'";
+                                singleOperate("delete", sqls, function (data) {
+                                    if (index == ids.length - 1) {
+                                        callback(data);
+                                    };
+                                })
+                            } else {
+                                callback(that.result);
+                            }
+                        });
+                    } catch (e) {
+                        alert(e);
+                    }
+                })
+            },
+            query: function (obj, callback) {
+                var resultData = {
+                    "status": 1,
+                    "code": 200,
+                    "msg": "ok",
+                    "rows": []
+                };
+                var userId = JSON.parse(localStorage.getItem("user")).oid;
+                if (obj.oid != null && obj.oid != "") {
+                    var param = {};
+                    param.oid = obj.oid;
+                    try {
+                        uexArcGisRuntime.queryReworkWeld(JSON.stringify(param), function (err, info) {
+                            if (err == 1) {
+                                if (info.data != "" && info.data != null) {
+                                    var weldInfo = JSON.parse(info.data);
+                                    resultData.rows = weldInfo;
+                                    callback(resultData);
+                                } else {
+                                    callback(resultData);
+                                };
+                            } else {
+                                resultData.status = -1;
+                                resultData.code = 406;
+                                resultData.msg = "查询失败";
+                                callback(resultData);
+                            };
+                        });
+                    } catch (e) {
+                        alert(e);
+                    }
+                } else {
+                    obj.userId = userId;
+                    try {
+                        uexArcGisRuntime.queryReworkWeld(JSON.stringify(obj), function (err, info) {
+                            if (err == 1) {
+                                if (info.data != "" && info.data != null) {
+                                    var weldsInfo = JSON.parse(info.data);
+                                    weldsInfo.forEach(function (weldInfo, index) {
+                                        resultData.rows.push(weldInfo);
+                                        if (index == weldsInfo.length - 1) {
+                                            callback(resultData);
 
+                                        };
+                                    })
+                                } else {
+                                    callback(resultData);
+                                }
+                            } else {
+                                resultData.status = -1;
+                                resultData.code = 406;
+                                resultData.msg = "查询失败";
+                                callback(resultData);
+                            }
+                        });
+                    } catch (e) {
+                        alert(e);
+                    }
+                }
+            },
+        },
+
+        queryPipeFittingList: {
+            get: function (obj, callback) {
+                var that = this;
+                var resultData = {
+                    "status": 1,
+                    "code": 200,
+                    "msg": "查询成功",
+                    "rows": []
+                };
+                var projectOid = localStorage.getItem("defaultProject");
+                var pipeSegmentOrCrossOid = obj.pipeSegmentOrCrossOid;
+                var pipeTypeCode = obj.frontPipeType || obj.backPipeType;
+                var userId = JSON.parse(localStorage.getItem("user")).oid;
+                var sql = "";
+                switch (pipeTypeCode) {
+                    case "pipe_type_code_001":
+                        //前直钢管
+                        sql = "select oid as key,pipeCode as value from DaqMaterialPipe  where frontIsUse=0 and isColdBend=0 and projectOid='" + projectOid + "'";
+                        break;
+                    case "pipe_type_code_0011":
+                        //后直钢管
+                        sql = "select oid as key,pipeCode as value from DaqMaterialPipe  where backIsUse=0 and isColdBend=0 and projectOid='" + projectOid + "'";
+                        break;
+                    case "pipe_type_code_002":
+                        //前热煨弯管
+                        sql = "select oid as key,hotBendsCode as value from DaqMaterialHotBends  where frontIsUse=0 and projectOid='" + projectOid + "'";
+                        break;
+                    case "pipe_type_code_0021":
+                        //后热煨弯管
+                        sql = "select oid as key,hotBendsCode as value from DaqMaterialHotBends  where backIsUse=0 and projectOid='" + projectOid + "'";
+                        break;
+                    case "pipe_type_code_003":
+                        //三通
+                        sql = "select oid as key,teeCode as value from DaqMaterialTee  where projectOid='" + projectOid + "'";
+                        break;
+                    case "pipe_type_code_004":
+                        //阀门
+                        sql = "select oid as key,valveName from DaqMaterialValve  where projectOid='" + projectOid + "'";
+                        break;
+                    case "pipe_type_code_005":
+                        //绝缘接头
+                        sql = "select oid as key,manufacturerCode as value from DaqMaterialJnsulatedJoint   where  projectOid='" + projectOid + "'";
+                        break;
+                    case "pipe_type_code_006":
+                        //大小头
+                        sql = "select oid as key,reducerCode as value from DaqMaterialReducer   where projectOid='" + projectOid + "'";
+                        break;
+                    case "pipe_type_code_007":
+                        //封堵物
+                        sql = "select oid as key,closureCode as value from DaqMaterialClosure  where  projectOid='" + projectOid + "'";
+                        break;
+                    case "pipe_type_code_008":
+                        //前冷弯管
+                        sql = "select oid as key,clodBendingPipeCode as value from DaqClodBendingPipe   where frontIsUse=0 and pipeSegmentOrCrossOid='" + pipeSegmentOrCrossOid + "' and approveStatus=2";
+                        break;
+                    case "pipe_type_code_0081":
+                        //后冷弯管
+                        sql = "select oid as key,clodBendingPipeCode as value from DaqClodBendingPipe   where backIsUse=0 and pipeSegmentOrCrossOid='" + pipeSegmentOrCrossOid + "' and approveStatus=2";
+                        break;
+                }
+                if (sql == "") {
+                    resultData.status = -1;
+                    resultData.code = 406;
+                    resultData.msg = "查询失败";
+                    callback(resultData);
+                    return;
+                }
+                var dbOperation = new DataBaseOperation();
+                dbOperation.dbSelect(sql, function (err, data) {
+                    if (err == 0) {
+                        resultData.rows = JSON.parse(data);
+                        callback(resultData);
+                    } else {
+                        resultData.status = -1;
+                        resultData.code = 406;
+                        resultData.msg = "查询失败";
+                        callback(resultData);
+                    };
+                });
+            }
+        }
     };
     return obj;
 })(jasTools, DataBaseOperation);
@@ -1000,31 +1586,31 @@ var localServer = (function (jasTools, DataBaseOperation) {
  *                          beforeDelete：obj是在query后封装的的前后管件的类型和oid数组
  * @param {Function} callback 回调函数
  */
-function changeMaterialState(type,obj,callback){
-    switch(type){
-        case "afterSave":
-            //保存后，obj是postData
-            changeIsUseState(obj,1,1,callback);
-            break;
-        case "beforeUpdate":
-            //修改前，obj是在query后封装的索引为0的前后管件的类型和oid
-            changeIsUseState(obj,0,0,callback);
-            break;
-        case "afterUpdate":
-            //修改后，obj是修改后的postData
-            changeIsUseState(obj,1,1,callback);
-            break;
-        case "beforeDelete":
-            //删除前，obj是在query后封装的的前后管件的类型和oid数组
-            obj.forEach(function(item,index){
-                changeIsUseState(item,0,0,callback);
-            })
-            break;
-        default:
-            callback({"msg":"ok"})
-            break;
-    }
-}
+// function changeMaterialState(type,obj,callback){
+// switch(type){
+// case "afterSave":
+// //保存后，obj是postData
+// changeIsUseState(obj,1,1,callback);
+// break;
+// case "beforeUpdate":
+// //修改前，obj是在query后封装的索引为0的前后管件的类型和oid
+// changeIsUseState(obj,0,0,callback);
+// break;
+// case "afterUpdate":
+// //修改后，obj是修改后的postData
+// changeIsUseState(obj,1,1,callback);
+// break;
+// case "beforeDelete":
+// //删除前，obj是在query后封装的的前后管件的类型和oid数组
+// obj.forEach(function(item,index){
+// changeIsUseState(item,0,0,callback);
+// })
+// break;
+// default:
+// callback({"msg":"ok"})
+// break;
+// }
+// }
 
 
 /**
@@ -1033,35 +1619,55 @@ function changeMaterialState(type,obj,callback){
  * @param {Integer} frontIsUse 前管件使用
  * @param {Integer} backIsUse  后管件使用
  */
-function changeIsUseState(obj,frontIsUse,backIsUse,callback){
+function changeIsUseState(obj, frontIsUse, backIsUse, callback) {
     var sqls = [];
-    switch(obj.frontPipeType){
+    switch (obj.frontPipeType) {
         case "pipe_type_code_001": //直钢管-->前
-            sqls[0] = "update DaqMaterialPipe set frontIsUse="+frontIsUse+" where oid='"+obj.frontPipeOid+"'";
+            sqls[0] = "update DaqMaterialPipe set frontIsUse=" + frontIsUse + " where oid='" + obj.frontPipeOid + "'";
             break;
         case "pipe_type_code_008": //冷弯管-->前
-            sqls[0] = "update DaqClodBendingPipe set frontIsUse="+frontIsUse+" where oid='"+obj.frontPipeOid+"'";
+            sqls[0] = "update DaqClodBendingPipe set frontIsUse=" + frontIsUse + " where oid='" + obj.frontPipeOid + "'";
             break;
         case "pipe_type_code_002": //热煨弯管-->前
-            sqls[0] = "update DaqMaterialHotBends set frontIsUse="+frontIsUse+" where oid='"+obj.frontPipeOid+"'";
+            sqls[0] = "update DaqMaterialHotBends set frontIsUse=" + frontIsUse + " where oid='" + obj.frontPipeOid + "'";
             break;
         default:
             sqls[0] = ""
             break;
     }
-    switch(obj.backPipeType){
+    switch (obj.backPipeType) {
         case "pipe_type_code_0011": //直钢管-->后
-            sqls[1] = "update DaqMaterialPipe set backIsUse="+backIsUse+" where oid='"+obj.backPipeOid+"'";
+            sqls[1] = "update DaqMaterialPipe set backIsUse=" + backIsUse + " where oid='" + obj.backPipeOid + "'";
             break;
         case "pipe_type_code_0081": //冷弯管-->后
-            sqls[1] = "update DaqClodBendingPipe set backIsUse="+backIsUse+" where oid='"+obj.backPipeOid+"'";
+            sqls[1] = "update DaqClodBendingPipe set backIsUse=" + backIsUse + " where oid='" + obj.backPipeOid + "'";
             break;
         case "pipe_type_code_0021": //热煨弯管-->后
-            sqls[1] = "update DaqMaterialHotBends set backIsUse="+backIsUse+" where oid='"+obj.backPipeOid+"'";
+            sqls[1] = "update DaqMaterialHotBends set backIsUse=" + backIsUse + " where oid='" + obj.backPipeOid + "'";
             break;
         default:
             sqls[1] = ""
             break;
     }
-    singleOperate("update",sqls,callback);
+    singleOperate("update", sqls, callback);
+}
+
+
+
+/**
+ * 修改补口记录中 焊口使用状态
+ * @param {Object} obj 补口对象
+ */
+function changeWelOidIsUseState(obj, status, callback) {
+    var param = {
+        oid: obj.weld_oid,
+        status: status
+    };
+    try {
+        uexArcGisRuntime.changeAnticorrosionCheckStatus(JSON.stringify(param), function (err, info) {
+            callback(err);
+        });
+    } catch (e) {
+        alert(e);
+    }
 }

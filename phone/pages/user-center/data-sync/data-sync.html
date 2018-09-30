@@ -21,6 +21,18 @@
 		<div v-setheight style="overflow: auto;">
 			<div>
                 <br />
+				<mt-button type="primary" @click.native="saveWeldMeasured">焊口测量保存</mt-button>
+				<mt-button type="primary" @click.native="updateWeldMeasured">焊口测量更新</mt-button>
+				<mt-button type="primary" @click.native="deleteWeldMeasured">焊口测量删除</mt-button>
+				<mt-button type="primary" @click.native="selectWeldMeasured">焊口测量查询</mt-button>
+                <br />
+                <br />
+				<mt-button type="primary" @click.native="saveReworkWeld">焊口返修保存</mt-button>
+				<mt-button type="primary" @click.native="updateReworkWeld">焊口返修更新</mt-button>
+				<mt-button type="primary" @click.native="deleteReworkWeld">焊口返修删除</mt-button>
+				<mt-button  type="primary" @click.native="selectReworkWeld">焊口返修查询</mt-button> 
+                <br />
+                <br />
 				<mt-button type="primary" @click.native="downloadBasic">同步基础数据</mt-button>
 				<mt-button type="primary" @click.native="getBasic">获取基础数据</mt-button>
                 <br />
@@ -65,16 +77,16 @@
 				<mt-button type="primary" @click.native="changeMaterialState">修改前后管件状态</mt-button>
                 <br />
                 <br />
-				<mt-button type="primary" @click.native="saveReworkWeld">焊口返修保存</mt-button>
-				<mt-button type="primary" @click.native="updateReworkWeld">焊口返修更新</mt-button>
-				<mt-button type="primary" @click.native="deleteReworkWeld">焊口返修删除</mt-button>
-				<mt-button type="primary" @click.native="selectReworkWeld">焊口返修查询</mt-button>
-                <br />
-                <br />
 				<mt-button type="primary" @click.native="saveAnticorrosionCheck">防腐补口保存</mt-button>
 				<mt-button type="primary" @click.native="updateAnticorrosionCheck">防腐补口更新</mt-button>
 				<mt-button type="primary" @click.native="deleteAnticorrosionCheck">防腐补口删除</mt-button>
 				<mt-button type="primary" @click.native="selectAnticorrosionCheck">防腐补口查询</mt-button>
+                <br />
+                <br />
+				<mt-button type="primary" @click.native="saveConstructWeld">焊口保存</mt-button>
+				<mt-button type="primary" @click.native="updateConstructWeld">焊口更新</mt-button>
+				<mt-button type="primary" @click.native="deleteConstructWeld">焊口删除</mt-button>
+				<mt-button type="primary" @click.native="selectConstructWeld">焊口查询</mt-button>
                 <br />
                 <br />
 
@@ -509,78 +521,6 @@
                 changeMaterialState("afterSave",obj,callback);
             },
             
-            //------------焊口返修保存
-            saveReworkWeld: function(obj){
-                var callback = function(data){
-                    alert(JSON.stringify(data))
-                }
-                var postData={
-                    "oid":"c-aaaaaaa",
-                    "projectOid":"c-bbbbb",
-                    "tendersOid":"c-ccccc",
-                    "pipelineOid":"c-bbbbb",
-                    "pipeSegmentOrCrossOid":"c-ccccc",
-                    "weldOid":"c-eeeeee",
-                    "attachment":[
-                        {
-                            "oid":"a-aaaaaa",
-                            "fileName":"a-bbbbbb",
-                            "src":"a-ccccccc"
-                        },{
-                            "oid":"a-ddddd",
-                            "fileName":"a-eeeeeee",
-                            "src":"a-ffffff"
-                        }
-                    ]
-                }
-                localServer.reworkWeld.save(postData,callback);
-            },
-            //------------焊口返修更新
-            updateReworkWeld: function(obj){
-                var callback = function(data){
-                    alert(JSON.stringify(data))
-                }
-                var postData={
-                    "oid":"c-aaaaaaa",
-                    "projectOid":"c-fffffffff",
-                    "tendersOid":"c-ccccc",
-                    "pipelineOid":"c-bbbbb",
-                    "pipeSegmentOrCrossOid":"c-ccccc",
-                    "weldOid":"c-eeeeee",
-                    "attachment":[
-                        {
-                            "oid":"a-aaaaaa",
-                            "fileName":"a-ffffffffffff",
-                            "src":"a-ccccccc"
-                        },{
-                            "oid":"a-ddddd",
-                            "fileName":"a-eeeeeee",
-                            "src":"a-ffffff"
-                        }
-                    ]
-                }
-                localServer.reworkWeld.update(postData,callback);
-            },
-            //------------焊口返修删除
-            deleteReworkWeld: function(obj){
-                var callback = function(data){
-                    alert(JSON.stringify(data))
-                }
-                var obj1={
-                    "oid":"c-aaaaaaa"
-                }
-                localServer.reworkWeld.delete(obj1,callback);
-            },
-            //------------焊口返修查询
-            selectReworkWeld: function(obj){
-                var callback = function(data){
-                    alert(JSON.stringify(data,4,4))
-                }
-                var obj1={
-                    "oid":"c-aaaaaaa"
-                }
-                localServer.reworkWeld.query(obj1,callback);
-            },
             
             //------------防腐补口保存
             saveAnticorrosionCheck: function(obj){ 
@@ -654,6 +594,482 @@
                     "oid":"c-aaaaaaa"
                 }
                 localServer.anticorrosionCheck.query(obj1,callback);
+            },
+            
+            
+            
+            
+            //------------焊口保存
+            saveConstructWeld: function(obj){ 
+                var callback = function(data){
+                    alert(JSON.stringify(data,4,4))
+                }
+                var postData={
+                    active : 1,
+                    approveStatus : 0,
+                    backPipeOid:"dc0a22d7-1965-45a2-9868-fbf7b66ba211",
+                    backPipeCode : "FY81810031-1",
+                    backPipeType:"pipe_type_code_0081",
+                    backPipeTypeName : "直钢管",
+                    collectionDate : "2018-09-15",
+                    collectionPerson : "测试",
+                    constructDate : "2018-09-15",
+                    constructUnit : "6f45fb5e-f2c7-4e40-bbe1-a2e643cc6a48",
+                    constructUnitName : "管道局一公司",
+                    coverName : "李组长",
+                    coverOid : "aa9a5164-a01a-483c-ab8a-26acbd0ef55f",
+                    createDatetime : "2018-09-15 15:16:35",
+                    createUserId : "a2b38ff3-bc0e-40b7-92c6-d7bd9892b0cb",
+                    createUserName : "张一",
+                    frontPipeOid:"d5084180-a600-402a-8264-d412c2c1ea04",
+                    frontPipeCode : "11111-1-1",
+                    frontPipeType:"pipe_type_code_001",
+                    frontPipeTypeName : "直钢管",
+                    geoState : "正常",
+                    isGoldeJoint : 1,
+                    isPipeHead : 1,
+                    medianStakeCode : "GX-2",
+                    medianStakeOid : "7193b203-9e08-4938-85d7-11eb45be9ca2",
+                    modifyDatetime : "2018-09-15 15:16:35",
+                    modifyUserId : "a2b38ff3-bc0e-40b7-92c6-d7bd9892b0cb",
+                    modifyUserName : "张一",
+                    oid : "d075e2fd-f679-4bac-bf06-49c47642950c4",
+                    padderName : "李组长",
+                    padderOid : "aa9a5164-a01a-483c-ab8a-26acbd0ef55f",
+                    pipeSegmentOrCrossName : "干线01",
+                    pipeSegmentOrCrossOid : "d6759553-cc22-432d-8b0f-1d3420eedfbd",
+                    pipelineName : "中俄管道干线",
+                    pipelineOid : "4d62b3e6-7b10-40df-bc0b-474beb0f3040",
+                    projectName : "中俄管道",
+                    projectOid : "8897c66d-b622-45ca-9cfd-405017447ed2",
+                    relativeMileage : 1.15,
+                    remarks : "",
+                    renderName : "李组长",
+                    renderOid : "aa9a5164-a01a-483c-ab8a-26acbd0ef55f",
+                    supervisionEngineer : "测试",
+                    supervisionUnit : "fa9cce85-d68a-4166-8675-513626510934",
+                    supervisionUnitName : "大庆监理",
+                    surfaceCheck : 1,
+                    tendersName : "第1标段",
+                    tendersOid : "62cc19b1-a74a-4d8c-8cc3-8e72049c543b",
+                    weldCode : "123qwaszx",
+                    weldMethod : "welding_method_temp_code_001",
+                    weldMethodName : "手工焊",
+                    weldProduce : "51c32896-66eb-4ad4-8600-aa276045ec2e",
+                    weldProduceCode : "GJGYGC-001",
+                    weldRodBatchNum : "11",
+                    weldType : "weld_type_code_001",
+                    weldTypeName : "正常焊口",
+                    weldWireBatchNum : "11",
+                    workUnitCode : "HJ-001",
+                    workUnitOid : "1cd29391-b86d-4691-8367-434bce7d39d3",
+                    attachment:[
+                        {
+                            "oid":"a-aaaaaa",
+                            "fileName":"a-bbbbbb",
+                            "src":"a-ccccccc"
+                        },{
+                            "oid":"a-ddddd",
+                            "fileName":"a-eeeeeee",
+                            "src":"a-ffffff"
+                        }
+                    ]
+                }
+                localServer.constructWeld.save(postData,callback);
+            },
+            //------------焊口更新
+            updateConstructWeld: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data))
+                }
+                var postData={
+                    oid : "d075e2fd-f679-4bac-bf06-49c47642950c4",
+                    active : 1,
+                    approveStatus : 0,
+                    backPipeOid:"00ececcb-0a1d-40f5-b33d-61349631eb82",
+                    backPipeCode : "FY81810031-1",
+                    backPipeType:"pipe_type_code_0081",
+                    backPipeTypeName : "直钢管",
+                    collectionDate : "2018-09-15",
+                    collectionPerson : "测试",
+                    constructDate : "2018-09-15",
+                    constructUnit : "6f45fb5e-f2c7-4e40-bbe1-a2e643cc6a48",
+                    constructUnitName : "管道局一公司",
+                    coverName : "李组长",
+                    coverOid : "aa9a5164-a01a-483c-ab8a-26acbd0ef55f",
+                    createDatetime : "2018-09-15 15:16:35",
+                    createUserId : "a2b38ff3-bc0e-40b7-92c6-d7bd9892b0cb",
+                    createUserName : "张一",
+                    frontPipeOid:"4269f71d-9069-408f-8bd0-f7092d43716c",
+                    frontPipeCode : "11111-1-1",
+                    frontPipeType:"pipe_type_code_001",
+                    frontPipeTypeName : "直钢管",
+                    geoState : "正常",
+                    isGoldeJoint : 1,
+                    isPipeHead : 1,
+                    medianStakeCode : "GX-2",
+                    medianStakeOid : "7193b203-9e08-4938-85d7-11eb45be9ca2",
+                    modifyDatetime : "2018-09-15 15:16:35",
+                    modifyUserId : "a2b38ff3-bc0e-40b7-92c6-d7bd9892b0cb",
+                    modifyUserName : "张一",
+                    padderName : "李组长",
+                    padderOid : "aa9a5164-a01a-483c-ab8a-26acbd0ef55f",
+                    pipeSegmentOrCrossName : "干线01",
+                    pipeSegmentOrCrossOid : "d6759553-cc22-432d-8b0f-1d3420eedfbd",
+                    pipelineName : "中俄管道干线",
+                    pipelineOid : "4d62b3e6-7b10-40df-bc0b-474beb0f3040",
+                    projectName : "中俄管道",
+                    projectOid : "8897c66d-b622-45ca-9cfd-405017447ed2",
+                    relativeMileage : 1.15,
+                    remarks : "",
+                    renderName : "李组长",
+                    renderOid : "aa9a5164-a01a-483c-ab8a-26acbd0ef55f",
+                    supervisionEngineer : "测试",
+                    supervisionUnit : "fa9cce85-d68a-4166-8675-513626510934",
+                    supervisionUnitName : "大庆监理",
+                    surfaceCheck : 1,
+                    tendersName : "第1标段",
+                    tendersOid : "62cc19b1-a74a-4d8c-8cc3-8e72049c543b",
+                    weldCode : "123qwaszx",
+                    weldMethod : "welding_method_temp_code_001",
+                    weldMethodName : "手工焊",
+                    weldProduce : "51c32896-66eb-4ad4-8600-aa276045ec2e",
+                    weldProduceCode : "GJGYGC-001",
+                    weldRodBatchNum : "11",
+                    weldType : "weld_type_code_001",
+                    weldTypeName : "异常焊口",
+                    weldWireBatchNum : "11",
+                    workUnitCode : "HJ-001",
+                    workUnitOid : "1cd29391-b86d-4691-8367-434bce7d39d3",
+                    attachment:[
+                        {
+                            "oid":"a-aaaaaa",
+                            "fileName":"a-ggggggg",
+                            "src":"a-ccccccc"
+                        },{
+                            "oid":"a-ddddd",
+                            "fileName":"a-hhhhhhh",
+                            "src":"a-ffffff"
+                        }
+                    ]
+                }
+                localServer.constructWeld.update(postData,callback);
+            },
+            //------------焊口删除
+            deleteConstructWeld: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data))
+                }
+                var obj1={
+                    oid : "d075e2fd-f679-4bac-bf06-49c47642950c4"
+                }
+                //单个删
+                // localServer.constructWeld.delete(obj1,callback);
+                var obj={
+                    ids : "d075e2fd-f679-4bac-bf06-49c47642950c4"
+                }
+                //批量删
+                localServer.constructWeld.deleteBatch(obj,callback);
+            },
+            //-----------焊口查询
+            selectConstructWeld: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data,4,4))
+                }
+                var obj1={
+                    // oid : "d075e2fd-f679-4bac-bf06-49c47642950c4",
+                    projectOid : "8897c66d-b622-45ca-9cfd-405017447ed2"
+                }
+                localServer.constructWeld.query(obj1,callback);
+                
+            },
+            
+            
+            //------------焊口返修保存
+            saveReworkWeld: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data))
+                }
+                var postData={
+                    "oid" : "0c797c0d-5c94-4abb-9e7b-a5c3ecbfd320",
+                    "active" : 1,
+                    "createUserId" : "bca0365f-798d-4414-84d0-82d39fb0486f",
+                    "createUserName" : "张鹏飞",
+                    "createDatetime" : "2018-09-09 03:51:00",
+                    "modifyUserId" : "bca0365f-798d-4414-84d0-82d39fb0486f",
+                    "modifyUserName" : "张鹏飞",
+                    "modifyDatetime" : "2018-09-09 03:51:00",
+                    "projectOid" : "9d0b31ca-ec1a-4ebe-8a9e-32a55fa5eeba",
+                    "projectName" : "太石管道",
+                    "pipelineOid" : "43c53ba4-a80b-40b8-8974-b995cef66102",
+                    "pipelineName" : "太石管道阳石干线",
+                    "tendersOid" : "ae8bac2b-27af-436c-a424-e0990c086992",
+                    "tendersName" : "太石管道1阶段",
+                    "pipeSegmentOrCrossOid" : "e018eb30-0c6a-4f5a-88c4-556f28290c96",
+                    "pipeSegmentOrCrossName" : "石干线",
+                    "weldOid" : "811e06f7-7256-4bc1-9773-c90966ea78cd",
+                    "weldCode" : "HKBH-001",
+                    "reworkWeldCode" : "HKBH-001-R",
+                    "weldRodBatchNum" : "",
+                    "weldWireBatchNum" : "",
+                    "weldProduce" : "912bda6e-a1c9-4ad7-8cee-70e701c32f5b",
+                    "weldProduceCode" : "HJGY-001",
+                    "coverOid" : "",
+                    "coverName" : "",
+                    "padderOid" : "",
+                    "padderName" : "",
+                    "renderOid" : "",
+                    "renderName" : "",
+                    "weldDate" : null,
+                    "constructUnit" : "df5332c7-961f-4df0-9cf6-a41b588dbe1b",
+                    "constructUnitName" : "管道局四公司",
+                    "workUnitOid" : "f06cbf49-e0b4-4c0c-bcd1-b927969638cd",
+                    "workUnitName" : "施工机组",
+                    "supervisionUnit" : "fa9cce85-d68a-4166-8675-513626510934",
+                    "supervisionUnitName" : "大庆监理",
+                    "supervisionEngineer" : "",
+                    "collectionPerson" : "",
+                    "collectionDate" : null,
+                    "approveStatus" : 2,
+                    "remarks" : "",
+                    "attachment":[
+                        {
+                            "oid":"a-aaaaaa",
+                            "fileName":"a-bbbbbb",
+                            "src":"a-ccccccc"
+                        },{
+                            "oid":"a-ddddd",
+                            "fileName":"a-eeeeeee",
+                            "src":"a-ffffff"
+                        }
+                    ]
+                }
+                localServer.reworkWeld.save(postData,callback);
+            },
+            //------------焊口返修更新
+            updateReworkWeld: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data))
+                }
+                var postData={
+                    "oid" : "0c797c0d-5c94-4abb-9e7b-a5c3ecbfd320",
+                    "active" : 1,
+                    "createUserId" : "bca0365f-798d-4414-84d0-82d39fb0486f",
+                    "createUserName" : "张鹏飞",
+                    "createDatetime" : "2018-09-09 03:51:00",
+                    "modifyUserId" : "bca0365f-798d-4414-84d0-82d39fb0486f",
+                    "modifyUserName" : "张鹏飞",
+                    "modifyDatetime" : "2018-09-09 03:51:00",
+                    "projectOid" : "9d0b31ca-ec1a-4ebe-8a9e-32a55fa5eeba",
+                    "projectName" : "太石管道",
+                    "pipelineOid" : "43c53ba4-a80b-40b8-8974-b995cef66102",
+                    "pipelineName" : "太石管道阳石干线",
+                    "tendersOid" : "ae8bac2b-27af-436c-a424-e0990c086992",
+                    "tendersName" : "太石管道1阶段",
+                    "pipeSegmentOrCrossOid" : "e018eb30-0c6a-4f5a-88c4-556f28290c96",
+                    "pipeSegmentOrCrossName" : "石干线",
+                    "weldOid" : "811e06f7-7256-4bc1-9773-c90966ea78cd",
+                    "weldCode" : "HKBH-001",
+                    "reworkWeldCode" : "HKBH-001-R",
+                    "weldRodBatchNum" : "",
+                    "weldWireBatchNum" : "",
+                    "weldProduce" : "912bda6e-a1c9-4ad7-8cee-70e701c32f5b",
+                    "weldProduceCode" : "HJGY-001",
+                    "coverOid" : "",
+                    "coverName" : "",
+                    "padderOid" : "",
+                    "padderName" : "",
+                    "renderOid" : "",
+                    "renderName" : "",
+                    "weldDate" : null,
+                    "constructUnit" : "df5332c7-961f-4df0-9cf6-a41b588dbe1b",
+                    "constructUnitName" : "管道局四公司",
+                    "workUnitOid" : "f06cbf49-e0b4-4c0c-bcd1-b927969638cd",
+                    "workUnitName" : "施工机组",
+                    "supervisionUnit" : "fa9cce85-d68a-4166-8675-513626510934",
+                    "supervisionUnitName" : "大庆监理",
+                    "supervisionEngineer" : "",
+                    "collectionPerson" : "",
+                    "collectionDate" : null,
+                    "approveStatus" : 2,
+                    "remarks" : "",
+                    "attachment":[
+                        {
+                            "oid":"a-aaaaaa",
+                            "fileName":"a-gggggg",
+                            "src":"a-ccccccc"
+                        },{
+                            "oid":"a-ddddd",
+                            "fileName":"a-hhhhhhhh",
+                            "src":"a-ffffff"
+                        }
+                    ]
+                }
+                localServer.reworkWeld.update(postData,callback);
+            },
+            //------------焊口返修删除
+            deleteReworkWeld: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data,4,4))
+                }
+                var obj1={
+                    "oid" : "0c797c0d-5c94-4abb-9e7b-a5c3ecbfd320",
+                }
+                localServer.reworkWeld.delete(obj1,callback);
+            },
+            //------------焊口返修查询
+            selectReworkWeld: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data,4,4))
+                }
+                var obj1={
+                    // "oid" : "0c797c0d-5c94-4abb-9e7b-a5c3ecbfd320"
+                    "tendersOid" : "ae8bac2b-27af-436c-a424-e0990c086992"
+                }
+                localServer.reworkWeld.query(obj1,callback);
+            },
+            
+            
+            
+             //------------焊口测量保存
+            saveWeldMeasured: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data,4,4))
+                }
+                var postData={
+                    "oid" : "812581f5-ca79-4d5f-82bb-7cdd7c2fe955",
+                    "active" : 1,
+                    "createUserId" : "bca0365f-798d-4414-84d0-82d39fb0486f",
+                    "createUserName" : "张鹏飞",
+                    "createDatetime" : "2018-09-10 07:58:20",
+                    "modifyUserId" : "bca0365f-798d-4414-84d0-82d39fb0486f",
+                    "modifyUserName" : "张鹏飞",
+                    "modifyDatetime" : "2018-09-10 07:58:20",
+                    "projectOid" : "9d0b31ca-ec1a-4ebe-8a9e-32a55fa5eeba",
+                    "projectName" : "太石管道",
+                    "pipelineOid" : "43c53ba4-a80b-40b8-8974-b995cef66102",
+                    "pipelineName" : "太石管道阳石干线",
+                    "tendersOid" : "ae8bac2b-27af-436c-a424-e0990c086992",
+                    "tendersName" : "太石管道1阶段",
+                    "pipeSegmentOrCrossOid" : "e018eb30-0c6a-4f5a-88c4-556f28290c96",
+                    "pipeSegmentOrCrossName" : "石干线",
+                    "weldOid" : "0c797c0d-5c94-4abb-9e7b-a5c3ecbfd320",
+                    "weldCode" : null,
+                    "medianStakeOid" : "f1bc4e47-ce6b-4436-984f-6d1c7294fe4f",
+                    "medianStakeCode" : "TSGDYSGX-001",
+                    "relativeMileage" : 0,
+                    "pointx" : 0,
+                    "pointy" : 0,
+                    "surfaceeLevation" : 0,
+                    "pipeTopElevation" : 0,
+                    "buriedDepth" : 0,
+                    "surveyCrew" : "张鹏飞",
+                    "surveyDate" : "2018-09-12",
+                    "workUnitOid" : "f06cbf49-e0b4-4c0c-bcd1-b927969638cd",
+                    "workUnitName" : "施工机组",
+                    "constructUnit" : "df5332c7-961f-4df0-9cf6-a41b588dbe1b",
+                    "constructUnitName" : "管道局四公司",
+                    "supervisionUnit" : "fa9cce85-d68a-4166-8675-513626510934",
+                    "supervisionUnitName" : "大庆监理",
+                    "supervisionEngineer" : "",
+                    "collectionPerson" : "",
+                    "collectionDate" : null,
+                    "geoState" : "正常",
+                    "approveStatus" : 0,
+                    "remarks" : "",
+                    "attachment":[
+                        {
+                            "oid":"a-aaaaaa",
+                            "fileName":"a-bbbbbb",
+                            "src":"a-ccccccc"
+                        },{
+                            "oid":"a-ddddd",
+                            "fileName":"a-eeeeeee",
+                            "src":"a-ffffff"
+                        }
+                    ]
+                }
+                localServer.weldMeasured.save(postData,callback);
+            },
+            //------------焊口测量更新
+            updateWeldMeasured: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data,4,4))
+                }
+                var postData={
+                    "oid" : "812581f5-ca79-4d5f-82bb-7cdd7c2fe955",
+                    "active" : 1,
+                    "createUserId" : "bca0365f-798d-4414-84d0-82d39fb0486f",
+                    "createUserName" : "张鹏飞",
+                    "createDatetime" : "2018-09-10 07:58:20",
+                    "modifyUserId" : "bca0365f-798d-4414-84d0-82d39fb0486f",
+                    "modifyUserName" : "张鹏飞",
+                    "modifyDatetime" : "2018-09-10 07:58:20",
+                    "projectOid" : "9d0b31ca-ec1a-4ebe-8a9e-32a55fa5eeba",
+                    "projectName" : "太石管道",
+                    "pipelineOid" : "43c53ba4-a80b-40b8-8974-b995cef66102",
+                    "pipelineName" : "太石管道阳石干线",
+                    "tendersOid" : "ae8bac2b-27af-436c-a424-e0990c086992",
+                    "tendersName" : "太石管道1阶段",
+                    "pipeSegmentOrCrossOid" : "e018eb30-0c6a-4f5a-88c4-556f28290c96",
+                    "pipeSegmentOrCrossName" : "石干线",
+                    "weldOid" : "0c797c0d-5c94-4abb-9e7b-a5c3ecbfd320",
+                    "weldCode" : null,
+                    "medianStakeOid" : "f1bc4e47-ce6b-4436-984f-6d1c7294fe4f",
+                    "medianStakeCode" : "TSGDYSGX-001",
+                    "relativeMileage" : 0,
+                    "pointx" : 0,
+                    "pointy" : 0,
+                    "surfaceeLevation" : 0,
+                    "pipeTopElevation" : 0,
+                    "buriedDepth" : 0,
+                    "surveyCrew" : "张鹏飞",
+                    "surveyDate" : "2018-09-12",
+                    "workUnitOid" : "f06cbf49-e0b4-4c0c-bcd1-b927969638cd",
+                    "workUnitName" : "施工机组",
+                    "constructUnit" : "df5332c7-961f-4df0-9cf6-a41b588dbe1b",
+                    "constructUnitName" : "管道局四公司",
+                    "supervisionUnit" : "fa9cce85-d68a-4166-8675-513626510934",
+                    "supervisionUnitName" : "大庆监理",
+                    "supervisionEngineer" : "",
+                    "collectionPerson" : "",
+                    "collectionDate" : null,
+                    "geoState" : "正常",
+                    "approveStatus" : 0,
+                    "remarks" : "",
+                    "attachment":[
+                        {
+                            "oid":"a-aaaaaa",
+                            "fileName":"a-ggggggggg",
+                            "src":"a-ccccccc"
+                        },{
+                            "oid":"a-ddddd",
+                            "fileName":"a-hhhhhh",
+                            "src":"a-ffffff"
+                        }
+                    ]
+                }
+                localServer.weldMeasured.update(postData,callback);
+            },
+            //------------焊口测量删除
+            deleteWeldMeasured: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data,4,4))
+                }
+                var obj1={
+                    "oid" : "812581f5-ca79-4d5f-82bb-7cdd7c2fe955"
+                }
+                localServer.weldMeasured.delete(obj1,callback);
+            },
+            //------------焊口测量查询
+            selectWeldMeasured: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data,4,4))
+                }
+                var obj1={
+                    "oid" : "812581f5-ca79-4d5f-82bb-7cdd7c2fe955"
+                }
+                localServer.weldMeasured.query(obj1,callback);
             },
         }  
 	});

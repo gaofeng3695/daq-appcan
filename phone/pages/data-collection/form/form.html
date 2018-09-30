@@ -14,7 +14,7 @@
 
 <body>
 	<div class="_outer-wrapper " v-cloak>
-		<jas-header :title="title"></jas-header>
+		<jas-header :title="title" right-icon="fa fa-qrcode" @clickright="clickright"></jas-header>
 		<div v-setheight style="overflow: auto;">
 			<jas-form-items-group ref="mainForm" :fields-group="fieldsGroup" :fields-config="fieldsConfig" :form="form"></jas-form-items-group>
 			<jas-file-group is-edit="true" ref="files"></jas-file-group>
@@ -70,6 +70,14 @@
 		},
 
 		methods: {
+			clickright: function () {
+				uexEfficientScanner.cbOpen = function (opCode, dataType, data) {
+					var resultData = JSON.parse(data);
+					var result = resultData.code;
+					var type = resultData.type;
+				};
+				uexEfficientScanner.open();
+			},
 			resetForm: function () {
 				var that = this;
 				for (var key in this.form) {
@@ -104,10 +112,10 @@
 					coating_pipe: 'checkCoatingPipe',
 					hot_bends: 'checkHotBends',
 					pipe_cold_bending: 'checkPipeColdBending',
-					construction_weld: '',
-					rework_weld: '',
-					measured_result: '',
-					anticorrosion_check: '',
+					construction_weld: 'constructWeld',
+					rework_weld: 'reworkWeld',
+					measured_result: 'weldMeasured',
+					anticorrosion_check: 'anticorrosionCheck',
 				};
 				this.table = tableMap[oParam.title];
 				var config = FieldsConfig[oParam.title];
@@ -135,6 +143,7 @@
 						if (data.status == 1 && data.rows.length > 0) {
 							// alert(JSON.stringify(data.rows[0], 4, 4))
 							that.form = data.rows[0];
+							// that.form.history = data.rows[0]; //存储历史的数据 用于进行改变焊口状态
 							if (status == '本地编辑') {
 								that.$refs.files.files = that.form.attachment;
 							}
@@ -152,6 +161,7 @@
 						oid: oid
 					}, function (data) {
 						that.form = data.data || data.rows[0];
+						// that.form.history = data.data || data.rows[0]; //存储历史的数据 用于进行改变焊口状态
 						if (status == '网上编辑') {
 							that.$refs.files.requestFile(oid);
 						}
@@ -166,11 +176,11 @@
 				that.form.attachment = that.$refs.files.files;
 				that.form.oid = that.form.oid ? that.form.oid : jasTools.base.createuuid();
 				var operation = this.formStatus === '本地编辑' ? 'update' : 'save';
-
 				that._formatForm();
 				var obj = that.$refs.mainForm.getSelectLabelValues();
 				jasTools.base.extend(that.form, obj);
 				localServer[that.table][operation](that.form, function (data) {
+					// alert("本地保存成功"+JSON.stringify(data));
 					if (data.status == 1) {
 						fnSuccess && fnSuccess();
 					} else {
@@ -180,10 +190,10 @@
 			},
 			saveToServer: function (fnSuccess, fnfail) {
 				var that = this;
-
 				var uploadToServer = function () {
 					var url = that.formStatus == '网上编辑' ? that.updateUrl : that.addUrl;
 					that._formatForm();
+					appcan.logs(that.form);
 					jasTools.ajax.post(url, that.form, function (data) {
 						var sBizId = data.data || that.oid;
 						that.UploadOid = data.data;
@@ -219,9 +229,8 @@
 				}
 			},
 			deleteLocalForm: function (callback) {
-
 				localServer[this.table].delete({
-					oid: this.oid
+					oid: this.form.oid
 				}, function (data) {
 					callback && callback();
 				});

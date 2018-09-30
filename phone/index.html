@@ -69,7 +69,7 @@
 					}, {
 						name: '地图展示',
 						icon: 'fa fa-globe',
-						url: '',
+						url: 'pages/map-view/map-view.html',
 					}, {
 						name: '个人中心',
 						icon: 'fa fa-user',
@@ -103,10 +103,13 @@
 					if (that.selectedTab === '数据录入') {
 						var scriptContent = 'vm.initPage()';
 					}
+					if (that.selectedTab === '数据审核') {
+						var scriptContent = 'vm.initPage()';
+					}
 					scriptContent && appcan.window.evaluatePopoverScript('index', that.openCurrentPageId, scriptContent);
 				});
 				//监听退出键
-				// that.checkOut();
+				that.checkOut();
 			});
 		},
 		methods: {
@@ -127,7 +130,7 @@
 			},
 			afterProjectChanged: function () { // 供 切换项目界面 调用的方法
 				appcan.window.evaluatePopoverScript('index', 'pages/data-collection/data-collection.html', 'vm.initPage()');
-				appcan.window.evaluatePopoverScript('index', 'pages/data-review/index.html', 'vm.requestUnit()');
+				appcan.window.evaluatePopoverScript('index', 'pages/data-review/index.html', 'vm.initPage()');
 				appcan.window.evaluatePopoverScript('index', 'pages/user-center/index.html', 'vm.initPage()');
 			},
 			openCurrentPage: function () {
@@ -159,8 +162,7 @@
 			},
 			checkOut: function () { //退出应用
 				//监听手机物理返回键
-				uexWindow.setReportKey(0, 1);
-				uexWindow.onKeyPressed = function (keyCode) {
+				appcan.window.monitorKey(0, 1, function (id) { // id:要拦截的键值id,0-返回键，1-菜单键 ;enable:是否拦截,0-不拦截，1-拦截
 					var _msg = "您是否要退出施工数据采集？";
 					appcan.window.confirm({
 						title: '提示',
@@ -172,7 +174,7 @@
 							}
 						}
 					});
-				};
+				});
 			}
 		},
 	});

@@ -159,7 +159,7 @@
 
 <body>
   <div class="_outer-wrapper " v-cloak>
-    <jas-header title="数据审核"></jas-header>
+    <jas-header :title="title"></jas-header>
     <div style="overflow: hidden;">
       <mt-navbar v-model="selected">
         <mt-tab-item id="a">
@@ -173,28 +173,66 @@
     <div class="heightContent">
       <mt-tab-container v-model="selected">
         <mt-tab-container-item id="a">
-          <mt-loadmore ref="loadmore" :top-method="refresh" :auto-fill="false" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded">
-            <div v-if="checkList.length==0" style="margin-top:10px;text-align: center;color:#999">
-              暂无数据
-            </div>
-            <ul>
-              <li v-for="item in checkList">
-                <jas-checkbox :checked="item.checked" :itemdate="item" @clickitem="clickItem">
-                  <div slot="options" class="ub-f1" @click="clickDetail(item)">
+          <div style="height:100%;overflow: scroll" class="listWrapper1">
+            <mt-loadmore ref="loadmore" :top-method="refresh" :auto-fill="false" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded">
+              <div v-if="checkList.length==0" style="margin-top:10px;text-align: center;color:#999">
+                暂无数据
+              </div>
+              <ul>
+                <li v-for="item in checkList">
+                  <jas-checkbox :checked="item.checked" :itemdate="item" @clickitem="clickItem">
+                    <div slot="options" class="ub-f1" @click="clickDetail(item)">
+                      <div class="item ub ub-ac clr333">
+                        <div class="ub-f1 ulim100">
+                          {{item.code}}
+                        </div>
+                        <div class="w35 txt-r">
+                          {{item.createTime}}
+                        </div>
+
+                      </div>
+                      <div class="item ub ub-ac clr666">
+                        <div class="ub-f1 ulim100 w35">
+                          {{item.createUserName||item.create_user_name}}
+                        </div>
+                        <div class="ub-f1 txt-c ulim100 w35">
+                          {{item.pipelineName||item.pipeline_name}}
+                        </div>
+                        <div class="ub-f1 txt-r ulim100 w35">
+                          {{item.tendersName||item.tenders_name}}
+                        </div>
+                      </div>
+                    </div>
+
+                  </jas-checkbox>
+                </li>
+              </ul>
+            </mt-loadmore>
+          </div>
+        </mt-tab-container-item>
+        <mt-tab-container-item id="b">
+          <div style="height:100%;overflow: scroll" class="listWrapper">
+            <mt-loadmore ref="loadmore1" :top-method="refresh" :auto-fill="false" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded">
+              <div v-if="checkList.length==0" style="margin-top:10px;text-align: center;color:#999">
+                暂无数据
+              </div>
+              <ul>
+                <li class="ub " v-for="item in checkList" @click="clickDetail(item)" :class="item.approveStatus=='-1'?'passMask1':'passMask'">
+                  <div class="ub-f1">
                     <div class="item ub ub-ac clr333">
+                      <!--<div class="ub-f1 ulim100">{{item.projectName||item.project_name}}</div>-->
                       <div class="ub-f1 ulim100">
                         {{item.code}}
                       </div>
                       <div class="w35 txt-r">
                         {{item.createTime}}
                       </div>
-
                     </div>
                     <div class="item ub ub-ac clr666">
                       <div class="ub-f1 ulim100 w35">
                         {{item.createUserName||item.create_user_name}}
                       </div>
-                      <div class="ub-f1 txt-c ulim100 w35">
+                      <div class="ub-f1 ulim100 txt-c">
                         {{item.pipelineName||item.pipeline_name}}
                       </div>
                       <div class="ub-f1 txt-r ulim100 w35">
@@ -202,44 +240,10 @@
                       </div>
                     </div>
                   </div>
-
-                </jas-checkbox>
-              </li>
-            </ul>
-          </mt-loadmore>
-        </mt-tab-container-item>
-        <mt-tab-container-item id="b">
-          <mt-loadmore ref="loadmore1" :top-method="refresh" :auto-fill="false" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded">
-            <div v-if="checkList.length==0" style="margin-top:10px;text-align: center;color:#999">
-              暂无数据
-            </div>
-            <ul>
-              <li class="ub " v-for="item in checkList" @click="clickDetail(item)" :class="item.approveStatus=='-1'?'passMask1':'passMask'">
-                <div class="ub-f1">
-                  <div class="item ub ub-ac clr333">
-                    <!--<div class="ub-f1 ulim100">{{item.projectName||item.project_name}}</div>-->
-                    <div class="ub-f1 ulim100">
-                      {{item.code}}
-                    </div>
-                    <div class="w35 txt-r">
-                      {{item.createTime}}
-                    </div>
-                  </div>
-                  <div class="item ub ub-ac clr666">
-                    <div class="ub-f1 ulim100 w35">
-                      {{item.createUserName||item.create_user_name}}
-                    </div>
-                    <div class="ub-f1 ulim100 txt-c">
-                      {{item.pipelineName||item.pipeline_name}}
-                    </div>
-                    <div class="ub-f1 txt-r ulim100 w35">
-                      {{item.tendersName||item.tenders_name}}
-                    </div>
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </mt-loadmore>
+                </li>
+              </ul>
+            </mt-loadmore>
+          </div>
         </mt-tab-container-item>
       </mt-tab-container>
     </div>
@@ -524,7 +528,8 @@
         currentRequestUrl: {},
         allLoaded: false,
         constructUnit: "", //施工单位oid
-        firestRequest: true
+        firestRequest: true,
+        title: "数据审核"
       }
     },
     watch: {
@@ -551,6 +556,7 @@
         var params = jasTools.base.getParamsInUrl();
         that.constructUnit = params.constructUnit;
         that.reHeight();
+        that.title = JSON.parse(params.obj).cnName + "-数据审核";
         try {
           that.requestURL.forEach(function (item, index) {
             if (item.name == JSON.parse(params.obj).cnName) {
@@ -602,9 +608,9 @@
         that.searchObj.pageNo = 1;
         that.checkList = [];
         that.allLoaded = false;
-        that.requestServer();
+        that.requestServer(true);
       },
-      requestServer: function () {
+      requestServer: function (isFresh) {
         var that = this;
         var obj = {
           "pageNo": that.searchObj.pageNo,
@@ -613,9 +619,12 @@
           "constructUnit": that.constructUnit,
           "projectOid": localStorage.getItem("defaultProject")
         };
-
         jasTools.ajax.post(that.serverURL, obj, function (data) {
           if (data.status == 1) {
+            setTimeout(function () {
+              isFresh && ($('.listWrapper')[0].scrollTop = 0);
+              isFresh && ($('.listWrapper1')[0].scrollTop = 0);
+            }, 10);
             if (that.searchObj.pageNo == 1) {
               if (data.rows.length > 0) {
                 that.checkList = data.rows;

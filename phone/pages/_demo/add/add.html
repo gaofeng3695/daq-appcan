@@ -21,7 +21,7 @@
 		<div v-setheight style="overflow: auto;">
 
 			<jas-group :title="title">
-				<jas-select-field label="名称" v-model="form.name" :options="options"></jas-select-field>
+				<jas-select-field label="名称" v-model="form.name" :options="options" v-fieldicon="'barcode'"></jas-select-field>
 				<jas-select-field label="名称" v-model="form.name2" :is-multi="true" :options="options"></jas-select-field>
 				<mt-field label="密码" placeholder="请输入密码" type="password" v-model="form.password"></mt-field>
 				<mt-field label="手机号" placeholder="请输入手机号" type="tel" v-model="form.phone"></mt-field>

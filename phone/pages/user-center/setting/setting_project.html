@@ -39,7 +39,7 @@
 			var that = this;
 			return {
 				value: localStorage.getItem("defaultProject") || '',
-				name:localStorage.getItem("defaultProjectName")||'',
+				name: localStorage.getItem("defaultProjectName") || '',
 				projectArry: [],
 				btns: ['确认']
 			}
@@ -49,7 +49,7 @@
 				var that = this;
 				that.projectArry.forEach(function (item) {
 					if (item.value == that.value) {
-						that.name=item.label;
+						that.name = item.label;
 						localStorage.setItem("defaultProjectName", item.label);
 						return;
 					}
@@ -75,10 +75,11 @@
 				that.$messagebox.confirm(msg).then(function (action) {
 					//确定 此时调用接口进行人员与默认项目关系的建立
 					var handle = defaultProject ? 'updateDefaultProject' : 'setDefaultProject';
-					localServer.login[handle]({
+					var obj = {
 						projectOid: that.value,
-						projectName:that.name
-					}, function (data) {
+						projectName: that.name
+					};
+					localServer.login[handle](obj, function (data) {
 						if (data.status == "1") {
 							localStorage.setItem("defaultProject", that.value);
 							appcan.window.evaluateScript('index', 'vm.afterProjectChanged()');
@@ -104,6 +105,7 @@
 								value: item.key
 							});
 						});
+						that.value = localStorage.getItem("defaultProject");
 					} else {
 						that.$toast("请先进行数据同步");
 					}

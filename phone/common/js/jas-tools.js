@@ -298,7 +298,7 @@
 			completeURL: completeURL,
 			refreshIpConfig: function () {
 				protocolConfig = appcan.locStorage.getVal('serverProtocol') || 'http://'; //协议
-				host = appcan.locStorage.getVal('serverIP') || '192.168.100.214'; //主机
+				host = appcan.locStorage.getVal('serverIP') || '192.168.100.43'; //主机
 				portConfig = appcan.locStorage.getVal('serverPort') || ''; //端口号
 				serverURL = protocolConfig + host + (portConfig ? ':' : '') + portConfig + '/';
 				completeURL = serverURL + routeURL;

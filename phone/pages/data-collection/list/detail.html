@@ -49,6 +49,7 @@
 <script src="./../../../common/components/jas-components.js"></script>
 <script src="./../../../common/js/data-base-operation.js"></script>
 <script src="../../user-center/data-sync/local-server.js"></script>
+<script src="../../data-review/checkList/domain.js"></script>
 <script src="formDetail.js"></script>
 <script>
   window.vm = new Vue({
@@ -71,9 +72,9 @@
     mounted: function () {
       var that = this;
       appcan.ready(function () {
-        that.$indicator.open({
-          spinnerType: 'fading-circle'
-        });
+        // that.$indicator.open({
+        // spinnerType: 'fading-circle'
+        // });
         var params = jasTools.base.getParamsInUrl();
         that.oid = JSON.parse(params.obj).oid;
         that.currentURL = JSON.parse(params.currentRequestUrl);
@@ -90,6 +91,7 @@
 
         }
         if (that.currentStatus != '3') {
+
           that.$refs.files.requestFile(that.oid);
           if (that.approveStatus == '2' || that.approveStatus == '1') { //表示通过与审核中按钮   只有再来一条
             that.btns = ['再来一条'];
@@ -147,7 +149,7 @@
             }, function (data) {
 
             });
-          }else{
+          } else {
             that.$toast("请在有网的情况下上传");
           }
         });
@@ -177,7 +179,8 @@
       deleteLocalForm: function () {
         var that = this;
         localServer[that.currentURL.localURl].delete({
-          oid: that.form.oid
+          oid: that.form.oid,
+          object:that.form//表示整个对象
         }, function (data) {
           appcan.window.close(-1); //关闭页面
         });
@@ -255,7 +258,7 @@
       },
       deleteByServer: function () {
         var that = this;
-        jasTools.ajax.post(that.currentURL.deleteURL, that.form, function (data) {
+        jasTools.ajax.post(that.currentURL.deleteURL, {oid:that.form.oid}, function (data) {
           if (data.status == 1) {
             appcan.window.close(-1);
             that.$toast("删除成功");
@@ -270,19 +273,24 @@
           }, function (data) {
             that.$indicator.close();
             that.form = data.data || data.rows[0];
+            for (var key in domain) {
+              that.form[key] = domain[key][that.form[key]];
+            }
           });
         } else { //查询本地详情
           localServer[that.currentURL.localURl].query({
             oid: that.oid
           }, function (data) {
+            // that.$indicator.close();
             if (data.status == 1) {
-              that.$indicator.close();
               that.form = data.rows[0];
+              for (var key in domain) {
+                that.form[key] = domain[key][that.form[key]];
+              }
               that.$refs.files.files = that.form.attachment;
             } else {
               that.$toast("网络异常，请稍候尝试")
             }
-
           });
         }
       }
