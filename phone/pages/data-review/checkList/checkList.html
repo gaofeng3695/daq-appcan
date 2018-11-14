@@ -30,9 +30,6 @@
     float: right;
   }
 
-  ul li:first-child {
-    margin-top: 10px;
-  }
 
   ul li {
     margin-bottom: 10px;
@@ -48,16 +45,6 @@
     height: 50px;
     margin-right: 10px;
   }
-
-  /*
-         .mint-checklist-label {
-         padding: 0px 10px 0px 0px;
-         }
-
-         .mint-checkbox {
-         padding-top: 15px;
-         display: inline-block;
-         }*/
 
   .checkImg {
     background-size: 16px 16px;
@@ -155,27 +142,34 @@
   .txt-c {
     text-align: center;
   }
+
+  .footerBtn {
+    min-width: 25vw;
+  }
 </style>
 
 <body>
   <div class="_outer-wrapper " v-cloak>
     <jas-header :title="title"></jas-header>
     <div style="overflow: hidden;">
-      <mt-navbar v-model="selected">
-        <mt-tab-item id="a">
-          未审核数据
-        </mt-tab-item>
-        <mt-tab-item id="b">
-          已审核数据
-        </mt-tab-item>
+      <div style="margin-bottom:10px;">
+
+        <mt-navbar v-model="selected">
+          <mt-tab-item id="a">
+            未审核数据
+          </mt-tab-item>
+          <mt-tab-item id="b">
+            已审核数据
+          </mt-tab-item>
+      </div>
       </mt-navbar>
     </div>
-    <div class="heightContent">
+    <div v-setheight class="heightContent">
       <mt-tab-container v-model="selected">
         <mt-tab-container-item id="a">
-          <div style="height:100%;overflow: scroll" class="listWrapper1">
+          <div style="height:100%;overflow: auto" class="listWrapper1">
             <mt-loadmore ref="loadmore" :top-method="refresh" :auto-fill="false" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded">
-              <div v-if="checkList.length==0" style="margin-top:10px;text-align: center;color:#999">
+              <div v-show="checkList.length==0" style="margin-top:20px;text-align: center;color:#999">
                 暂无数据
               </div>
               <ul>
@@ -189,7 +183,6 @@
                         <div class="w35 txt-r">
                           {{item.createTime}}
                         </div>
-
                       </div>
                       <div class="item ub ub-ac clr666">
                         <div class="ub-f1 ulim100 w35">
@@ -211,9 +204,9 @@
           </div>
         </mt-tab-container-item>
         <mt-tab-container-item id="b">
-          <div style="height:100%;overflow: scroll" class="listWrapper">
+          <div style="height:100%;overflow: auto" class="listWrapper">
             <mt-loadmore ref="loadmore1" :top-method="refresh" :auto-fill="false" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded">
-              <div v-if="checkList.length==0" style="margin-top:10px;text-align: center;color:#999">
+              <div v-show="checkList.length==0" style="margin-top:20px;text-align: center;color:#999">
                 暂无数据
               </div>
               <ul>
@@ -250,11 +243,11 @@
     <div class="jas-button-footer" v-show="isShow">
       <jas-checkbox :checked="allchecked" @clickitem="chooseAll" :is-all='true'>
         <div slot="options" class="txt-r ub-f1" style="line-height: 47px;">
-          <mt-button type="primary" size="small" @click="pass">
-            通过
-          </mt-button>
-          <mt-button type="primary" size="small" @click="reject" style="background:#ed9028">
+          <mt-button class="footerBtn" style="margin-right:6px;background:#ef4f4f;" type="primary" size="small" @click="reject">
             驳回
+          </mt-button>
+          <mt-button class="footerBtn" type="primary" size="small" @click="pass">
+            通过
           </mt-button>
         </div>
       </jas-checkbox>
@@ -276,249 +269,273 @@
         allchecked: false,
         checkList: [],
         approveOpinion: "", //驳回意见
-        requestURL: [{
-          name: "冷弯信息",
-          url: "/jdbc/commonData/coldBendingPipe/getPage.do",
-          code: "pipeColdBendingCode",
-          className: "cn.jasgroup.jasframework.acquisitiondata.material.base.coldbending.dao.entity.ColdBendingPipe"
-        }, {
-          name: "焊口信息记录",
-          url: "/jdbc/commonData/constructionWeld/getPage.do",
-          code: "weldCode",
-          className: "cn.jasgroup.jasframework.acquisitiondata.weld.weldinfo.dao.entity.ConstructionWeld"
-        }, {
-          name: "焊口返修信息记录",
-          url: "/jdbc/commonData/reworkWeld/getPage.do",
-          code: "reworkWeldCode",
-          className: "cn.jasgroup.jasframework.acquisitiondata.weld.reworkweld.dao.entity.ReworkWeld"
-        }, {
-          name: "焊口割口信息记录",
-          url: "/jdbc/commonData/weldCut/getPage.do",
-          code: "weldCode",
-          className: "cn.jasgroup.jasframework.acquisitiondata.weld.weldcut.dao.entity.DaqWeldCut"
-        }, {
-          name: "钢管切管信息记录",
-          url: "/jdbc/commonData/cutWeld/getPage.do",
-          code: "pipeCode",
-          className: "cn.jasgroup.jasframework.acquisitiondata.weld.cutweld.dao.entity.CutWeld"
-        }, {
-          name: "防腐补口检查信息记录",
-          url: "/jdbc/commonData/weldAnticorrosionCheck/getPage.do",
-          detailURL: "/map/commonData/F000036/get.do",
-          code: "weldCode",
-          functionCode: "F000036"
-        }, {
-          name: "防腐补口剥离强度试验",
-          url: "/jdbc/commonData/weldAnticorrosionTest/getPage.do",
-          detailURL: "/map/commonData/F000037/get.do",
-          code: "weldCode",
-          functionCode: "F000037"
-        }, {
-          name: "防腐补伤信息记录",
-          url: "/jdbc/commonData/weldAnticorrosionRepair/getPage.do",
-          code: "weld_code",
-          detailURL: "/map/commonData/F000038/get.do",
-          functionCode: "F000038"
-        }, {
-          name: "焊口测量成果信息记录",
-          url: "/jdbc/commonData/weldMeasuredResult/getPage.do",
-          code: "weldCode",
-          className: "cn.jasgroup.jasframework.acquisitiondata.weld.measuredresult.dao.entity.WeldMeasuredResult"
-        }, {
-          name: "射线检测",
-          url: "/jdbc/commonData/detectionRay/getPage.do",
-          code: "weldCode",
-          className: "cn.jasgroup.jasframework.acquisitiondata.material.detection.ray.dao.entity.DaqDetectionRay",
-          detailURL: "/daq/detectionRay/get.do",
-          type: "get"
-        }, {
-          name: "超声波检测",
-          url: "/jdbc/commonData/detectionUltrasonic/getPage.do",
-          detailURL: "/daq/detectionUltrasonic/get.do",
-          className: "cn.jasgroup.jasframework.acquisitiondata.material.detection.ultrasonic.dao.entity.DaqDetectionUltrasonic",
-          code: "weldCode",
-          type: "get"
-        }, {
-          name: "磁粉检测",
-          url: "/jdbc/commonData/detectionMagneticPowder/getPage.do",
-          code: "weldCode",
-          detailURL: "/daq/detectionMagneticPowder/get.do",
-          className: "cn.jasgroup.jasframework.acquisitiondata.material.detection.magneticpowder.dao.entity.DaqDetectionMagneticPowder",
-          type: "get"
-        }, {
-          name: "渗透检测",
-          url: "/jdbc/commonData/detectionInfiltration/getPage.do",
-          code: "weldCode",
-          detailURL: "/daq/detectionInfiltration/get.do",
-          className: "cn.jasgroup.jasframework.acquisitiondata.material.detection.infiltration.dao.entity.DaqDetectionInfiltration",
-          type: "get"
-        }, {
-          name: "相控阵超声波检测",
-          url: "/jdbc/commonData/detectionPaUltrasonic/getPage.do",
-          className: "cn.jasgroup.jasframework.acquisitiondata.material.detection.paultrasonic.dao.entity.DaqDetectionPaUltrasonic",
-          code: "weldCode",
-          detailURL: "/daq/detectionPaUltrasonic/get.do",
-          type: "get"
-        }, {
-          name: "全自动超声波检测",
-          url: "/jdbc/commonData/detectionFaUltrasonic/getPage.do",
-          className: "cn.jasgroup.jasframework.acquisitiondata.material.detection.faultrasonic.dao.entity.DaqDetectionFaUltrasonic",
-          code: "weldCode",
-          detailURL: "/daq/detectionFaUltrasonic/get.do",
-          type: "get"
-        }, {
-          name: "测量放线",
-          url: "/jdbc/commonData/laySurveying/getPage.do",
-          code: "medianStakeCode",
-          className: "cn.jasgroup.jasframework.acquisitiondata.lay.surveying.dao.entity.LaySurveying"
-        }, {
-          name: "管沟开挖",
-          url: "/jdbc/commonData/layPipeTrenchExcavation/getPage.do",
-          code: "pipeSegmentOrCrossName",
-          className: "cn.jasgroup.jasframework.acquisitiondata.lay.excavation.dao.entity.LayPipeTrenchExcavation"
-        }, {
-          name: "管沟回填",
-          url: "/jdbc/commonData/layPipeTrenchBackfill/getPage.do",
-          code: "pipeSegmentOrCrossName",
-          className: "cn.jasgroup.jasframework.acquisitiondata.lay.backfill.dao.entity.LayPipeTrenchBackfill"
-        }, {
-          name: "地貌恢复验收",
-          url: "/jdbc/commonData/layLandRestoration/getPage.do",
-          code: "certificateNum",
-          className: "cn.jasgroup.jasframework.acquisitiondata.lay.restoration.dao.entity.LayLandRestoration"
-        }, {
-          name: "保温",
-          url: "/jdbc/commonData/layThermalInsulation/getPage.do",
-          code: "pipeSegmentOrCrossName",
-          className: "cn.jasgroup.jasframework.acquisitiondata.lay.Insulation.dao.entity.LayThermalInsulation"
-        }, {
-          name: "开挖穿越",
-          url: "/jdbc/commonData/crossExcavation/getPage.do",
-          code: "crossName",
-          className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.excavation.dao.entity.DaqCrossExcavation"
-        }, {
-          name: "顶管穿越",
-          url: "/jdbc/commonData/crossPipeJacking/getPage.do",
-          code: "crossName",
-          className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.pipejacking.dao.entity.DaqCrossPipeJacking"
-        }, {
-          name: "箱涵穿越",
-          url: "/jdbc/commonData/crossBoxCulvert/getPage.do",
-          code: "crossName",
-          className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.boxculvert.dao.entity.DaqCrossBoxCulvert"
-        }, {
-          name: "定向钻穿越",
-          url: "/jdbc/commonData/crossDrilling/getPage.do",
-          code: "crossName",
-          className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.drilling.dao.entity.DaqCrossDrilling"
-        }, {
-          name: "钻爆隧道穿越",
-          url: "/jdbc/commonData/crossDrillingBlasting/getPage.do",
-          code: "crossName",
-          className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.drillingblasting.dao.entity.DaqCrossDrillingBlasting"
-        }, {
-          name: "跨越",
-          url: "/jdbc/commonData/crossAcross/getPage.do",
-          code: "crossName",
-          className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.across.dao.entity.DaqCrossAcross"
-        }, {
-          name: "盾构隧道穿越",
-          url: "/jdbc/commonData/crossShield/getPage.do",
-          code: "crossName",
-          className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.shield.dao.entity.DaqCrossShield"
-        }, {
-          name: "绝缘件",
-          url: "/jdbc/commonData/cathodicIsolatingPiece/getPage.do",
-          code: "isolatingPieceCode",
-          className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.isolating.dao.entity.CathodicIsolatingPiece"
-        }, {
-          name: "阴极保护电缆",
-          url: "/jdbc/commonData/cathodicCableProtection/getPage.do",
-          code: "cableCode",
-          className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.cable.dao.entity.CathodicCableProtection"
-        }, {
-          name: "牺牲阳极",
-          url: "/jdbc/commonData/cathodicSacrificeAnode/getPage.do",
-          code: "anodeCode",
-          className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.sacrifice.dao.entity.CathodicSacrificeAnode"
-        }, {
-          name: "绝缘接头保护器",
-          url: "/jdbc/commonData/cathodicInsulatedJoint/getPage.do",
-          code: "equipmentCode",
-          className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.protector.dao.entity.CathodicInsulatedJoint"
-        }, {
-          name: "固态去耦合器",
-          url: "/jdbc/commonData/cathodicSolidDecouplert/getPage.do",
-          code: "equipmentCode",
-          className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.decoupler.dao.entity.CathodicSolidDecoupler"
-        }, {
-          name: "阴极保护测试桩",
-          url: "/jdbc/commonData/cathodicTestStake/getPage.do",
-          code: "testStakeCode",
-          className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.teststack.dao.entity.CathodicTestStake"
-        }, {
-          name: "极性排流器",
-          url: "/jdbc/commonData/cathodicPolarityDrainage/getPage.do",
-          code: "equipmentCode",
-          className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.drainage.dao.entity.CathodicPolarityDrainage"
-        }, {
-          name: "辅助阳极地床",
-          url: "/jdbc/commonData/cathodicAnodeBed/getPage.do",
-          code: "groundBed",
-          className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.bed.dao.entity.CathodicAnodeBed"
-        }, {
-          name: "牺牲阳极电参数测试信息记录",
-          url: "/jdbc/commonData/cathodicElectricalParameterTest/getPage.do",
-          code: "test_stake_code",
-          detailURL: "/map/commonData/F000040/get.do",
-          functionCode: "F000040"
-        }, {
-          name: "外加电流电参数测试信息记录",
-          url: "/jdbc/commonData/cathodicImpressedCurrentTest/getPage.do",
-          code: "test_stake_code",
-          detailURL: "/map/commonData/F000041/get.do",
-          functionCode: "F000041"
-        }, {
-          name: "标志桩安装检查信息记录",
-          url: "/jdbc/commonData/appendagesMarkStake/getPage.do",
-          code: "markStakeCode",
-          className: "cn.jasgroup.jasframework.acquisitiondata.material.appendages.markstake.dao.entity.DaqAppendagesMarkStake"
-        }, {
-          name: "电子标签信息记录",
-          url: "/jdbc/commonData/appendagesElectronicLabel/getPage.do",
-          code: "electronicLabelCode",
-          detailURL: "/daq/appendagesElectronicLabel/get.do",
-          type: "get",
-          className: "cn.jasgroup.jasframework.acquisitiondata.material.appendages.electroniclabel.dao.entity.DaqAppendagesElectronicLabel"
-        }, {
-          name: "通信光缆人（手）孔位置信息记录",
-          url: "/jdbc/commonData/appendagesHandHole/getPage.do",
-          code: "handHoleCode",
-          className: "cn.jasgroup.jasframework.acquisitiondata.material.appendages.handhole.dao.entity.DaqAppendagesHandHole"
-        }, {
-          name: "管道沿线地下障碍物信息记录",
-          url: "/jdbc/commonData/appendagesObstacle/getPage.do",
-          code: "obstacleCode",
-          detailURL: "/daq/appendagesObstacle/get.do",
-          type: "get",
-          className: "cn.jasgroup.jasframework.acquisitiondata.material.appendages.obstacle.dao.entity.DaqAppendagesObstacle"
-        }, {
-          name: "管道沿线水工保护信息记录",
-          url: "/jdbc/commonData/appendagesHydraulicProtection/getPage.do",
-          code: "hydraulicProtectionCode",
-          className: "cn.jasgroup.jasframework.acquisitiondata.material.appendages.hydraulicprotection.dao.entity.DaqAppendagesHydraulicProtection"
-        }, {
-          name: "伴行路",
-          url: "/jdbc/commonData/appendagesConcomitantRoad/getPage.do",
-          code: "concomitant_road_code",
-          detailURL: "/map/commonData/F000043/get.do",
-          functionCode: "F000043"
-        }, {
-          name: "套管",
-          url: "/jdbc/commonData/appendagesCasingPipe/getPage.do",
-          code: "pipeSegmentOrCrossName",
-          className: "cn.jasgroup.jasframework.acquisitiondata.material.appendages.casingpipe.dao.entity.DaqAppendagesCasingPipe"
-        }],
+        requestURL: [ //
+          {
+            name: "冷弯信息",
+            url: "/jdbc/commonData/coldBendingPipe/getPage.do",
+            code: "pipeColdBendingCode",
+            className: "cn.jasgroup.jasframework.acquisitiondata.material.base.coldbending.dao.entity.ColdBendingPipe"
+          }, {
+            name: "焊口信息记录",
+            url: "/jdbc/commonData/constructionWeld/getPage.do",
+            code: "weldCode",
+            className: "cn.jasgroup.jasframework.acquisitiondata.weld.weldinfo.dao.entity.ConstructionWeld"
+          }, {
+            name: "焊口返修信息记录",
+            url: "/jdbc/commonData/reworkWeld/getPage.do",
+            code: "reworkWeldCode",
+            className: "cn.jasgroup.jasframework.acquisitiondata.weld.reworkweld.dao.entity.ReworkWeld"
+          }, {
+            name: "焊口割口信息记录",
+            url: "/jdbc/commonData/weldCut/getPage.do",
+            code: "weldCode",
+            className: "cn.jasgroup.jasframework.acquisitiondata.weld.weldcut.dao.entity.DaqWeldCut"
+          }, {
+            name: "钢管切管信息记录",
+            url: "/jdbc/commonData/cutWeld/getPage.do",
+            code: "pipeCode",
+            className: "cn.jasgroup.jasframework.acquisitiondata.weld.cutweld.dao.entity.CutWeld"
+          }, {
+            name: "防腐补口检查信息记录",
+            url: "/jdbc/commonData/weldAnticorrosionCheck/getPage.do",
+            detailURL: "/map/commonData/F000036/get.do",
+            code: "weld_code",
+            functionCode: "F000036"
+          }, {
+            name: "防腐补口剥离强度试验",
+            url: "/jdbc/commonData/weldAnticorrosionTest/getPage.do",
+            detailURL: "/map/commonData/F000037/get.do",
+            code: "weld_code",
+            functionCode: "F000037"
+          }, {
+            name: "防腐补伤信息记录",
+            url: "/jdbc/commonData/weldAnticorrosionRepair/getPage.do",
+            code: "weld_code",
+            detailURL: "/map/commonData/F000038/get.do",
+            functionCode: "F000038"
+          }, {
+            name: "焊口测量成果信息记录",
+            url: "/jdbc/commonData/weldMeasuredResult/getPage.do",
+            code: "weldCode",
+            className: "cn.jasgroup.jasframework.acquisitiondata.weld.measuredresult.dao.entity.WeldMeasuredResult"
+          }, {
+            name: "射线检测",
+            url: "/jdbc/commonData/detectionRay/getPage.do",
+            code: "weldCode",
+            className: "cn.jasgroup.jasframework.acquisitiondata.material.detection.ray.dao.entity.DaqDetectionRay",
+            detailURL: "/daq/detectionRay/get.do",
+            type: "get"
+          }, {
+            name: "超声波检测",
+            url: "/jdbc/commonData/detectionUltrasonic/getPage.do",
+            detailURL: "/daq/detectionUltrasonic/get.do",
+            className: "cn.jasgroup.jasframework.acquisitiondata.material.detection.ultrasonic.dao.entity.DaqDetectionUltrasonic",
+            code: "weldCode",
+            type: "get"
+          }, {
+            name: "磁粉检测",
+            url: "/jdbc/commonData/detectionMagneticPowder/getPage.do",
+            code: "weldCode",
+            detailURL: "/daq/detectionMagneticPowder/get.do",
+            className: "cn.jasgroup.jasframework.acquisitiondata.material.detection.magneticpowder.dao.entity.DaqDetectionMagneticPowder",
+            type: "get"
+          }, {
+            name: "渗透检测",
+            url: "/jdbc/commonData/detectionInfiltration/getPage.do",
+            code: "weldCode",
+            detailURL: "/daq/detectionInfiltration/get.do",
+            className: "cn.jasgroup.jasframework.acquisitiondata.material.detection.infiltration.dao.entity.DaqDetectionInfiltration",
+            type: "get"
+          }, {
+            name: "相控阵超声波检测",
+            url: "/jdbc/commonData/detectionPaUltrasonic/getPage.do",
+            className: "cn.jasgroup.jasframework.acquisitiondata.material.detection.paultrasonic.dao.entity.DaqDetectionPaUltrasonic",
+            code: "weldCode",
+            detailURL: "/daq/detectionPaUltrasonic/get.do",
+            type: "get"
+          }, {
+            name: "全自动超声波检测",
+            url: "/jdbc/commonData/detectionFaUltrasonic/getPage.do",
+            className: "cn.jasgroup.jasframework.acquisitiondata.material.detection.faultrasonic.dao.entity.DaqDetectionFaUltrasonic",
+            code: "weldCode",
+            detailURL: "/daq/detectionFaUltrasonic/get.do",
+            type: "get"
+          }, {
+            name: "测量放线",
+            url: "/jdbc/commonData/laySurveying/getPage.do",
+            code: "medianStakeCode",
+            className: "cn.jasgroup.jasframework.acquisitiondata.lay.surveying.dao.entity.LaySurveying"
+          }, {
+            name: "管沟开挖",
+            url: "/jdbc/commonData/layPipeTrenchExcavation/getPage.do",
+            code: "pipeSegmentOrCrossName",
+            className: "cn.jasgroup.jasframework.acquisitiondata.lay.excavation.dao.entity.LayPipeTrenchExcavation"
+          }, {
+            name: "管沟回填",
+            url: "/jdbc/commonData/layPipeTrenchBackfill/getPage.do",
+            code: "pipeSegmentOrCrossName",
+            className: "cn.jasgroup.jasframework.acquisitiondata.lay.backfill.dao.entity.LayPipeTrenchBackfill"
+          }, {
+            name: "地貌恢复验收",
+            url: "/jdbc/commonData/layLandRestoration/getPage.do",
+            code: "certificateNum",
+            className: "cn.jasgroup.jasframework.acquisitiondata.lay.restoration.dao.entity.LayLandRestoration"
+          }, {
+            name: "保温",
+            url: "/jdbc/commonData/layThermalInsulation/getPage.do",
+            code: "pipeSegmentOrCrossName",
+            className: "cn.jasgroup.jasframework.acquisitiondata.lay.Insulation.dao.entity.LayThermalInsulation"
+          }, {
+            name: "开挖穿越",
+            url: "/jdbc/commonData/crossExcavation/getPage.do",
+            code: "crossName",
+            detailURL: "/daq/crossExcavation/get.do",
+            type: 'get',
+            className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.excavation.dao.entity.DaqCrossExcavation"
+          }, {
+            name: "顶管穿越",
+            url: "/jdbc/commonData/crossPipeJacking/getPage.do",
+            code: "crossName",
+            detailURL: "/daq/crossPipeJacking/get.do",
+            type: 'get',
+            className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.pipejacking.dao.entity.DaqCrossPipeJacking"
+          }, {
+            name: "箱涵穿越",
+            url: "/jdbc/commonData/crossBoxCulvert/getPage.do",
+            code: "crossName",
+            detailURL: "/daq/crossBoxCulvert/get.do",
+            type: 'get',
+            className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.boxculvert.dao.entity.DaqCrossBoxCulvert"
+          }, {
+            name: "定向钻穿越",
+            url: "/jdbc/commonData/crossDrilling/getPage.do",
+            code: "crossName",
+            detailURL: "/daq/crossDrilling/get.do",
+            type: 'get',
+            className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.drilling.dao.entity.DaqCrossDrilling"
+          }, {
+            name: "钻爆隧道穿越",
+            url: "/jdbc/commonData/crossDrillingBlasting/getPage.do",
+            code: "crossName",
+            detailURL: "/daq/crossDrillingBlasting/get.do",
+            type: 'get',
+            className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.drillingblasting.dao.entity.DaqCrossDrillingBlasting"
+          }, {
+            name: "跨越",
+            url: "/jdbc/commonData/crossAcross/getPage.do",
+            code: "crossName",
+            detailURL: "/daq/crossAcross/get.do",
+            type: 'get',
+            className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.across.dao.entity.DaqCrossAcross"
+          }, {
+            name: "盾构隧道穿越",
+            url: "/jdbc/commonData/crossShield/getPage.do",
+            code: "crossName",
+            detailURL: "/daq/crossShield/get.do",
+            type: 'get',
+            className: "cn.jasgroup.jasframework.acquisitiondata.material.cross.shield.dao.entity.DaqCrossShield"
+          }, {
+            name: "绝缘件",
+            url: "/jdbc/commonData/cathodicIsolatingPiece/getPage.do",
+            code: "isolatingPieceCode",
+            className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.isolating.dao.entity.CathodicIsolatingPiece"
+          }, {
+            name: "阴极保护电缆",
+            url: "/jdbc/commonData/cathodicCableProtection/getPage.do",
+            code: "cableCode",
+            className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.cable.dao.entity.CathodicCableProtection"
+          }, {
+            name: "牺牲阳极",
+            url: "/jdbc/commonData/cathodicSacrificeAnode/getPage.do",
+            code: "anodeCode",
+            className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.sacrifice.dao.entity.CathodicSacrificeAnode"
+          }, {
+            name: "绝缘接头保护器",
+            url: "/jdbc/commonData/cathodicInsulatedJoint/getPage.do",
+            code: "equipmentCode",
+            className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.protector.dao.entity.CathodicInsulatedJoint"
+          }, {
+            name: "固态去耦合器",
+            url: "/jdbc/commonData/cathodicSolidDecouplert/getPage.do",
+            code: "equipmentCode",
+            className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.decoupler.dao.entity.CathodicSolidDecoupler"
+          }, {
+            name: "阴极保护测试桩",
+            url: "/jdbc/commonData/cathodicTestStake/getPage.do",
+            code: "testStakeCode",
+            className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.teststack.dao.entity.CathodicTestStake"
+          }, {
+            name: "极性排流器",
+            url: "/jdbc/commonData/cathodicPolarityDrainage/getPage.do",
+            code: "equipmentCode",
+            className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.drainage.dao.entity.CathodicPolarityDrainage"
+          }, {
+            name: "辅助阳极地床",
+            url: "/jdbc/commonData/cathodicAnodeBed/getPage.do",
+            code: "groundBed",
+            className: "cn.jasgroup.jasframework.acquisitiondata.cathodic.bed.dao.entity.CathodicAnodeBed"
+          }, {
+            name: "牺牲阳极电参数测试信息记录",
+            url: "/jdbc/commonData/cathodicElectricalParameterTest/getPage.do",
+            code: "test_stake_code",
+            detailURL: "/map/commonData/F000040/get.do",
+            functionCode: "F000040"
+          }, {
+            name: "外加电流电参数测试信息记录",
+            url: "/jdbc/commonData/cathodicImpressedCurrentTest/getPage.do",
+            code: "test_stake_code",
+            detailURL: "/map/commonData/F000041/get.do",
+            functionCode: "F000041"
+          }, {
+            name: "标志桩安装检查信息记录", ///
+            url: "/jdbc/commonData/appendagesMarkStake/getPage.do",
+            code: "markStakeCode",
+            detailURL: "/daq/appendagesMarkStake/get.do",
+            type: "get",
+            className: "cn.jasgroup.jasframework.acquisitiondata.material.appendages.markstake.dao.entity.DaqAppendagesMarkStake"
+          }, {
+            name: "电子标签信息记录",
+            url: "/jdbc/commonData/appendagesElectronicLabel/getPage.do",
+            code: "electronicLabelCode",
+            detailURL: "/daq/appendagesElectronicLabel/get.do",
+            type: "get",
+            className: "cn.jasgroup.jasframework.acquisitiondata.material.appendages.electroniclabel.dao.entity.DaqAppendagesElectronicLabel"
+          }, {
+            name: "通信光缆人（手）孔位置信息记录",
+            url: "/jdbc/commonData/appendagesHandHole/getPage.do",
+            code: "handHoleCode",
+            detailURL: "/daq/appendagesHandHole/get.do",
+            type: "get",
+            className: "cn.jasgroup.jasframework.acquisitiondata.material.appendages.handhole.dao.entity.DaqAppendagesHandHole"
+          }, {
+            name: "管道沿线地下障碍物信息记录",
+            url: "/jdbc/commonData/appendagesObstacle/getPage.do",
+            code: "obstacleCode",
+            detailURL: "/daq/appendagesObstacle/get.do",
+            type: "get",
+            className: "cn.jasgroup.jasframework.acquisitiondata.material.appendages.obstacle.dao.entity.DaqAppendagesObstacle"
+          }, {
+            name: "管道沿线水工保护信息记录",
+            url: "/jdbc/commonData/appendagesHydraulicProtection/getPage.do",
+            code: "hydraulicProtectionCode",
+            detailURL: "/daq/appendagesHydraulicProtection/get.do",
+            type: "get",
+            className: "cn.jasgroup.jasframework.acquisitiondata.material.appendages.hydraulicprotection.dao.entity.DaqAppendagesHydraulicProtection"
+          }, {
+            name: "伴行路",
+            url: "/jdbc/commonData/appendagesConcomitantRoad/getPage.do",
+            code: "concomitant_road_code",
+            detailURL: "/map/commonData/F000043/get.do",
+            functionCode: "F000043"
+          }, {
+            name: "套管",
+            url: "/jdbc/commonData/appendagesCasingPipe/getPage.do",
+            code: "pipeSegmentOrCrossName",
+            detailURL: "/daq/appendagesCasingPipe/get.do",
+            type: "get",
+            className: "cn.jasgroup.jasframework.acquisitiondata.material.appendages.casingpipe.dao.entity.DaqAppendagesCasingPipe"
+          }
+        ],
         serverURL: "",
         searchObj: {
           pageNo: 1,
@@ -542,7 +559,6 @@
         } else {
           that.searchObj.approveStatus = "-1,2";
         }
-        that.reHeight();
         that.refresh();
       }
     },
@@ -555,8 +571,7 @@
 
         var params = jasTools.base.getParamsInUrl();
         that.constructUnit = params.constructUnit;
-        that.reHeight();
-        that.title = JSON.parse(params.obj).cnName + "-数据审核";
+        that.title = JSON.parse(params.obj).cnName;
         try {
           that.requestURL.forEach(function (item, index) {
             if (item.name == JSON.parse(params.obj).cnName) {
@@ -569,12 +584,10 @@
               if (item.functionCode) {
                 that.searchObj.functionCode = item.functionCode;
               }
-              foreach.break = new Error("StopIteration");
+              foreach.break = new Error("StopIteration"); // 配合try cathch ,人为制造错误，跳出foreach循环
             }
           });
-        } catch (e) {
-
-        }
+        } catch (e) {}
         that.refresh();
         appcan.window.on("resume", function () {
           if (that.firestRequest) {
@@ -586,27 +599,10 @@
       });
     },
     methods: {
-      reHeight: function () {
-        var otherHeight = 0;
-        var that = this;
-        setTimeout(function () {
-          var arr = $("._outer-wrapper").children();
-          for (var i = 0; i < arr.length; i++) {
-            if (i == 0 || i == 1) {
-              otherHeight += arr[i].clientHeight;
-            }
-            if (i == 3 && that.isShow) {
-              otherHeight += arr[i].clientHeight;
-            }
-          }
-          $(".heightContent").css('height', 'calc(100% - ' + otherHeight + 'px)');
-          $(".heightContent").css('overflow', 'auto');
-        }, 0);
-      },
       refresh: function () {
         var that = this;
         that.searchObj.pageNo = 1;
-        that.checkList = [];
+        // that.checkList = [];
         that.allLoaded = false;
         that.requestServer(true);
       },
@@ -619,7 +615,13 @@
           "constructUnit": that.constructUnit,
           "projectOid": localStorage.getItem("defaultProject")
         };
+        that.toastInst && that.toastInst.close();
+        that.$indicator.open({
+          text: '正在加载数据...',
+          spinnerType: 'fading-circle'
+        });
         jasTools.ajax.post(that.serverURL, obj, function (data) {
+          that.$indicator.close();
           if (data.status == 1) {
             setTimeout(function () {
               isFresh && ($('.listWrapper')[0].scrollTop = 0);
@@ -635,7 +637,7 @@
                 });
               } else {
                 that.checkList = [];
-                that.$toast('暂无数据');
+                that.toastInst = that.$toast('暂无数据');
                 that.allLoaded = true;
               }
               that.searchObj.pageNo++;
@@ -650,11 +652,11 @@
                 that.searchObj.pageNo++;
               } else {
                 that.allLoaded = true;
-                that.$toast('没有更多数据');
+                that.toastInst = that.$toast('没有更多数据');
               }
             }
           } else {
-            that.$toast("网络异常，请稍候尝试")
+            that.toastInst = that.$toast("网络异常，请稍候尝试")
           }
           if (that.selected == "a") {
             that.$refs.loadmore.onTopLoaded();
@@ -713,9 +715,13 @@
           that.allchecked = false;
         }
       },
-      clickDetail: function (obj) {
+      clickDetail: function (_obj) {
         //进入详情
         var that = this;
+        var obj = {
+          approveStatus: _obj.approveStatus,
+          oid: _obj.oid
+        }
         appcan.window.open('checkdetail', 'detail.html?obj=' + JSON.stringify(obj) + "&currentRequestUrl=" + JSON
           .stringify(that.currentRequestUrl), 10, 16, 0, 0, 0);
       },
@@ -728,7 +734,7 @@
           }
         });
         if (businessOid.length == 0) {
-          that.$toast("请至少选择一条数据");
+          that.toastInst = that.$toast("请至少选择一条数据");
           return;
         }
         that.approvesToServer(businessOid, 2);
@@ -742,7 +748,7 @@
           }
         });
         if (businessOid.length == 0) {
-          that.$toast("请至少选择一条数据");
+          that.toastInst = that.$toast("请至少选择一条数据");
           return;
         }
         //差条件判断，验证驳回意见不能为空
@@ -786,7 +792,7 @@
             that.refresh();
             that.allchecked = false;
           } else {
-            that.$toast("网络异常，请稍候尝试")
+            that.toastInst = that.$toast("网络异常，请稍候尝试")
           }
         });
       }

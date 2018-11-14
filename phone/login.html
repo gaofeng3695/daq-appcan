@@ -8,22 +8,36 @@
 	<link rel="stylesheet" href="./lib/mint-ui/style.css">
 	<link rel="stylesheet" href="./lib/font-awesome-4.7.0/css/font-awesome.min.css">
 	<link rel="stylesheet" href="./common/css/jas-main.css">
+	<style>
+		.loginface {
+			display: block;
+			float: right;
+			margin: 10px;
+			color: #26a2ff;
+		}
+	</style>
 </head>
 
 <body>
 	<div class="_outer-wrapper">
 		<jas-header title="登录" :is-return="false" right-icon="fa fa-cog" @clickright="gotoHost"></jas-header>
 		<div style="background: #fff " v-setheight>
-			<div style="height:50vw;background: #fff url(common/images/logo.png) no-repeat center center;background-size:25vw 25vw;">
-			</div>
+			<div style="height:50vw;background: #fff url(common/images/logo.png) no-repeat center center;background-size:25vw 25vw;"></div>
 			<div>
 				<mt-field label="用户名" placeholder="请输入用户名" v-model="form.username"></mt-field>
 				<mt-field label="密码" placeholder="请输入密码" type="password" v-model="form.password"></mt-field>
 			</div>
 			<div style="margin:10px;">
-				<mt-button type="primary" @click.native="login" size="large">登录</mt-button>
+				<mt-button style="margin-top:10px;"  type="primary" @click.native="login" size="large">
+					登录
+				</mt-button>
+				<mt-button style="margin-top:10px;" @click.native="loginByFace" size="large">
+					人脸登录
+				</mt-button>
 			</div>
-
+			<!-- <div class="loginface">
+				<span @click="loginByFace">人脸登录</span>
+			</div> -->
 		</div>
 	</div>
 </body>
@@ -43,9 +57,10 @@
 		data: function () {
 			return {
 				form: {
-					username: 'zhangyi',
-					password: '111111',
+					username: localStorage.getItem('lastUsername') || '',
+					password: localStorage.getItem('lastPassword') || '',
 				},
+
 				isNet: true //是否有网络
 			}
 		},
@@ -53,7 +68,7 @@
 		mounted: function () {
 			var that = this;
 			appcan.ready(function () {
-
+				that.faceInit();
 				appcan.window.on('resume', function () {
 					jasTools.ajax.refreshIpConfig();
 				});
@@ -73,17 +88,71 @@
 			});
 		},
 		methods: {
+			getFaceInfo: function (callback) {
+				var that = this;
+				var obj = {
+					loginName: that.form.username
+				};
+				localServer.userFaceInfo.getUserFaceCount(obj, function (data) {
+					if (data.status == 1) {
+						if (data.rows[0].total == 0) {
+							that.$toast("请先密码登录，在个人设置进行人脸数据采集");
+						} else {
+							callback && callback();
+						}
+					}
+				});
+			},
+			loginByFace: function () {
+				var that = this;
+				if (!that.form.username) {
+					that.$toast("请输入用户名！");
+					return;
+				}
+				try {
+					uexFaceRecognition.faceLogin(that.form.username, function (err, info) {
+						if (err == 1) {
+							info = JSON.parse(info);
+							if (info.unitType == 1 || info.unitType == 2 || info.unitType == 4) { // 属于三大单位的
+								localStorage.setItem('lastUsername', that.form.username);
+								localStorage.setItem('lastPassword', that.form.password);
+								localStorage.setItem("token", info.token);
+								info.user.unitType = info.unitType;
+								localStorage.setItem("user", JSON.stringify(info.user));
+								localStorage.setItem("calculateType", 1);
+								//1-显示桩和偏移量  2显示坐标
+								that.uexArcGisInit();
+								that.queryDefaultProject(function () {
+									appcan.window.open('index', 'index.html',
+										10, 16, 0, 0,
+										0);
+								});
+							} else {
+								that.$toast("该用户没有登录权限！");
+							}
+
+						} else {
+							///alert(info);
+						}
+
+					});
+				} catch (e) {
+					alert(e);
+				}
+			},
 			login: function () {
 				var that = this;
 				that.$indicator.open({
 					text: '正在登录...',
 					spinnerType: 'fading-circle'
 				});
+
 				if (that.isNet) {
 					that.loginByServer();
 					// that.loginByLoacl();
 				} else {
-					that.loginByLoacl(); //本地离线登录
+					that.loginByLoacl();
+					//本地离线登录
 				}
 			},
 			loginByLoacl: function () {
@@ -94,16 +163,20 @@
 				};
 				localServer.login.loginByLocal(obj, function (data) {
 					// alert(JSON.stringify(data.rows[0]))
-					that.$indicator.close();
+
 					if (data.status == "1") {
-					    
+						localStorage.setItem('lastUsername', that.form.username);
+						localStorage.setItem('lastPassword', that.form.password);
 						// alert(JSON.stringify(data.rows[0], 4, 4))
-						localStorage.setItem("token", "");
+						// localStorage.setItem("token", "");
 						localStorage.setItem("user", JSON.stringify(data.rows[0]));
-						localStorage.setItem("calculateType", 1); //1-显示桩和偏移量  2显示坐标
-						that.queryDefaultProject();
+						localStorage.setItem("calculateType", 1);
+						//1-显示桩和偏移量  2显示坐标
 						that.uexArcGisInit();
-						appcan.window.open('index', 'index.html', 10, 16, 0, 0, 0);
+						that.$indicator.close();
+						that.queryDefaultProject(function () {
+							appcan.window.open('index', 'index.html', 10, 16, 0, 0, 0);
+						});
 					} else {
 						that.$toast(data.msg);
 					}
@@ -111,7 +184,8 @@
 			},
 			loginByServer: function () {
 				var that = this;
-				var url = "/jasframework/login/login.do";
+				var url = "/daq/privilege/appLogin.do";
+				// var url = "/jasframework/login/login.do";
 				jasTools.ajax.post(url, {
 					"logintype": "0",
 					"loginNum": that.form.username,
@@ -119,17 +193,24 @@
 					"i18n": "zh_CN",
 					"appId": "402894a152681ba30152681e8b320003"
 				}, function (data) {
-				    
 					that.$indicator.close();
-					// alert(JSON.stringify(data.user, 4, 4))
-				
-					localStorage.setItem("token", data.token);
-					localStorage.setItem("user", JSON.stringify(data.user));
-					localStorage.setItem("calculateType", 1); //1-显示桩和偏移量  2显示坐标
-					that.uexArcGisInit();
-					that.queryDefaultProject(function () {
-						appcan.window.open('index', 'index.html', 10, 16, 0, 0, 0);
-					});
+					if (data.unitType == 1 || data.unitType == 2 || data.unitType == 4) { // 属于三大单位的
+						localStorage.setItem('lastUsername', that.form.username);
+						localStorage.setItem('lastPassword', that.form.password);
+						// alert(JSON.stringify(data.user, 4, 4))
+
+						localStorage.setItem("token", data.token);
+						data.user.unitType = data.unitType;
+						localStorage.setItem("user", JSON.stringify(data.user));
+						localStorage.setItem("calculateType", 1);
+						//1-显示桩和偏移量  2显示坐标
+						that.uexArcGisInit();
+						that.queryDefaultProject(function () {
+							appcan.window.open('index', 'index.html', 10, 16, 0, 0, 0);
+						});
+					} else {
+						that.$toast("该用户没有登录权限！");
+					}
 				});
 			},
 			gotoHost: function () {
@@ -141,38 +222,82 @@
 				localServer.login.queryDefaultProject(function (data) {
 					if (data.status == 1) {
 						if (data.rows.length > 0) {
-							// alert(JSON.stringify(data.rows[0], 4, 4))
 							localStorage.setItem("defaultProject", data.rows[0].projectOid);
 							localStorage.setItem("defaultProjectName", data.rows[0].projectName);
+							cb && cb();
 						} else {
-							localStorage.setItem("defaultProject", "");
-							localStorage.setItem("defaultProjectName", "");
+							//查询项目个数
+							localServer.project.get({}, function (data) {
+								if (data.rows.length == 1) {
+									//登录的时候 只有一个默认企业 进行直接设置为默认企业
+									var obj = {
+										projectOid: data.rows[0].key,
+										projectName: data.rows[0].value
+									};
+									localServer.login.setDefaultProject(obj, function (data) {
+										if (data.status == "1") {
+											localStorage.setItem("defaultProject",
+												obj.projectOid);
+											localStorage.setItem(
+												"defaultProjectName", obj.projectName
+											);
+											cb && cb();
+										} else {
+											that.$toast("网络异常，请稍候尝试");
+										}
+
+									});
+								} else {
+									localStorage.setItem("defaultProject", '');
+									localStorage.setItem("defaultProjectName", '');
+									cb && cb();
+								}
+							});
 						}
 					} else {
 						that.$toast("网络异常，请稍候尝试");
 					}
-					cb && cb();
+
 				});
+
 			},
-			uexArcGisInit:function () {
-            var param = {
-                protocol : appcan.locStorage.getVal('serverProtocol') || 'http://',
-                ip : appcan.locStorage.getVal('serverIP') || '192.168.100.214',
-                port :appcan.locStorage.getVal('serverPort') || '8080',
-                token : appcan.locStorage.getVal('token'),
-                dataBaseName : "123",
-                downloadUrl : "http://192.168.100.43/DAQProject/attachment/download.do?oid=61d3b18a-ef6b-4fef-9b5e-0a595b57c799&token="+appcan.locStorage.getVal('token'),//除token外其余固定
-                userId : JSON.parse(appcan.locStorage.getVal('user')).oid
-            };
-          
-            try {
-                uexArcGisRuntime.init(JSON.stringify(param),function(err,info){
-                 
-                });
-            } catch(e) {
-                alert(e);
-            }
-        }
+			uexArcGisInit: function () {
+				var param = {
+					protocol: jasTools.ajax.protocolConfig, //  appcan.locStorage.getVal('serverProtocol') || 'http://',
+					ip: jasTools.ajax.host, // appcan.locStorage.getVal('serverIP') || '192.168.100.214',
+					port: jasTools.ajax.portConfig, //appcan.locStorage.getVal('serverPort') || '8080',
+					token: appcan.locStorage.getVal('token'),
+					dataBaseName: (new DataBaseOperation()).dbGetBaseName(),
+					downloadUrl: "http://download.zyax.cn/china_img_l4.tpk", //固定
+					userId: JSON.parse(appcan.locStorage.getVal('user')).oid
+				};
+
+				try {
+					uexArcGisRuntime.init(JSON.stringify(param), function (err, info) {
+
+					});
+				} catch (e) {
+					alert(e);
+				}
+			},
+			faceInit: function () {
+				var that = this;
+				var param = {
+					protocol: jasTools.ajax.protocolConfig,
+					ip: jasTools.ajax.host,
+					port: jasTools.ajax.portConfig,
+					dataBaseName: (new DataBaseOperation()).dbGetBaseName()
+				};
+				//alert(JSON.stringify(param));
+				try {
+					uexFaceRecognition.init(JSON.stringify(param), function (err, info) {
+						//alert(err);
+						//alert(info);
+					});
+				} catch (e) {
+					//alert(e);
+				}
+			}
 		},
 	});
 </script>

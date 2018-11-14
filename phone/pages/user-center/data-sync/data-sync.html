@@ -21,6 +21,14 @@
 		<div v-setheight style="overflow: auto;">
 			<div>
                 <br />
+				<mt-button type="primary" @click.native="getUserFaceCount">获取人脸识别条数</mt-button>
+                <br />
+                <br />
+				<mt-button type="primary" @click.native="getMedianStack">中线桩get</mt-button>
+				<mt-button type="primary" @click.native="getWeldAndRework">焊口+返修get</mt-button>
+				<mt-button type="primary" @click.native="getWeld">焊口get</mt-button>
+                <br />
+                <br />
 				<mt-button type="primary" @click.native="saveWeldMeasured">焊口测量保存</mt-button>
 				<mt-button type="primary" @click.native="updateWeldMeasured">焊口测量更新</mt-button>
 				<mt-button type="primary" @click.native="deleteWeldMeasured">焊口测量删除</mt-button>
@@ -1070,6 +1078,44 @@
                     "oid" : "812581f5-ca79-4d5f-82bb-7cdd7c2fe955"
                 }
                 localServer.weldMeasured.query(obj1,callback);
+            },
+            
+            
+            getMedianStack: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data,4,4))
+                }
+                var obj1={
+                    "pipeSegmentOrCrossOid": "d6759553-cc22-432d-8b0f-1d3420eedfbd"
+                }
+                localServer.medianStake.get(obj1,callback);
+            },
+            getWeld: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data,4,4))
+                }
+                var obj1={
+                    "pipeSegmentOrCrossOid": "d6759553-cc22-432d-8b0f-1d3420eedfbd"
+                }
+                localServer.constructionWeld.get(obj1,callback);
+            },
+            getWeldAndRework: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data,4,4))
+                }
+                var obj1={
+                    "pipeSegmentOrCrossOid": "d6759553-cc22-432d-8b0f-1d3420eedfbd"
+                }
+                localServer.weldAndRework.get(obj1,callback);
+            },
+            getUserFaceCount: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data,4,4))
+                }
+                var obj1={
+                    "loginName":"张毅"
+                }
+                localServer.userFaceInfo.getUserFaceCount(obj1,callback);
             },
         }  
 	});

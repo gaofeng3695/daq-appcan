@@ -15,7 +15,7 @@
 		<div class="" v-setheight>
 
 			<div style="text-align: center;padding-top:50vw;">
-				地图模块正在开发中。。。。
+				<!-- 地图模块正在开发中。。。。 -->
 			</div>
 
 
@@ -35,14 +35,53 @@
 		el: '._outer-wrapper',
 		data: function () {
 			return {
-
+				top: 0,
+				height: 0,
+				width: 0,
 			}
 		},
 		computed: {},
-		created: function () {},
-		mounted: function () {},
+		created: function () {
+			var that = this;
+			that.top = Math.floor(40 * (window.devicePixelRatio || 1));
+			that.height = Math.floor($(window).height() * (window.devicePixelRatio || 1));
+			that.width = Math.floor($(window).width() * (window.devicePixelRatio || 1));
+			appcan.ready(function () {
+				that.initPage();
+			});
+		},
 		methods: {
-			confirm: function () {},
+			initPage: function (callback) {
+				var that = this;
+				var defaultProjectId = localStorage.getItem("defaultProject");
+				if (defaultProjectId) {
+					that.openMap();
+				} else {
+					appcan.window.confirm({
+						title: '提示',
+						content: '初次使用需要进行数据同步及项目配置',
+						buttons: ['去配置'],
+						callback: function (err, data, dataType, optId) {
+							if (data == 0) {
+								that.goToDataSync();
+							}
+						}
+					});
+				}
+			},
+			goToDataSync: function () {
+				var url = jasTools.base.setParamsToUrl("../user-center/data-sync/data-sync-main.html", {
+					isInit: 1
+				});
+				appcan.window.open('list-checked', url, 10, 16, 0, 0, 0);
+			},
+			openMap: function () {
+				var that = this;
+				uexArcGisRuntime.openMap(0, that.top, that.width, that.height, function (err, info) {});
+			},
+			closeMap: function () {
+				uexArcGisRuntime.closeMap();
+			},
 		},
 	});
 </script>

@@ -1,118 +1,144 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-	<title></title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-	<link rel="stylesheet" href="./../../../lib/mint-ui/style.css">
-	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
-	<link rel="stylesheet" href="./../../../common/css/jas-main.css">
-</head>
-<style>
-	/*.mint-cell {
-		margin-bottom: 10px;
-	}*/
-</style>
+    <head>
+        <title></title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <link rel="stylesheet" href="./../../../lib/mint-ui/style.css">
+        <link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="./../../../common/css/jas-main.css">
+    </head>
+    <style>
+        /*.mint-cell {
+         margin-bottom: 10px;
+         }*/
+    </style>
 
-<body>
-	<div class="_outer-wrapper " v-cloak>
-		<jas-header title="项目设置"></jas-header>
-		<div v-setheight style="overflow: auto;">
-			<mt-radio v-model="value" :options="projectArry">
-			</mt-radio>
-		</div>
-		<jas-button-footer :buttons="btns" @click="clickbtn"></jas-button-footer>
-	</div>
-</body>
-<script src="./../../../appcan/js/appcan.js"></script>
-<script src="./../../../lib/vue/vue.js"></script>
-<script src="./../../../lib/mint-ui/index.js"></script>
-<script src="./../../../common/js/jas-tools.js"></script>
-<script src="./../../../common/js/data-base-operation.js"></script>
-<script src="./../../../common/components/jas-components.js"></script>
-<script src="../../user-center/data-sync/local-server.js"></script>
-<script>
-	var vm = new Vue({
-		el: '._outer-wrapper',
-		data: function () {
-			var that = this;
-			return {
-				value: localStorage.getItem("defaultProject") || '',
-				name: localStorage.getItem("defaultProjectName") || '',
-				projectArry: [],
-				btns: ['确认']
-			}
-		},
-		watch: {
-			value: function () {
-				var that = this;
-				that.projectArry.forEach(function (item) {
-					if (item.value == that.value) {
-						that.name = item.label;
-						localStorage.setItem("defaultProjectName", item.label);
-						return;
-					}
-				});
-			}
-		},
-		mounted: function () {
-			var that = this;
-			appcan.ready(function () {
-				that.requestProject();
-			});
-		},
-		methods: {
-			clickbtn: function (name) {
-				var that = this
-				var msg = "";
-				var defaultProject = localStorage.getItem("defaultProject");
-				if (defaultProject) {
-					msg = '确定更改默认项目';
-				} else {
-					msg = "确定设置该项目为默认项目";
-				}
-				that.$messagebox.confirm(msg).then(function (action) {
-					//确定 此时调用接口进行人员与默认项目关系的建立
-					var handle = defaultProject ? 'updateDefaultProject' : 'setDefaultProject';
-					var obj = {
-						projectOid: that.value,
-						projectName: that.name
-					};
-					localServer.login[handle](obj, function (data) {
-						if (data.status == "1") {
-							localStorage.setItem("defaultProject", that.value);
-							appcan.window.evaluateScript('index', 'vm.afterProjectChanged()');
-							that.$toast("设置成功");
-							appcan.window.close();
-						} else {
-							that.$toast("网络异常，请稍候尝试");
-						}
-					});
-				}, function (cancel) {
-					//取消，此时将默认企业恢复到最初始的时候
-					that.value = defaultProject;
-					localStorage.setItem("defaultProject", defaultProject);
-				});
-			},
-			requestProject: function () { //获取个人项目列表
-				var that = this;
-				localServer.project.get({}, function (data) {
-					if (data.rows.length > 0) {
-						data.rows.forEach(function (item) {
-							that.projectArry.push({
-								label: item.value,
-								value: item.key
-							});
-						});
-						that.value = localStorage.getItem("defaultProject");
-					} else {
-						that.$toast("请先进行数据同步");
-					}
-				});
-			}
-		},
-	});
-</script>
+    <body>
+        <div class="_outer-wrapper " v-cloak>
+            <jas-header title="项目设置"></jas-header>
+            <div v-setheight style="overflow: auto;">
+                <mt-radio v-model="value" :options="projectArry"></mt-radio>
+            </div>
+            <jas-button-footer :buttons="btns" @click="clickbtn"></jas-button-footer>
+        </div>
+    </body>
+    <script src="./../../../appcan/js/appcan.js"></script>
+    <script src="./../../../lib/vue/vue.js"></script>
+    <script src="./../../../lib/mint-ui/index.js"></script>
+    <script src="./../../../common/js/jas-tools.js"></script>
+    <script src="./../../../common/js/data-base-operation.js"></script>
+    <script src="./../../../common/components/jas-components.js"></script>
+    <script src="../../user-center/data-sync/local-server.js"></script>
+    <script>
+        var vm = new Vue({
+            el : '._outer-wrapper',
+            data : function() {
+                var that = this;
+                return {
+                    value : '',
+                    name : '',
+                    projectArry : [],
+                    btns : ['确认']
+                }
+            },
+            watch : {
+                value : function(newval) {
+                    var that = this;
+                    that.projectArry.forEach(function(item) {
+                        if (item.value == newval) {
+                            that.name = item.label;
+                        }
+                    });
+                }
+            },
+            mounted : function() {
+                var that = this;
+                appcan.ready(function() {
+                     that.value = localStorage.getItem("defaultProject") || '';
+                     that.name = localStorage.getItem("defaultProjectName") || '';
+                    that.requestProject();
+                });
+            },
+            methods : {
+                setDefaultProject : function(value) {
+                    var that = this;
+                    localStorage.setItem("defaultProject", value);
+                    that.projectArry.forEach(function(item) {
+                        if (item.value == value) {
+                            that.name = item.label;
+                            localStorage.setItem("defaultProjectName", item.label);
+                        }
+                    });
+                },
+                clickbtn : function(name) {
+                    var that = this
+                    var defaultProject = localStorage.getItem("defaultProject");
+                    var msg = defaultProject ? '确定更改默认项目' : "确定设置该项目为默认项目";
+                     
+                    if (!that.value) {
+                        this.$toast('请选择默认项目');
+                        return;
+                    }
+                    if(defaultProject==that.value){
+                       appcan.window.close();
+                       return;   
+                    }
+                    that.$messagebox.confirm(msg).then(function(action) {
+                        //确定 此时调用接口进行人员与默认项目关系的建立
+                        var handle = defaultProject ? 'updateDefaultProject' : 'setDefaultProject';
+                        var obj = {
+                            projectOid : that.value,
+                            projectName : that.name
+                        };
+                        localServer.login[handle](obj, function(data) {
+                            if (data.status == "1") {
+                                that.setDefaultProject(that.value);
+                                appcan.window.evaluateScript('index', 'vm.afterProjectChanged()');
+                                that.$toast("设置成功");
+                                appcan.window.close();
+                            } else {
+                                that.$toast("网络异常，请稍候尝试");
+                            }
+                        });
+                    }, function(cancel) {
+                    });
+                },
+                requestProject : function() {//获取个人项目列表
+                    var that = this;
+                    localServer.project.get({}, function(data) {
+                        if (data.rows.length > 0) {
+                            that.projectArry = data.rows.map(function(item) {
+                                return {
+                                    label : item.value,
+                                    value : item.key
+                                }
+                            });
+                           // that.$nextTick(function() {
+                             //   that.value = localStorage.getItem("defaultProject") || '';
+                              //  that.name = localStorage.getItem("defaultProjectName") || '';
+                               //  alert(that.value + that.name)
+                            //});
+                            if (data.rows.length == 1 && !that.value) {//如果项目为1的话 直接调用 设置为默认项目
+                                that.value = data.rows[0].key;
+                                var obj = {
+                                    projectOid : data.rows[0].key,
+                                    projectName : data.rows[0].value
+                                };
+                                localServer.login.setDefaultProject(obj, function(data) {
+                                    that.setDefaultProject(that.value);
+                                    appcan.window.evaluateScript('index', 'vm.afterProjectChanged()');
+                                });
+                            }
+
+                        } else {
+                            that.$toast("请先进行数据同步");
+                        }
+                    });
+                }
+            },
+        });
+    </script>
 
 </html>

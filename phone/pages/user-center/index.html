@@ -200,6 +200,7 @@
 			},
 			seeDetail: function () {
 				var that = this;
+				if (!this.photoOid) return;
 				this.photoSrc && uexImage.openBrowser({
 					enableGrid: true,
 					displayActionButton: true,

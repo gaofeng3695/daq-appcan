@@ -1,13 +1,4 @@
 var FieldsConfig = (function () {
-  var checkOption = [ //
-    {
-      label: '合格',
-      value: '合格',
-    }, {
-      label: '不合格',
-      value: '不合格',
-    },
-  ];
   var booleanOption = [ //
     {
       label: '是',
@@ -92,44 +83,51 @@ var FieldsConfig = (function () {
         'groove_check': {
           name: '坡口检查',
           type: 'select',
-          labelfield: 'groove_check',
-          options: checkOption
+          options: checkOptionForNumber,
+          labelfield: 'groove_check_name',
+
         },
         'pipe_end_proring_check': {
           name: '管端保护圈',
           type: 'select',
-          labelfield: 'pipe_end_proring_check',
-          options: checkOption
+          options: checkOptionForNumber,
+          labelfield: 'pipe_end_proring_check_name',
+
         },
         'coating_io_face_check': {
           name: '防腐层内外表面质量',
           type: 'select',
-          labelfield: 'coating_io_face_check',
-          options: checkOption
+          options: checkOptionForNumber,
+          labelfield: 'coating_io_face_check_name',
+
         },
         'diameter_check': {
           name: '管径偏差+0.2mm至-0.5mm',
           type: 'select',
-          labelfield: 'diameter_check',
-          options: checkOption
+          options: checkOptionForNumber,
+          labelfield: 'diameter_check_name',
+
         },
         'coating_io_ends_check': {
           name: '防腐层端部内外涂层',
           type: 'select',
-          labelfield: 'coating_io_ends_check',
-          options: checkOption
+          options: checkOptionForNumber,
+          labelfield: 'coating_io_ends_check_name',
+
         },
         'excess_weld_metal': {
           name: '管端焊缝余高（0mm）',
           type: 'select',
-          labelfield: 'excess_weld_metal',
-          options: checkOption
+          options: checkOptionForNumber,
+          labelfield: 'excess_weld_metal_name',
+
         },
         'ovality': {
           name: '椭圆度<0.6%D',
           type: 'select',
-          labelfield: 'ovality',
-          options: checkOption
+          options: checkOptionForNumber,
+          labelfield: 'ovality_name',
+
         },
         'checked_by': {
           name: '检查人',
@@ -138,6 +136,7 @@ var FieldsConfig = (function () {
         'checked_date': {
           name: '检查日期',
           type: 'date',
+          required: true,
         },
         'remarks': {
           name: '备注',
@@ -208,38 +207,38 @@ var FieldsConfig = (function () {
         'weld_position': {
           name: '纵焊缝位置',
           type: 'select',
-          labelfield: 'weld_position',
-          options: checkOption
+          options: checkOptionForNumber,
+          labelfield: 'weld_position_name',
         },
         'pipe_length': {
           name: '直管段长度',
           type: 'select',
-          labelfield: 'pipe_length',
-          options: checkOption
+          options: checkOptionForNumber,
+          labelfield: 'pipe_length_name',
         },
         'ovality': {
           name: '椭圆度<0.6%D',
           type: 'select',
-          labelfield: 'ovality',
-          options: checkOption
+          options: checkOptionForNumber,
+          labelfield: 'ovality_name',
         },
         'groove_check': {
           name: '坡口检查',
           type: 'select',
-          labelfield: 'groove_check',
-          options: checkOption
+          options: checkOptionForNumber,
+          labelfield: 'groove_check_name',
         },
         'coating_io_face_check': {
           name: '防腐层内外表面质量',
           type: 'select',
-          labelfield: 'coating_io_face_check',
-          options: checkOption
+          options: checkOptionForNumber,
+          labelfield: 'coating_io_face_check_name',
         },
         'coating_io_ends_check': {
           name: '防腐层端部内外涂层',
           type: 'select',
-          labelfield: 'coating_io_ends_check',
-          options: checkOption
+          options: checkOptionForNumber,
+          labelfield: 'coating_io_ends_check_name',
         },
         'checked_by': {
           name: '检查人',
@@ -248,6 +247,7 @@ var FieldsConfig = (function () {
         'checked_date': {
           name: '检查日期',
           type: 'date',
+          required: true,
         },
         'remarks': {
           name: '备注',
@@ -324,12 +324,11 @@ var FieldsConfig = (function () {
           name: '冷弯管编号',
           type: 'select',
           labelfield: 'pipeColdBendingCode',
+          required: true,
         },
         'pipeLength': {
           name: '弯管长度(m)',
-          type: 'select',
-          labelfield: 'pipeLength',
-          options: checkOption
+          type: 'number',
         },
         'pipeDiameter': {
           name: ' 管径(mm)',
@@ -350,32 +349,32 @@ var FieldsConfig = (function () {
         'weldPosition': {
           name: '纵焊缝位置',
           type: 'select',
-          labelfield: 'weldPosition',
-          options: checkOption
+          options: checkOptionForNumber,
+          labelfield: 'weldPositionName',
         },
         'ovality': {
           name: '椭圆度<0.6%D',
           type: 'select',
-          labelfield: 'ovality',
-          options: checkOption
+          options: checkOptionForNumber,
+          labelfield: 'ovalityName',
         },
         'grooveCheck': {
           name: '坡口检查',
           type: 'select',
-          labelfield: 'grooveCheck',
-          options: checkOption
+          options: checkOptionForNumber,
+          labelfield: 'grooveCheckName',
         },
         'coatingIoFaceCheck': {
           name: '防腐层内外表面质量',
           type: 'select',
-          labelfield: 'coatingIoFaceCheck',
-          options: checkOption
+          options: checkOptionForNumber,
+          labelfield: 'coatingIoFaceCheckName',
         },
         'coatingIoEndsCheck': {
           name: '防腐层端部内外涂层',
           type: 'select',
-          labelfield: 'coatingIoEndsCheck',
-          options: checkOption
+          options: checkOptionForNumber,
+          labelfield: 'coatingIoEndsCheckName',
         },
         'checkedBy': {
           name: '检查人',
@@ -384,6 +383,7 @@ var FieldsConfig = (function () {
         'checkedDate': {
           name: '检查日期',
           type: 'date',
+          required: true,
         },
         'remarks': {
           name: '备注',
@@ -488,9 +488,8 @@ var FieldsConfig = (function () {
           name: '线路段/穿跨越',
           type: 'select',
           labelfield: 'pipeSegmentOrCrossName',
-          childSelect: ['medianStakeOid'],
-          childOptionFrom: 'uexArcGisRuntime',
-          childUrl: ['getMedianStakeList'],
+          childSelect: ['medianStakeOid', 'frontPipeType', 'backPipeType'],
+          childUrl: ['/daq/privilege/getMedianStakeList.do', 'domainName', 'domainName'],
           required: true,
         },
         'medianStakeOid': {
@@ -512,14 +511,17 @@ var FieldsConfig = (function () {
         },
         'coverOid': {
           name: '盖面人员',
+          labelfield: 'coverName',
           type: 'multiSelect',
         },
         'padderOid': {
           name: '填充人员',
+          labelfield: 'padderName',
           type: 'multiSelect',
         },
         'renderOid': {
           name: '打底人员',
+          labelfield: 'renderName',
           type: 'multiSelect',
         },
         'supervisionUnit': {
@@ -545,15 +547,16 @@ var FieldsConfig = (function () {
           type: 'select',
           labelfield: 'frontPipeTypeName',
           domainName: 'pipe_type_domain',
+          isChildSelect: true,
           childSelect: ['frontPipeOid'],
           childUrl: ['queryPipeFittingList'],
           required: true,
-        },
+        }, //frontPipeType
         'frontPipeOid': {
           name: '前管件编号',
           type: 'select',
           labelfield: 'frontPipeCode',
-          Params: {
+          requestParams: {
             pipeSegmentOrCrossOid: ""
           },
           required: true,
@@ -563,6 +566,7 @@ var FieldsConfig = (function () {
           type: 'select',
           labelfield: 'backPipeTypeName',
           domainName: 'back_pipe_type_domain',
+          isChildSelect: true,
           childSelect: ['backPipeOid'],
           childUrl: ['queryPipeFittingList'],
           required: true,
@@ -571,7 +575,7 @@ var FieldsConfig = (function () {
           name: '后管件编号',
           type: 'select',
           labelfield: 'backPipeCode',
-          Params: {
+          requestParams: {
             pipeSegmentOrCrossOid: "",
           },
           required: true,
@@ -584,10 +588,12 @@ var FieldsConfig = (function () {
         'collectionDate': {
           name: '采集日期',
           type: 'date',
+          required: true,
         },
         'supervisionEngineer': {
           name: '监理工程师',
           type: 'text',
+          required: true,
         },
         'collectionPerson': {
           name: '采集人员',
@@ -632,6 +638,7 @@ var FieldsConfig = (function () {
           name: '是否连头口',
           type: 'select',
           labelfield: 'isPipeHeadName',
+          required: true,
           options: booleanOption
         },
         'remarks': {
@@ -727,9 +734,7 @@ var FieldsConfig = (function () {
           type: 'select',
           labelfield: 'pipeSegmentOrCrossName',
           childSelect: ['weldOid'],
-          childOptionFrom: 'uexArcGisRuntime',
-          childUrl: ['getWeldList'],
-          childType: "1", ////1只查询焊口，2查询焊口和返修
+          childUrl: ['/daq/weld/getOnlyWeldList.do'],
           required: true,
         },
         'workUnitOid': {
@@ -780,14 +785,17 @@ var FieldsConfig = (function () {
         'collectionDate': {
           name: '采集日期',
           type: 'date',
+          required: true,
         },
         'weldDate': {
           name: '焊接日期',
           type: 'date',
+          required: true,
         },
         'supervisionEngineer': {
           name: '监理工程师',
           type: 'text',
+          required: true,
         },
         'collectionPerson': {
           name: '采集人员',
@@ -805,6 +813,7 @@ var FieldsConfig = (function () {
           name: '焊接工艺规程',
           type: 'select',
           labelfield: 'weldProduceCode',
+          required: true,
         },
         'remarks': {
           name: '备注',
@@ -906,15 +915,14 @@ var FieldsConfig = (function () {
           type: 'select',
           labelfield: 'pipeSegmentOrCrossName',
           childSelect: ['weldOid', 'medianStakeOid'],
-          childOptionFrom: 'uexArcGisRuntime',
-          childUrl: ['getWeldList', 'getMedianStakeList'],
-          childType: "2", ////1只查询焊口，2查询焊口和返修
+          childUrl: ['/daq/weld/getWeldList.do', '/daq/privilege/getMedianStakeList.do'],
           required: true,
         },
         'weldOid': {
           name: '焊口编号',
           type: 'select',
           labelfield: 'weldCode',
+          required: true,
         },
         'workUnitOid': {
           name: '施工机组代号',
@@ -936,6 +944,7 @@ var FieldsConfig = (function () {
         'supervisionEngineer': {
           name: '监理工程师',
           type: 'text',
+          required: true,
         },
         'collectionPerson': {
           name: '采集人员',
@@ -944,6 +953,7 @@ var FieldsConfig = (function () {
         'collectionDate': {
           name: '采集日期',
           type: 'date',
+          required: true,
         },
         'remarks': {
           name: '备注',
@@ -953,10 +963,12 @@ var FieldsConfig = (function () {
           name: '桩号',
           type: 'select',
           labelfield: 'medianStakeCode',
+          required: true,
         },
         'relativeMileage': {
           name: '相对桩位置',
           type: 'number',
+          required: true,
         },
         'surveyCrew': {
           name: '测量人',
@@ -1067,11 +1079,9 @@ var FieldsConfig = (function () {
           name: '线路段/穿跨越',
           type: 'select',
           labelfield: 'pipe_segment_or_cross_name',
-          labelfield: 'pipeSegmentOrCrossName',
+          // labelfield: 'pipeSegmentOrCrossName',
           childSelect: ['weld_oid'],
-          childOptionFrom: 'uexArcGisRuntime',
-          childUrl: ['getWeldList'],
-          childType: "2", ////1只查询焊口，2查询焊口和返修
+          childUrl: ['/daq/weld/getWeldList.do'],
           required: true,
         },
         'construct_unit': {
@@ -1090,6 +1100,8 @@ var FieldsConfig = (function () {
         'supervision_engineer': {
           name: '监理工程师',
           type: 'text',
+          required: true,
+
         },
         'collection_person': {
           name: '采集人员',
@@ -1098,6 +1110,8 @@ var FieldsConfig = (function () {
         'collection_date': {
           name: '采集日期',
           type: 'date',
+          required: true,
+
         },
         'weld_oid': {
           name: '焊口编号',
@@ -1119,18 +1133,24 @@ var FieldsConfig = (function () {
           type: 'select',
           labelfield: 'buckle_anticorrosive_type_name',
           domainName: 'buckle_anticorrosive_type_domain',
+          required: true,
+
         },
         'buckle_anticorrosive_grade': {
           name: '防腐等级',
           type: 'select',
           labelfield: 'buckle_anticorrosive_grade_name',
           domainName: 'anticorrosive_grade_domain',
+          required: true,
+
         },
         'derusting_grade': {
           name: '除锈等级',
           type: 'select',
           labelfield: 'derusting_grade_name',
           domainName: 'derusting_grade_domain',
+          required: true,
+
         },
         'pipe_mouth_clean': {
           name: '管口清理',
@@ -1215,9 +1235,9 @@ var FieldsConfig = (function () {
           '/daq/privilege/getPipelineListByTendersOid.do': 'pipeline',
           '/daq/privilege/getPipeSegmentOrCrossList.do': 'pipeSegmentOrCross',
           '/daq/privilege/getSupervisionUnitByTendersOid.do': 'supervisionUnit',
-          'getMedianStakeList': 'getMedianStakeList',
-          'getWeldList': 'getWeldList',
-          '/daq/privilege/getMedianStakeList.do': '',
+          '/daq/privilege/getMedianStakeList.do': 'medianStake',
+          '/daq/weld/getOnlyWeldList.do': 'constructionWeld',
+          '/daq/weld/getWeldList.do': 'weldAndRework',
 
 
           'materialPipe': 'materialPipe',
@@ -1248,13 +1268,13 @@ var FieldsConfig = (function () {
             if (field.childUrl && field.childUrl.length > 0) {
               field.childTable = field.childUrl.map(function (url) {
                 if (!map[url]) {
-                  alert('未找到对应表：\r\n' + url)
+                  // alert('未找到对应表：\r\n' + url)
                 }
                 return map[url] || '';
               });
             }
 
-            if (field.options == checkOption || field.options == checkOptionForNumber) {
+            if (field.options == checkOptionForNumber) {
               field.placeholder = '请选择是否合格'
             }
 

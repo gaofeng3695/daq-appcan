@@ -26,5 +26,6 @@ init_sql = ["create table if not exists DaqProject (id INTEGER PRIMARY KEY AUTOI
             "create table if not exists DaqCheckPipeColdBending(id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,pipeColdBendingOid text unique,projectOid text,tendersOid text,postData text,state int,userId text)",//冷弯管检查
             
             "create table if not exists DaqWeldAnticorrosionCheck(id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,weldOid text unique,projectOid text,tendersOid text,pipelineOid text,pipeSegmentOrCrossOid text,postData text,state int,userId text)",//防腐补口
-            "create table if not exists DaqSysAttachment(id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,fileName text, businessId text,src text,state int)"//附件表
+            "create table if not exists DaqSysAttachment(id INTEGER PRIMARY KEY AUTOINCREMENT,oid text,fileName text, businessId text,src text,state int)",//附件表
+            "create table IF NOT EXISTS DaqUserFaceInfo (id INTEGER PRIMARY KEY AUTOINCREMENT, login_name text, base64_image text)" //人脸识别信息表
 ];

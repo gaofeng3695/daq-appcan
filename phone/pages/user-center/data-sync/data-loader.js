@@ -495,6 +495,160 @@ var dataLoader = (function (jasTools, DataBaseOperation, localServer) {
           
       }
     },
+    
+    medianStake:{
+        getCount: function (cb){
+            var total = 1;
+            var index = 0;
+            var result = {
+                "status":1,
+                "code":200,
+                "msg":"查询成功",
+                "rows":[],
+                "total":0,
+                "lastModifyTime":""
+            }
+            var callback = function (data) {
+              index++;
+              if (index === total) {
+                cb && cb(data);
+              }
+            };
+            localServer.medianStake.getCount(function(data){
+                if (data.count >= 0 ) {
+                    result.lastUpdateTime = data.lastUpdateTime;
+                    result.total = data.count;
+                    var obj = {'medianStake': data.count};
+                    result.rows.push(obj)
+                    callback(result)
+                } else{
+                    var obj = {'medianStake': 0};
+                    result.rows.push(obj);
+                    callback(result);
+                };
+            });
+        },
+        sync: function (cb){
+            var result = {
+                "status":1,
+                "code":200,
+                "msg":"同步成功",
+            }
+            localServer.medianStake.sync(function(data){
+                if (data >= 0 ) {
+                    cb(result)
+                } else{
+                    result.status = -1;
+                    result.code = 406;
+                    result.msg = "同步失败";
+                    cb(result);
+                };
+                
+            });
+        },
+    },
+    constructionWeld:{
+        getCount: function (cb){
+            var total = 1;
+            var index = 0;
+            var result = {
+                "status":1,
+                "code":200,
+                "msg":"查询成功",
+                "rows":[],
+                "total":0,
+                "lastModifyTime":""
+            }
+            var callback = function (data) {
+              index++;
+              if (index === total) {
+                cb && cb(data);
+              }
+            };
+            localServer.constructionWeld.getCount(function(data){
+                if (data.count >= 0 ) {
+                    result.lastUpdateTime = data.lastUpdateTime;
+                    result.total = data.count;
+                    var obj = {'constructionWeld': data.count};
+                    result.rows.push(obj)
+                    callback(result)
+                } else{
+                    var obj = {'constructionWeld': 0};
+                    result.rows.push(obj);
+                    callback(result);
+                };
+            });
+        },
+        sync: function (cb){
+            var result = {
+                "status":1,
+                "code":200,
+                "msg":"同步成功",
+            }
+            localServer.constructionWeld.sync(function(data){
+                if (data >= 0 ) {
+                    cb(result)
+                } else{
+                    result.status = -1;
+                    result.code = 406;
+                    result.msg = "同步失败";
+                    cb(result);
+                };
+                
+            });
+        },
+    },
+    reworkWeld:{
+        getCount: function (cb){
+            var total = 1;
+            var index = 0;
+            var result = {
+                "status":1,
+                "code":200,
+                "msg":"查询成功",
+                "rows":[],
+                "total":0,
+                "lastModifyTime":""
+            }
+            var callback = function (data) {
+              index++;
+              if (index === total) {
+                cb && cb(data);
+              }
+            };
+            localServer.weldAndRework.getCount(function(data){
+                if (data.count >= 0 ) {
+                    result.lastUpdateTime = data.lastUpdateTime;
+                    result.total = data.count;
+                    var obj = {'reworkWeld': data.count};
+                    result.rows.push(obj)
+                    callback(result)
+                } else{
+                    var obj = {'reworkWeld': 0};
+                    result.rows.push(obj);
+                    callback(result);
+                };
+            });
+        },
+        sync: function (cb){
+            var result = {
+                "status":1,
+                "code":200,
+                "msg":"同步成功",
+            }
+            localServer.weldAndRework.sync(function(data){
+                if (data >= 0 ) {
+                    cb(result)
+                } else{
+                    result.status = -1;
+                    result.code = 406;
+                    result.msg = "同步失败";
+                    cb(result);
+                };
+                
+            });
+        },
+    },
   };
   return obj;
 })(jasTools, DataBaseOperation, localServer);

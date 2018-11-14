@@ -181,6 +181,24 @@ input[type=date] {
     background-color: transparent;
 }
 
+input::-webkit-input-placeholder {
+    /* placeholder颜色  */
+    color: rgb(192, 192, 192);
+    /* placeholder字体大小  */
+    /* font-size: 12px; */
+    /* placeholder位置  */
+    /* text-align: right; */
+}
+
+textarea::-webkit-input-placeholder {
+    /* placeholder颜色  */
+    color: rgb(192, 192, 192);
+    /* placeholder字体大小  */
+    /* font-size: 12px; */
+    /* placeholder位置  */
+    /* text-align: right; */
+}
+
 .mint-toast {
     z-index: 9999;
 }

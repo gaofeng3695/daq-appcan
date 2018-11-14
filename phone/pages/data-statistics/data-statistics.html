@@ -55,10 +55,16 @@
 				<div>
 					<div style="overflow: hidden;">
 						<div class="rightLine" style="float:left;background-size: 1px 70%">
-							<canvas id="pie01" :width="canvasWidth/2" :height="200"></canvas>
+							<div v-show="isPie01Show">
+								<canvas id="pie01" :width="canvasWidth/2" :height="200"></canvas>
+							</div>
+							<div v-show="!isPie01Show" style="height:200px;text-align: center;width:50vw;line-height: 180px;color:#999;">暂无数据</div>
 						</div>
 						<div style="float:left;">
-							<canvas id="pie02" :width="canvasWidth/2" :height="200"></canvas>
+							<div v-show="isPie02Show">
+								<canvas id="pie02" :width="canvasWidth/2" :height="200"></canvas>
+							</div>
+							<div v-show="!isPie02Show" style="height:200px;text-align: center;width:50vw;line-height: 180px;color:#999;">暂无数据</div>
 						</div>
 					</div>
 					<div v-show="!isClosed">
@@ -101,6 +107,8 @@
 		el: '._outer-wrapper',
 		data: {
 			isClosed: true,
+			isPie01Show: true,
+			isPie02Show: true,
 			projectList: [],
 			projectId: '',
 			canvasWidth: $(document).width(),
@@ -161,6 +169,8 @@
 		methods: {
 			initData: function () {
 				this.isClosed = true;
+				this.isPie01Show = true;
+				this.isPie02Show = true;
 				this.WeldCheckDetails = [];
 				this.progress = {
 					currentItem: '',
@@ -439,7 +449,10 @@
 
 			},
 			renderPie01: function (nTotal, nDone) {
-
+				if (+(nTotal) == 0) {
+					this.isPie01Show = false;
+					// this.isPie02Show = false;
+				}
 				var data = [{
 					name: '已检测',
 					percent: nDone,
@@ -495,6 +508,10 @@
 
 			},
 			renderPie02: function (nTotal, nDone) {
+				if (+(nTotal) == 0) {
+					// this.isPie01Show = false;
+					this.isPie02Show = false;
+				}
 				var data = [{
 					name: '合格',
 					percent: nDone,

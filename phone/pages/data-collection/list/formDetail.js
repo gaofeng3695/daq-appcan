@@ -20,29 +20,29 @@ var fieldConfigs = [{
         },
         {
           "name": "坡口检查",
-          "field": "groove_check"
+          "field": "groove_check_name"
         },
         {
           "name": "管端保护圈",
-          "field": "pipe_end_proring_check"
+          "field": "pipe_end_proring_check_name"
         },
         {
           "name": "防腐层内外表面质量",
-          "field": "coating_io_face_check"
+          "field": "coating_io_face_check_name"
         },
         {
           "name": "管径偏差+0.2mm至-0.5mm",
-          "field": "diameter_check"
+          "field": "diameter_check_name"
         },
         {
           "name": "管端焊缝余高(0mm)",
-          "field": "coating_io_ends_check"
+          "field": "coating_io_ends_check_name"
         }, {
           "name": "防腐层端部内外涂层",
-          "field": "excess_weld_metal"
+          "field": "excess_weld_metal_name"
         }, {
           "name": "椭圆度<0.6%D",
-          "field": "ovality"
+          "field": "ovality_name"
         }, {
           "name": "检查人",
           "field": "checked_by"
@@ -161,28 +161,28 @@ var fieldConfigs = [{
         },
         {
           "name": "纵焊缝位置",
-          "field": "weldPosition"
+          "field": "weldPositionName"
         },
         {
           "name": "椭圆度<0.6%D",
-          "field": "ovality"
+          "field": "ovalityName"
         },
         {
           "name": "坡口检查",
-          "field": "grooveCheck"
+          "field": "grooveCheckName"
         },
         {
           "name": "防腐层内外表面质量",
-          "field": "coatingIoFaceCheck"
+          "field": "coatingIoFaceCheckName"
         }, {
           "name": "防腐层端部内外涂层",
-          "field": "coatingIoEndsCheck"
+          "field": "coatingIoEndsCheckName"
         }, {
           "name": "检查人",
-          "field": "checked_by"
+          "field": "checkedBy"
         }, {
           "name": "检查日期",
-          "field": "checked_date"
+          "field": "checkedDate"
         }
       ]
     }, {
@@ -197,53 +197,51 @@ var fieldConfigs = [{
     "fields": [{
       "groupName": "基础数据",
       "fileds": [{
-          "name": "项目名称",
-          "field": "projectName"
-        }, {
-          "name": "标段名称",
-          "field": "tendersName"
-        }, {
-          "name": "管线名称",
-          "field": "pipelineName"
-        }, {
-          "name": "线路段名称",
-          "field": "pipeSegmentOrCrossName"
-        }, {
-          "name": "施工单位",
-          "field": "constructUnitName"
-        }, {
-          "name": "施工机组代号",
-          "field": "workUnitCode"
-        }, {
-          "name": "施工日期",
-          "field": "constructDate"
-        }, {
-          "name": "盖面人员",
-          "field": "coverName"
-        }, {
-          "name": "填充人员",
-          "field": "padderName"
-        }, {
-          "name": "打底人员",
-          "field": "renderName"
-        },
-        {
-          "name": "监理单位",
-          "field": "supervisionUnitName"
-        }, {
-          "name": "监理工程师",
-          "field": "supervisionEngineer"
-        }, {
-          "name": "采集人员",
-          "field": "collectionPerson"
-        }, {
-          "name": "采集日期",
-          "field": "collectionDate"
-        }, {
-          "name": "审核状态",
-          "field": "approveStatus"
-        }
-      ]
+        "name": "项目名称",
+        "field": "projectName"
+      }, {
+        "name": "标段名称",
+        "field": "tendersName"
+      }, {
+        "name": "管线名称",
+        "field": "pipelineName"
+      }, {
+        "name": "线路段名称",
+        "field": "pipeSegmentOrCrossName"
+      }, {
+        "name": "施工单位",
+        "field": "constructUnitName"
+      }, {
+        "name": "施工机组代号",
+        "field": "workUnitCode"
+      }, {
+        "name": "施工日期",
+        "field": "constructDate"
+      }, {
+        "name": "盖面人员",
+        "field": "coverName"
+      }, {
+        "name": "填充人员",
+        "field": "padderName"
+      }, {
+        "name": "打底人员",
+        "field": "renderName"
+      }, {
+        "name": "监理单位",
+        "field": "supervisionUnitName"
+      }, {
+        "name": "监理工程师",
+        "field": "supervisionEngineer"
+      }, {
+        "name": "采集人员",
+        "field": "collectionPerson"
+      }, {
+        "name": "采集日期",
+        "field": "collectionDate"
+      }, {
+        "name": "审核状态",
+        "field": "approveStatus"
+      }]
     }, {
       "groupName": "位置数据",
       "fileds": [{
@@ -256,48 +254,51 @@ var fieldConfigs = [{
     }, {
       "groupName": "焊口数据",
       "fileds": [{
-          "name": "焊口编号",
-          "field": "weldCode"
-        }, {
-          "name": "焊口类型",
-          "field": "weldTypeName"
-        }, {
-          "name": "焊接方式",
-          "field": "weldMethodName"
-        }, {
-          "name": "前管件类型",
-          "field": "frontPipeTypeName"
-        }, {
-          "name": "前管件编号",
-          "field": "frontPipeCode"
-        }, {
-          "name": "后管件类型",
-          "field": "backPipeTypeName"
-        }, {
-          "name": "后管件编号",
-          "field": "backPipeCode"
-        },
-        {
-          "name": "焊条批号",
-          "field": "weldRodBatchNum"
-        }, {
-          "name": "焊丝批号",
-          "field": "weldWireBatchNum"
-        }, {
-          "name": "焊接工艺规格",
-          "field": "weldProduceCode"
-        }, {
-          "name": "外观质量检查",
-          "field": "surfaceCheckName"
-        },
-        {
-          "name": "是否金口",
-          "field": "isGoldeJointName"
-        }, {
-          "name": "是否连头口",
-          "field": "isPipeHeadName"
-        }
-      ]
+        "name": "焊口编号",
+        "field": "weldCode"
+      }, {
+        "name": "焊口类型",
+        "field": "weldTypeName"
+      }, {
+        "name": "焊接方式",
+        "field": "weldMethodName"
+      }, {
+        "name": "前管件类型",
+        "field": "frontPipeTypeName"
+      }, {
+        "name": "前管件编号",
+        "field": "frontPipeCode"
+      }, {
+        "name": "后管件类型",
+        "field": "backPipeTypeName"
+      }, {
+        "name": "后管件编号",
+        "field": "backPipeCode"
+      }, {
+        "name": "焊条批号",
+        "field": "weldRodBatchNum"
+      }, {
+        "name": "焊丝批号",
+        "field": "weldWireBatchNum"
+      }, {
+        "name": "焊接工艺规格",
+        "field": "weldProduceCode"
+      }, {
+        "name": "外观质量检查",
+        "field": "surfaceCheck"
+      }, {
+        "name": "是否金口",
+        "field": "isGoldeJoint"
+      }, {
+        "name": "是否连头口",
+        "field": "isPipeHead"
+      }]
+    }, {
+      "groupName": "其他",
+      "fileds": [{
+        "name": "备注",
+        "field": "remarks"
+      }]
     }]
   }, {
     "name": "焊口返修",
@@ -369,56 +370,60 @@ var fieldConfigs = [{
         "name": "焊接工艺规程",
         "field": "weldProduceCode"
       }]
+    }, {
+      "groupName": "其他",
+      "fileds": [{
+        "name": "备注",
+        "field": "remarks"
+      }]
     }]
   }, {
     "name": "焊口测量",
     "fields": [{
       "groupName": "基础数据",
       "fileds": [{
-          "name": "项目名称",
-          "field": "projectName"
-        }, {
-          "name": "标段名称",
-          "field": "tendersName"
-        }, {
-          "name": "管线名称",
-          "field": "pipelineName"
-        }, {
-          "name": "线路段名称",
-          "field": "pipeSegmentOrCrossName"
-        }, {
-          "name": "焊口编号",
-          "field": "weldCode"
-        }, {
-          "name": "施工单位",
-          "field": "constructUnitName"
-        }, {
-          "name": "施工机组代号",
-          "field": "workUnitName"
-        },
-        {
-          "name": "监理单位",
-          "field": "supervisionUnitName"
-        }, {
-          "name": "监理工程师",
-          "field": "supervisionEngineer"
-        }, {
-          "name": "测量人",
-          "field": "surveyCrew"
-        }, {
-          "name": "测量日期",
-          "field": "surveyDate"
-        }, {
-          "name": "采集人员",
-          "field": "collectionPerson"
-        }, {
-          "name": "采集日期",
-          "field": "collectionDate"
-        }, {
-          "name": "审核状态",
-          "field": "approveStatus"
-        }
-      ]
+        "name": "项目名称",
+        "field": "projectName"
+      }, {
+        "name": "标段名称",
+        "field": "tendersName"
+      }, {
+        "name": "管线名称",
+        "field": "pipelineName"
+      }, {
+        "name": "线路段名称",
+        "field": "pipeSegmentOrCrossName"
+      }, {
+        "name": "焊口编号",
+        "field": "weldCode"
+      }, {
+        "name": "施工单位",
+        "field": "constructUnitName"
+      }, {
+        "name": "施工机组代号",
+        "field": "workUnitCode"
+      }, {
+        "name": "监理单位",
+        "field": "supervisionUnitName"
+      }, {
+        "name": "监理工程师",
+        "field": "supervisionEngineer"
+      }, {
+        "name": "测量人",
+        "field": "surveyCrew"
+      }, {
+        "name": "测量日期",
+        "field": "surveyDate"
+      }, {
+        "name": "采集人员",
+        "field": "collectionPerson"
+      }, {
+        "name": "采集日期",
+        "field": "collectionDate"
+      }, {
+        "name": "审核状态",
+        "field": "approveStatus"
+      }]
     }, {
       "groupName": "位置数据",
       "fileds": [{
@@ -445,6 +450,12 @@ var fieldConfigs = [{
       }, {
         "name": "埋深",
         "field": "buriedDepth"
+      }]
+    }, {
+      "groupName": "其他",
+      "fileds": [{
+        "name": "备注",
+        "field": "remarks"
       }]
     }]
   }, {
@@ -487,56 +498,60 @@ var fieldConfigs = [{
     }, {
       "groupName": "防腐补口检查信息",
       "fileds": [{
-          "name": "焊口编号",
-          "field": "weld_code"
-        },
-        {
-          "name": "补口材料批号",
-          "field": "buckle_material_batch_num"
-        }, {
-          "name": "补口日期",
-          "field": "buckle_date"
-        }, {
-          "name": "补口防腐类型",
-          "field": "buckle_anticorrosive_type_name"
-        }, {
-          "name": "防腐等级",
-          "field": "buckle_anticorrosive_grade_name"
-        }, {
-          "name": "除锈等级",
-          "field": "derusting_grade_name"
-        }, {
-          "name": "管口清理",
-          "field": "pipe_mouth_clean_name"
-        }, {
-          "name": "喷砂除锈",
-          "field": "sandblasting_and_derusting_name"
-        }, {
-          "name": "管口预热",
-          "field": "pipe_mouth_preheat_name"
-        }, {
-          "name": "环氧底漆",
-          "field": "epoxy_primer_name"
-        }, {
-          "name": "喷拷",
-          "field": "baking_check_name"
-        }, {
-          "name": "轴向搭接",
-          "field": "overlap_check_name"
-        }, {
-          "name": "外观检查",
-          "field": "appearance_check_name"
-        }, {
-          "name": "电火花捡漏",
-          "field": "electric_spark_leak_detection_name"
-        }, {
-          "name": "补口结论",
-          "field": "buckle_conclusion_name"
-        }, {
-          "name": "防腐工",
-          "field": "anticorrosion"
-        }
-      ]
+        "name": "焊口编号",
+        "field": "weld_code"
+      }, {
+        "name": "补口材料批号",
+        "field": "buckle_material_batch_num"
+      }, {
+        "name": "补口日期",
+        "field": "buckle_date"
+      }, {
+        "name": "补口防腐类型",
+        "field": "buckle_anticorrosive_type_name"
+      }, {
+        "name": "防腐等级",
+        "field": "buckle_anticorrosive_grade_name"
+      }, {
+        "name": "除锈等级",
+        "field": "derusting_grade_name"
+      }, {
+        "name": "管口清理",
+        "field": "pipe_mouth_clean_name"
+      }, {
+        "name": "喷砂除锈",
+        "field": "sandblasting_and_derusting_name"
+      }, {
+        "name": "管口预热",
+        "field": "pipe_mouth_preheat_name"
+      }, {
+        "name": "环氧底漆",
+        "field": "epoxy_primer_name"
+      }, {
+        "name": "喷拷",
+        "field": "baking_check_name"
+      }, {
+        "name": "轴向搭接",
+        "field": "overlap_check_name"
+      }, {
+        "name": "外观检查",
+        "field": "appearance_check_name"
+      }, {
+        "name": "电火花捡漏",
+        "field": "electric_spark_leak_detection_name"
+      }, {
+        "name": "补口结论",
+        "field": "buckle_conclusion_name"
+      }, {
+        "name": "防腐工",
+        "field": "anticorrosion"
+      }]
+    }, {
+      "groupName": "其他",
+      "fileds": [{
+        "name": "备注",
+        "field": "remarks"
+      }]
     }]
   },
 ]

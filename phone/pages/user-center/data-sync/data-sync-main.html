@@ -21,29 +21,30 @@
 		<div v-setheight style="overflow: auto;">
 			<div>
 				<mt-cell title="基础数据" :label="tips(basic)">
-					<mt-button size="small" type="primary" @click.native="downloadBasic">同步</mt-button>
+					<mt-button size="small" type="primary" @click.native="downloadBasic()">同步</mt-button>
 				</mt-cell>
 				<mt-cell title="物资数据" :label="tips(material)">
-					<mt-button size="small" type="primary" @click.native="downloadMaterial">同步</mt-button>
+					<mt-button size="small" type="primary" @click.native="downloadMaterial()">同步</mt-button>
 				</mt-cell>
 				<mt-cell title="施工人员机组数据" :label="tips(workPersonAndUnit)">
-					<mt-button size="small" type="primary" @click.native="downloadWorkPersonAndUnit">同步</mt-button>
+					<mt-button size="small" type="primary" @click.native="downloadWorkPersonAndUnit()">同步</mt-button>
 				</mt-cell>
 				<mt-cell title="施工单位用户数据" :label="tips(constructUser)">
-					<mt-button size="small" type="primary" @click.native="downloadConstructUser">同步</mt-button>
+					<mt-button size="small" type="primary" @click.native="downloadConstructUser()">同步</mt-button>
 				</mt-cell>
 				<mt-cell title="域值信息" :label="tips(domain)">
-					<mt-button size="small" type="primary" @click.native="downloadSysDomain">同步</mt-button>
+					<mt-button size="small" type="primary" @click.native="downloadSysDomain()">同步</mt-button>
 				</mt-cell>
-				<mt-cell title="中线桩数据" :label="tips(median)">
-					<mt-button size="small" type="primary" @click.native="synMedianStakeData">同步</mt-button>
-				</mt-cell>
+
 				<mt-cell title="焊口返修数据" :label="tips(reworkWeld)">
-					<mt-button size="small" type="primary" @click.native="synReworkWeldData">同步</mt-button>
+					<mt-button size="small" type="primary" @click.native="synReworkWeldData()">同步</mt-button>
 				</mt-cell>
 				<mt-cell title="焊口数据" :label="tips(constructionWeld)">
-                    <mt-button size="small" type="primary" @click.native="synConstructionWeldData">同步</mt-button>
-                </mt-cell>
+					<mt-button size="small" type="primary" @click.native="synConstructionWeldData()">同步</mt-button>
+				</mt-cell>
+				<mt-cell title="中线桩数据" :label="tips(median)">
+					<mt-button size="small" type="primary" @click.native="synMedianStakeData()">同步</mt-button>
+				</mt-cell>
 			</div>
 
 		</div>
@@ -65,9 +66,10 @@
 		el: '._outer-wrapper',
 		data: function () {
 			return {
+				toastObj: null,
 				isInit: 0,
 				isSynced: false,
-				footerBtns: [],
+				footerBtns: ['一键同步'],
 				basic: {
 					qtty: 0,
 					time: '',
@@ -96,9 +98,9 @@
 					qtty: 0,
 					time: ''
 				},
-				constructionWeld:{
-				 qtty: 0,
-                 time: ''   
+				constructionWeld: {
+					qtty: 0,
+					time: ''
 				}
 			}
 		},
@@ -108,7 +110,7 @@
 				that.getLocalDataInfo();
 				var oParam = jasTools.base.getParamsInUrl();
 				if (oParam.isInit == 1) {
-					that.footerBtns = ['下一步'];
+					that.footerBtns = ['一键同步', '下一步'];
 				}
 				appcan.window.on('pause', function () {
 					appcan.window.close(0);
@@ -128,6 +130,9 @@
 					}
 					var url = '../setting/setting_project.html?isInit=1';
 					appcan.window.open('setting_project', url, 10, 16, 0, 0, 0);
+				}
+				if (btn == '一键同步') {
+					this.syncAll();
 				}
 			},
 			getLocalDataInfo: function () {
@@ -153,47 +158,24 @@
 					that.domain.qtty = data.total;
 					that.domain.time = data.lastUpdateTime;
 				});
-				that.getMedianStakeInfo();
-				that.getReworkWeldInfo();
-				that.getConstructionWeldInfo();
-			},
-			getMedianStakeInfo: function () {
-				var that = this;
-				try {
-					uexArcGisRuntime.getMedianStakeSynInfo(function (err, info) {
-						that.median.qtty = info.data.count;
-						that.median.time = info.data.lastUpdateTime;
-					});
-				} catch (e) {
-					alert(e);
-				}
-			},
-			getReworkWeldInfo: function () {
-				var that = this;
-				try {
-					uexArcGisRuntime.getReworkWeldSynInfo(function (err, info) {
-						that.reworkWeld.qtty = info.data.count;
-						that.reworkWeld.time = info.data.lastUpdateTime;
-					});
-				} catch (e) {
-					alert(e);
-				}
-			},
-			getConstructionWeldInfo:function(){
-			    
-			   var that = this;
-                try {
-                    uexArcGisRuntime.getConstructionWeldSynInfo(function (err, info) {
-                        that.constructionWeld.qtty = info.data.count;
-                        that.constructionWeld.time = info.data.lastUpdateTime;
-                    });
-                } catch (e) {
-                    alert(e);
-                }
+				dataLoader.medianStake.getCount(function (data) {
+					that.median.qtty = data.total;
+					that.median.time = data.lastUpdateTime;
+				});
+				dataLoader.constructionWeld.getCount(function (data) {
+					that.constructionWeld.qtty = data.total;
+					that.constructionWeld.time = data.lastUpdateTime;
+				});
+				dataLoader.reworkWeld.getCount(function (data) {
+					that.reworkWeld.qtty = data.total;
+					that.reworkWeld.time = data.lastUpdateTime;
+				});
 			},
 			tips: function (obj) {
 				// alert(JSON.stringify(obj))
-				if (!obj.time) return '-';
+				if (!obj.time) {
+					return ' 已同步' + obj.qtty + '条数据';
+				}
 				return obj.time + ' 已同步' + obj.qtty + '条数据';
 			},
 			_getQtty: function (odata) {
@@ -208,11 +190,13 @@
 			},
 			//----------------------------基础数据--------------------------
 			//------------同步基础数据
-			downloadBasic: function () {
+			downloadBasic: function (cb) {
 				var that = this;
+				if (that.toastObj) that.toastObj.close();
 				that.toast && that.toast.close();
+				this.$indicator.close();
 				this.$indicator.open({
-					text: '正在同步，请稍后...',
+					text: '正在同步基础数据...',
 					spinnerType: 'fading-circle'
 				});
 				dataLoader.basic.request(function (odata) {
@@ -221,10 +205,12 @@
 							dataLoader.basic.getCount(function (data) {
 								// alert(JSON.stringify(data,4,4))
 								that.isSynced = true;
-								that.$indicator.close();
-								that.toast = that.$toast('同步成功');
+								!cb && that.$indicator.close();
+								// that.toast = that.$toast('同步成功');
+								!cb && (that.toastObj = that.$toast("同步成功"));
 								that.basic.qtty = data.total;
 								that.basic.time = data.lastUpdateTime;
+								cb && cb();
 							});
 						});
 					});
@@ -232,10 +218,12 @@
 			},
 			//----------------------------线路物资--------------------------
 			//------------同步线路物资
-			downloadMaterial: function () {
+			downloadMaterial: function (cb) {
 				var that = this;
+				if (that.toastObj) that.toastObj.close();
+				this.$indicator.close();
 				this.$indicator.open({
-					text: '正在同步，请稍后...',
+					text: '正在同步线路物资...',
 					spinnerType: 'fading-circle'
 				});
 				dataLoader.material.request(function (odata) {
@@ -243,10 +231,13 @@
 						dataLoader.material.insertData(odata, function () {
 							dataLoader.material.getCount(function (data) {
 								// alert(JSON.stringify(data,4,4))
-								that.$indicator.close();
-								that.toast = that.$toast('同步成功');
+								!cb && that.$indicator.close();
+								// that.toast = that.$toast('同步成功');
+								!cb && (that.toastObj = that.$toast("同步成功"));
 								that.material.qtty = data.total;
 								that.material.time = data.lastUpdateTime;
+								cb && cb();
+
 							});
 						});
 					});
@@ -254,10 +245,12 @@
 			},
 			//----------------------------施工机组人员--------------------------
 			//------------同步施工人员机组
-			downloadWorkPersonAndUnit: function () {
+			downloadWorkPersonAndUnit: function (cb) {
 				var that = this;
+				if (that.toastObj) that.toastObj.close();
+				this.$indicator.close();
 				this.$indicator.open({
-					text: '正在同步，请稍后...',
+					text: '正在同步施工人员...',
 					spinnerType: 'fading-circle'
 				});
 				dataLoader.workPersonAndUnit.request(function (odata) {
@@ -265,10 +258,13 @@
 						dataLoader.workPersonAndUnit.insertData(odata, function () {
 							dataLoader.workPersonAndUnit.getCount(function (data) {
 								// alert(JSON.stringify(data,4,4))
-								that.$indicator.close();
-								that.toast = that.$toast('同步成功');
+								!cb && that.$indicator.close();
+								// that.toast = that.$toast('同步成功');
+								!cb && (that.toastObj = that.$toast("同步成功"));
 								that.workPersonAndUnit.qtty = data.total;
 								that.workPersonAndUnit.time = data.lastUpdateTime;
+								cb && cb();
+
 							});
 						});
 					});
@@ -276,10 +272,12 @@
 			},
 			//----------------------------施工单位用户--------------------------
 			//------------同步施工单位用户
-			downloadConstructUser: function () {
+			downloadConstructUser: function (cb) {
 				var that = this;
+				if (that.toastObj) that.toastObj.close();
+				this.$indicator.close();
 				this.$indicator.open({
-					text: '正在同步，请稍后...',
+					text: '正在同步施工单位用户...',
 					spinnerType: 'fading-circle'
 				});
 				dataLoader.offlineUser.request(function (odata) {
@@ -287,10 +285,12 @@
 						dataLoader.offlineUser.insertData(odata, function () {
 							dataLoader.offlineUser.getCount(function (data) {
 								// alert(JSON.stringify(data,4,4))
-								that.$indicator.close();
-								that.toast = that.$toast('同步成功');
+								!cb && that.$indicator.close();
+								!cb && (that.toastObj = that.$toast("同步成功"));
 								that.constructUser.qtty = data.total;
 								that.constructUser.time = data.lastUpdateTime;
+								cb && cb();
+
 							});
 						});
 					});
@@ -298,10 +298,12 @@
 			},
 			//----------------------------域值信息--------------------------
 			//------------同步域值信息
-			downloadSysDomain: function () {
+			downloadSysDomain: function (cb) {
 				var that = this;
+				if (that.toastObj) that.toastObj.close();
+				this.$indicator.close();
 				this.$indicator.open({
-					text: '正在同步，请稍后...',
+					text: '正在同步域值信息...',
 					spinnerType: 'fading-circle'
 				});
 				dataLoader.sysDomain.request(function (odata) {
@@ -309,10 +311,12 @@
 						dataLoader.sysDomain.insertData(odata, function () {
 							dataLoader.sysDomain.getCount(function (data) {
 								// alert(JSON.stringify(data,4,4))
-								that.$indicator.close();
-								that.toast = that.$toast('同步成功');
+								!cb && that.$indicator.close();
+								!cb && (that.toastObj = that.$toast("同步成功"));
 								that.domain.qtty = data.total;
 								that.domain.time = data.lastUpdateTime;
+								cb && cb();
+
 							});
 						});
 					});
@@ -320,67 +324,114 @@
 			},
 			//----------------------------空间数据同步--------------------------
 			//中线桩数据同步
-			synMedianStakeData: function () {
+			synMedianStakeData: function (cb) {
 				var that = this;
-				that.$indicator.open({
-					text: '正在同步，请稍后...',
+				if (that.toastObj) that.toastObj.close();
+				this.$indicator.close();
+				this.$indicator.open({
+					text: '正在同步中线桩数据...',
 					spinnerType: 'fading-circle'
 				});
+				//因不能及时出现正在同步的提示，故加300ms延迟
+				setTimeout(function () {
+					dataLoader.medianStake.sync(function (data) {
+						dataLoader.medianStake.getCount(function (data) {
+							!cb && that.$indicator.close();
+							!cb && (that.toastObj = that.$toast("同步成功"));
+							that.median.qtty = data.total;
+							that.median.time = data.lastUpdateTime;
+							cb && cb();
 
-				try {
-					uexArcGisRuntime.synMedianStakeData(function (err, info) {
-					     that.$indicator.close();
-						if (err == 1) {
-							that.toast = that.$toast('同步成功');
-							that.getMedianStakeInfo();
-						} else {
-							that.toast = that.$toast('同步失败');
-						}
+						});
 					});
-				} catch (e) {
-					alert(e);
-				}
+				}, 300)
 			},
 			//返修口编号
-			synReworkWeldData: function () {
+			synReworkWeldData: function (cb) {
 				var that = this;
-				that.$indicator.open({
-					text: '正在同步，请稍后...',
+				if (that.toastObj) that.toastObj.close();
+				this.$indicator.close();
+				this.$indicator.open({
+					text: '正在同步返修口数据...',
 					spinnerType: 'fading-circle'
 				});
+				//因不能及时出现正在同步的提示，故加300ms延迟
+				setTimeout(function () {
+					dataLoader.reworkWeld.sync(function (data) {
+						dataLoader.reworkWeld.getCount(function (data) {
+							!cb && that.$indicator.close();
+							!cb && (that.toastObj = that.$toast("同步成功"));
+							that.reworkWeld.qtty = data.total;
+							that.reworkWeld.time = data.lastUpdateTime;
+							cb && cb();
 
-				try {
-					uexArcGisRuntime.synReworkWeldData(function (err, info) {
-					    that.$indicator.close();
-						if (err == 1) {
-							
-							that.toast = that.$toast('同步成功');
-							that.getReworkWeldInfo();
-						} else {
-							that.toast = that.$toast('同步失败');
-						}
+						});
 					});
-				} catch (e) {
-					alert(e);
-				}
+				}, 300)
 			},
-			synConstructionWeldData:function(){//焊口信息
-			    var that=this;
-			      try {
-                uexArcGisRuntime.synConstructionWeldData(function(err, info) {
-                     that.$indicator.close();
-                if (err == 1) {
-                           
-                            that.toast = that.$toast('同步成功');
-                            that.getConstructionWeldInfo();
-                        } else {
-                            that.toast = that.$toast('同步失败');
-                        }
-                });
-            } catch(e) {
-                alert(e);
-            }
-			}
+			synConstructionWeldData: function (cb) { //焊口信息
+				var that = this;
+				if (that.toastObj) that.toastObj.close();
+				this.$indicator.close();
+				this.$indicator.open({
+					text: '正在同步焊口信息...',
+					spinnerType: 'fading-circle'
+				});
+				//因不能及时出现正在同步的提示，故加300ms延迟
+				setTimeout(function () {
+					dataLoader.constructionWeld.sync(function (data) {
+						dataLoader.constructionWeld.getCount(function (data) {
+							!cb && that.$indicator.close();
+							!cb && (that.toastObj = that.$toast("同步成功"));
+							that.constructionWeld.qtty = data.total;
+							that.constructionWeld.time = data.lastUpdateTime;
+							cb && cb();
+
+						});
+					});
+				}, 300)
+			},
+			syncAll: function () {
+				var that = this;
+				var nDone = 0;
+				var callback = function () {
+					nDone++;
+					alert(nDone)
+					that.$toast(nDone);
+					if (nDone === 7) {
+						that.synMedianStakeData(function () {
+							alert('done')
+						});
+					}
+				};
+				that.downloadBasic(function () {
+
+					that.downloadMaterial(function () {
+
+						that.downloadWorkPersonAndUnit(function () {
+
+							that.downloadConstructUser(function () {
+
+								that.downloadSysDomain(function () {
+
+									that.synReworkWeldData(function () {
+
+										that.synConstructionWeldData(function () {
+
+											that.synMedianStakeData(function () {
+												that.$indicator.close();
+												that.toastObj = that.$toast("同步完成");
+
+											});
+										});
+									});
+								});
+							});
+						});
+					});
+				});
+
+			},
 		}
 	});
 </script>

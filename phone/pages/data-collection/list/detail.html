@@ -14,7 +14,7 @@
 
 <body>
   <div class="_outer-wrapper">
-    <jas-header title="数据采集"></jas-header>
+    <jas-header :title="titleName"></jas-header>
     <div v-setheight style="overflow: auto;" class="heightContent">
       <div v-for="item in fieldConfig">
         <jas-group :title="item.groupName" v-if="!item.groupS">
@@ -29,14 +29,8 @@
       </div>
       <jas-file-group ref="files"></jas-file-group>
     </div>
-    <!--<jas-button-footer v-if="approveStatus=='0'" :buttons="['上报', '编辑', '再来一条', '删除']" :buttons-color="['#FF5722', '#FFB800',  '#1E9FFF','#009688']"
-      @click="clickbtn"></jas-button-footer>
-    <jas-button-footer v-if="approveStatus=='-1'" :buttons="['上报', '编辑',  '删除']" :buttons-color="['#FF5722', '#FFB800', '#009688']"
-      @click="clickbtn3"></jas-button-footer>
-    <jas-button-footer v-else-if="approveStatus=='2'||approveStatus=='1'||approveStatus==''" :buttons="['再来一条']" :buttons-color="['#1E9FFF']"
-      @click="clickbtn1"></jas-button-footer>-->
+
     <jas-button-footer :buttons="btns" :buttons-color="btnsColr" @click="clickbtn"></jas-button-footer>
-    <!--<jas-button-footer v-else :buttons="['编辑', '再来一条', '删除']" :buttons-color="['#FFB800', '#1E9FFF', '#009688']" @click="clickbtn4"></jas-button-footer>-->
 
     <!--状态不同控制显示按钮-->
   </div>
@@ -62,8 +56,16 @@
         fieldConfig: {}, //字段配置
         approveStatus: "", //表示当前这条记录的状态
         currentStatus: "", //表示从那个状态进入
-        btns: ['上传', '编辑', '再来一条', '删除'],
-        btnsColr: ['#FF5722', '#FFB800', '#1E9FFF', '#009688']
+        btns: [], //['上传', '编辑', '再来一条', '删除'],
+        btnsColr: [], // ['#FF5722', '#FFB800', '#1E9FFF', '#009688']
+      }
+    },
+    computed: {
+      titleName: function () {
+        if (this.currentURL.type) {
+          return this.currentURL.type + '详情';
+        }
+        return '详情';
       }
     },
     created: function () {
@@ -72,9 +74,6 @@
     mounted: function () {
       var that = this;
       appcan.ready(function () {
-        // that.$indicator.open({
-        // spinnerType: 'fading-circle'
-        // });
         var params = jasTools.base.getParamsInUrl();
         that.oid = JSON.parse(params.obj).oid;
         that.currentURL = JSON.parse(params.currentRequestUrl);
@@ -90,33 +89,46 @@
         } catch (e) {
 
         }
-        if (that.currentStatus != '3') {
+        that.resetFooterBtns(); //currentStatus
 
-          that.$refs.files.requestFile(that.oid);
-          if (that.approveStatus == '2' || that.approveStatus == '1') { //表示通过与审核中按钮   只有再来一条
-            that.btns = ['再来一条'];
-            that.btnsColr = ['#1E9FFF'];
-          }
-          if (that.approveStatus == '0') { //未上报
-            that.btns = ['上报', '编辑', '再来一条', '删除'],
-              that.btnsColr = ['#FF5722', '#FFB800', '#1E9FFF', '#009688']
-          }
-          if (that.approveStatus == '-1') { //表示驳回
-            that.btns = ['上报', '编辑', '删除'],
-              that.btnsColr = ['#FF5722', '#FFB800', '#009688']
-          }
-          if (!that.approveStatus) {
-            that.btns = ['编辑', '再来一条', '删除'],
-              that.btnsColr = ['#FFB800', '#1E9FFF', '#009688']
-          }
-        }
         that.requestDetail();
         appcan.window.on('resume', function () {
-          that.requestDetail();
+          if (!that.firstResumed) {
+            that.firstResumed = true;
+          } else {
+            that.requestDetail();
+          }
         });
       });
     },
     methods: {
+      resetFooterBtns: function () {
+        var that = this;
+        if (that.currentStatus != '3') {
+          if (that.approveStatus == '2' || that.approveStatus == '1') { //表示通过与审核中按钮   只有再来一条
+            that.btns = ['再来一条'];
+            that.btnsColr = ['#1E9FFF'];
+            return;
+          }
+          if (that.approveStatus == '0') { //未上报
+            that.btns = ['上报', '编辑', '再来一条', '删除'],
+              that.btnsColr = ['#FF5722', '#FFB800', '#1E9FFF', '#009688']
+            return;
+          }
+          if (that.approveStatus == '-1') { //表示驳回
+            that.btns = ['上报', '编辑', '删除'],
+              that.btnsColr = ['#FF5722', '#FFB800', '#009688']
+            return;
+          }
+          if (!that.approveStatus) {
+            that.btns = ['编辑', '再来一条', '删除'],
+              that.btnsColr = ['#FFB800', '#1E9FFF', '#009688']
+            return;
+          }
+        }
+        that.btns = ['上传', '编辑', '再来一条', '删除'];
+        that.btnsColr = ['#FF5722', '#FFB800', '#1E9FFF', '#009688'];
+      },
       clickbtn: function (index) {
         var that = this;
         if (index == '上传') {
@@ -156,9 +168,13 @@
       },
       submitBusData: function (fnSuccess, fnfail) {
         var that = this;
-        jasTools.ajax.post(that.currentURL.addURL, that.form, function (data) {
-          var sBizId = that.form.oid;
-          var aFiles = that.form.attachment.map(function (item) {
+        // alert(JSON.stringify(that.form, 4, 4));
+        var obj = jasTools.base.extend({}, that.originForm);
+        delete obj.approveStatus;
+        delete obj.approve_status;
+        jasTools.ajax.post(that.currentURL.addURL, obj, function (data) {
+          var sBizId = that.originForm.oid;
+          var aFiles = that.originForm.attachment.map(function (item) {
             return item.src
           });
           if (aFiles && aFiles.length > 0) {
@@ -176,11 +192,12 @@
           fnfail && fnfail(data);
         });
       },
-      deleteLocalForm: function () {
+      deleteLocalForm: function () { // 0 : 真删除 1 : 上传到服务器后的假删除
         var that = this;
         localServer[that.currentURL.localURl].delete({
           oid: that.form.oid,
-          object:that.form//表示整个对象
+          object: that.form, //表示整个对象
+          deleteType: 1
         }, function (data) {
           appcan.window.close(-1); //关闭页面
         });
@@ -245,10 +262,11 @@
           }
         });
       },
-      deleteByLocal: function () {
+      deleteByLocal: function () { // 0 : 真删除 1 : 上传到服务器后的假删除
         var that = this;
         localServer[that.currentURL.localURl].delete({
-          oid: that.form.oid
+          oid: that.form.oid,
+          deleteType: 0,
         }, function (data) {
           if (data.status == 1) {
             appcan.window.close(-1);
@@ -258,7 +276,9 @@
       },
       deleteByServer: function () {
         var that = this;
-        jasTools.ajax.post(that.currentURL.deleteURL, {oid:that.form.oid}, function (data) {
+        jasTools.ajax.post(that.currentURL.deleteURL, {
+          oid: that.form.oid
+        }, function (data) {
           if (data.status == 1) {
             appcan.window.close(-1);
             that.$toast("删除成功");
@@ -268,31 +288,45 @@
       requestDetail: function () {
         var that = this;
         if (that.currentStatus != '3') {
-          jasTools.ajax.post(that.currentURL.detailURL, {
-            oid: that.oid
-          }, function (data) {
-            that.$indicator.close();
-            that.form = data.data || data.rows[0];
-            for (var key in domain) {
-              that.form[key] = domain[key][that.form[key]];
-            }
-          });
+          this.requestDetailFromServer();
         } else { //查询本地详情
           localServer[that.currentURL.localURl].query({
             oid: that.oid
           }, function (data) {
             // that.$indicator.close();
             if (data.status == 1) {
-              that.form = data.rows[0];
-              for (var key in domain) {
-                that.form[key] = domain[key][that.form[key]];
+              if (data.rows.length > 0) {
+
+
+                that.form = data.rows[0];
+                that.originForm = jasTools.base.extend({}, that.form);
+
+                for (var key in domain) {
+                  that.form[key] = domain[key][that.form[key]];
+                }
+                that.$refs.files.files = that.form.attachment;
+              } else {
+                appcan.window.close();
               }
-              that.$refs.files.files = that.form.attachment;
             } else {
               that.$toast("网络异常，请稍候尝试")
             }
           });
         }
+      },
+      requestDetailFromServer: function () {
+        var that = this;
+        jasTools.ajax.post(that.currentURL.detailURL, {
+          oid: that.oid
+        }, function (data) {
+          that.$refs.files.requestFile(that.oid);
+          that.$indicator.close();
+          that.form = data.data || data.rows[0];
+          for (var key in domain) {
+            that.form[key] = domain[key][that.form[key]];
+          }
+
+        });
       }
     },
   });

@@ -2,39 +2,39 @@
 <html>
 
 <head>
-    <title></title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <link rel="stylesheet" href="./../../../lib/mint-ui/style.css">
-    <link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="./../../../common/css/jas-main.css">
+	<title></title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<link rel="stylesheet" href="./../../../lib/mint-ui/style.css">
+	<link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./../../../common/css/jas-main.css">
 </head>
 <style>
 </style>
 
 <body>
-    <div class="_outer-wrapper">
-        <jas-header title="数据审核"></jas-header>
-        <div v-setheight style="overflow: auto;" class="heightContent">
-            <div v-for="item in fieldConfig">
-                <jas-group :title="item.groupName" v-if="!item.groupS">
-                    <jas-check-detail-field-group :fields="item.fileds" :form="form">
-                    </jas-check-detail-field-group>
-                </jas-group>
-                <jas-group v-else v-for="(values,index) in form[item.groupS]" :title="item.groupName+(index+1)">
-                    <div v-for="child in item.fileds">
-                        <jas-detail-field :label="child.name" :value="values[child.field]"></jas-detail-field>
-                    </div>
-                </jas-group>
+	<div class="_outer-wrapper">
+		<jas-header title="数据审核"></jas-header>
+		<div v-setheight style="overflow: auto;" class="heightContent">
+			<div v-for="item in fieldConfig">
+				<jas-group :title="item.groupName" v-if="!item.groupS">
+					<jas-check-detail-field-group :fields="item.fileds" :form="form">
+					</jas-check-detail-field-group>
+				</jas-group>
+				<jas-group v-else v-for="(values,index) in form[item.groupS]" :title="item.groupName+(index+1)">
+					<div v-for="child in item.fileds">
+						<jas-detail-field :label="child.name" :value="values[child.field]"></jas-detail-field>
+					</div>
+				</jas-group>
 
-            </div>
-                <jas-file-group  ref="files"></jas-file-group>
-        </div>
-        <div v-show="isBackIdea" style="width: 100%;position: absolute;bottom: 47px;">
-            <mt-field placeholder="请输入驳回意见" type="textarea" rows="3" v-model="idea"></mt-field>
-        </div>
-        <jas-button-footer v-show="isShow" :buttons="['通过','驳回']" :buttons-color="['','#ed9028']" @click="clickbtn"></jas-button-footer>
-    </div>
+			</div>
+			<jas-file-group ref="files"></jas-file-group>
+			<div v-show="isBackIdea" style="width: 100%;position: absolute;bottom: 47px;">
+				<mt-field placeholder="请输入驳回意见" type="textarea" rows="3" v-model="idea"></mt-field>
+			</div>
+		</div>
+		<jas-button-footer :is-return="true" :buttons="isShow?['驳回','通过']:[]" :buttons-color="['#ef4f4f','']" @click="clickbtn"></jas-button-footer>
+	</div>
 </body>
 <script src="./../../../appcan/js/appcan.js"></script>
 <script src="./../../../lib/vue/vue.js"></script>
@@ -44,143 +44,154 @@
 <script src="formDetail.js"></script>
 <script src="domain.js"></script>
 <script>
-    window.vm = new Vue({
-        el: '._outer-wrapper',
-        data: function () {
-            return {
-                form: {},
-                oid: '',
-                currentRequestUrl: {},
-                fieldConfig: [],
-                isShow: true,
-                isBackIdea: false,
-                idea: "", //驳回意见
-                params: {}
-            }
-        },
-        created: function () {
+	window.vm = new Vue({
+		el: '._outer-wrapper',
+		data: function () {
+			return {
+				form: {},
+				oid: '',
+				currentRequestUrl: {},
+				fieldConfig: [],
+				isShow: false,
+				isBackIdea: false,
+				idea: "", //驳回意见
+				params: {}
+			}
+		},
+		created: function () {
 
-        },
-        mounted: function () {
-            var that = this;
-            appcan.ready(function () {
-                that.$indicator.open({
-                    spinnerType: 'fading-circle'
-                });
-                var params = jasTools.base.getParamsInUrl();
-                that.params = JSON.parse(params.currentRequestUrl);
-                if (JSON.parse(params.obj).approveStatus == 1) {
-                    that.isShow = true;
-                } else {
-                    that.isShow = false;
-                    that.recount();
-                }
-                that.oid = JSON.parse(params.obj).oid;
-                that.currentRequestUrl = JSON.parse(params.currentRequestUrl);
-                try {
-                    fieldConfigs.forEach(function (item, index) {
-                        if (item.name == that.currentRequestUrl.name) {
-                            that.fieldConfig = item.fields;
-                            foreach.break = new Error("StopIteration");
-                        }
-                    });
-                } catch (e) {
+		},
+		mounted: function () {
+			var that = this;
+			that.$indicator.open({
+				spinnerType: 'fading-circle'
+			});
+			appcan.ready(function () {
+				var params = jasTools.base.getParamsInUrl();
+				that.params = JSON.parse(params.currentRequestUrl);
+				if (JSON.parse(params.obj).approveStatus == 1) {
+					that.isShow = true;
+				} else {
+					that.isShow = false;
+				}
+				that.oid = JSON.parse(params.obj).oid;
+				that.currentRequestUrl = JSON.parse(params.currentRequestUrl);
+				try {
+					fieldConfigs.forEach(function (item, index) {
+						if (item.name == that.currentRequestUrl.name) {
 
-                }
-                that.$refs.files.requestFile(that.oid);
-                that.requestDetail();
-            });
-        },
-        methods: {
-            recount: function () {
-                var otherHeight = 0;
-                var that = this;
-                setTimeout(function () {
-                    var arr = $("._outer-wrapper").children();
-                    for (var i = 0; i < arr.length; i++) {
-                        if (i == 0) {
-                            otherHeight += arr[i].clientHeight;
-                        }
-                        if (i == 3 && that.isShow) {
-                            otherHeight += arr[i].clientHeight;
-                        }
-                    }
-                    $(".heightContent").css('height', 'calc(100% - ' + otherHeight + 'px)');
-                    $(".heightContent").css('overflow', 'auto');
-                }, 0);
-            },
-            clickbtn: function (index) {
-                if (index == 0) {
-                    this.pass();
-                }
-                if (index == 1) {
-                    this.reject();
-                }
-            },
-            reject: function () {
-                var that = this;
-                if (!that.isBackIdea) {
-                    that.isBackIdea = true;
-                    return;
-                }
-                that.approvesToServer(-1);
-            },
-            pass: function () {
-                var that = this;
-                that.approvesToServer(2);
-            },
-            approvesToServer: function (approveStatus) {
-                var that = this;
-                var obj = {
-                    businessOid: [],
-                    approveStatus: approveStatus,
-                };
-                obj.businessOid[0] = that.oid;
-                if (that.params.className) {
-                    obj.className = that.params.className;
-                }
-                if (that.params.functionCode) {
-                    obj.functionCode = that.params.functionCode;
-                }
-                if (that.idea) {
-                    obj.approveOpinion = that.idea;
-                }
-                jasTools.ajax.post('/daq/dataApprove/save.do', obj, function (data) {
-                    if (data.status == 1) {
-                        appcan.window.close(-1);
-                    } else {
-                        that.$toast("网络异常，请稍候尝试")
-                    }
-                });
-            },
-            requestDetail: function () {
-                var that = this;
-                var url = that.currentRequestUrl.detailURL || that.currentRequestUrl.url;
-                if (that.currentRequestUrl.type) {
-                    jasTools.ajax.get(url, {
-                        oid: that.oid
-                    }, function (data) {
-                        that.$indicator.close();
-                        that.form = data.data || data.rows[0];
-                        for (var key in domain) {
-                            that.form[key] = domain[key][that.form[key]];
-                        }
-                    });
-                } else {
-                    jasTools.ajax.post(url, {
-                        oid: that.oid
-                    }, function (data) {
-                        that.$indicator.close();
-                        that.form = data.data || data.rows[0];
-                        for (var key in domain) {
-                            that.form[key] = domain[key][that.form[key]];
-                        }
-                    });
-                }
+							that.fieldConfig = item.fields;
+							foreach.break = new Error("StopIteration");
+						}
+					});
+				} catch (e) {}
+				that.$refs.files.requestFile(that.oid);
+				that.requestDetail();
+			});
+		},
+		methods: {
+			clickbtn: function (index) {
+				if (index == '通过') {
+					this.pass();
+				}
+				if (index == '驳回') {
+					this.reject();
+				}
+			},
+			reject: function () {
+				var that = this;
+				if (!that.isBackIdea) {
+					that.isBackIdea = true;
+					return;
+				}
+				that.approvesToServer(-1);
+			},
+			pass: function () {
+				var that = this;
+				that.approvesToServer(2);
+			},
+			approvesToServer: function (approveStatus) {
+				var that = this;
+				var obj = {
+					businessOid: [],
+					approveStatus: approveStatus,
+				};
+				obj.businessOid[0] = that.oid;
+				if (that.params.className) {
+					obj.className = that.params.className;
+				}
+				if (that.params.functionCode) {
+					obj.functionCode = that.params.functionCode;
+				}
+				if (that.idea) {
+					obj.approveOpinion = that.idea;
+				}
+				jasTools.ajax.post('/daq/dataApprove/save.do', obj, function (data) {
+					if (data.status == 1) {
+						appcan.window.close(-1);
+					} else {
+						that.$toast("网络异常，请稍候尝试")
+					}
+				});
+			},
+			requestDetail: function () {
+				var that = this;
+				var url = that.currentRequestUrl.detailURL || that.currentRequestUrl.url;
+				if (that.currentRequestUrl.type) {
+					jasTools.ajax.get(url, {
+						oid: that.oid
+					}, function (data) {
+						that.$indicator.close();
+						that.form = data.data || data.rows[0];
+						for (var key in domain) {
+							that.form[key] = domain[key][that.form[key]];
+						}
+					});
+				} else {
+					jasTools.ajax.post(url, {
+						oid: that.oid
+					}, function (data) {
+						that.$indicator.close();
+						that.form = data.data || data.rows[0];
+						// alert(JSON.stringify(that.fieldConfig, 4, 4))
+						if (that.currentRequestUrl.name == '阴极保护电缆') {
+							var cableUse = [{
+								id: 'cable_use_code_001',
+								name: '测试桩号',
+								field: 'testStakeCode'
+							}, {
+								id: 'cable_use_code_002',
+								name: '牺牲阳极编号',
+								field: 'anodeCode'
+							}, {
+								id: 'cable_use_code_003',
+								name: '阴保电源编号',
+								field: 'cableProtectionCode',
+							}, {
+								id: 'cable_use_code_004',
+								name: '辅助阳极地床编号',
+								field: 'groundBed',
+							}];
+							cableUse.forEach(function (item) {
+								if (item.id == that.form.cableUse) {
+									that.fieldConfig[2].fileds.push({
+										name: item.name,
+										field: item.field
+									});
+								}
+							});
+						}
 
-            }
-        },
-    });
+
+						for (var key in domain) {
+							that.form[key] = domain[key][that.form[key]];
+						}
+					});
+				}
+
+			}
+		},
+	});
 </script>
 
 </html>

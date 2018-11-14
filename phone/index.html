@@ -46,7 +46,7 @@
 		el: '._outer-wrapper',
 		data: function () {
 			return {
-				selectedTab: '个人中心',
+				selectedTab: '数据统计',
 				isInitResume: false,
 				tabs: [ //
 					// {
@@ -104,6 +104,9 @@
 						var scriptContent = 'vm.initPage()';
 					}
 					if (that.selectedTab === '数据审核') {
+						var scriptContent = 'vm.requestTotalNum()';
+					}
+					if (that.selectedTab === '地图展示') {
 						var scriptContent = 'vm.initPage()';
 					}
 					scriptContent && appcan.window.evaluatePopoverScript('index', that.openCurrentPageId, scriptContent);
@@ -116,17 +119,25 @@
 			initTabs: function () {
 				var userBo = JSON.parse(localStorage.getItem('user'));
 				var userName = userBo.loginName;
-				if (userName === 'zhangyi') { // 施工单位
+				// 1：施工单位；2：监理单位；3：检测单位；4：建设单位；5：厂商；0：顶级部门
+				var unitType = userBo.unitType;
+				if (unitType == 1) { // 施工单位
 					this.tabs.splice(0, 1);
 					this.tabs.splice(1, 1);
+					this.selectedTab = this.tabs[0].name;
+					return;
 				}
-				if (userName === 'liyi') { // 监理单位
+				if (unitType == 2) { // 监理单位
 					this.tabs.splice(0, 2);
+					this.selectedTab = this.tabs[0].name;
+					return;
 				}
-				if (userName === 'leifeng') { // 建设单位
+				if (unitType == 4) { // 建设单位
 					this.tabs.splice(1, 2);
+					this.selectedTab = this.tabs[0].name;
+					return;
 				}
-				this.selectedTab = this.tabs[0].name;
+				appcan.window.close();
 			},
 			afterProjectChanged: function () { // 供 切换项目界面 调用的方法
 				appcan.window.evaluatePopoverScript('index', 'pages/data-collection/data-collection.html', 'vm.initPage()');
@@ -147,8 +158,16 @@
 				var width = Math.floor($('#content').width() * (window.devicePixelRatio || 1));
 				if (this[src]) {
 					appcan.window.bringPopoverToFront(src);
+					if (that.selectedTab == '地图展示') {
+						appcan.window.evaluatePopoverScript('index', 'pages/map-view/map-view.html', 'vm.initPage()');
+					} else {
+						appcan.window.evaluatePopoverScript('index', 'pages/map-view/map-view.html', 'vm.closeMap()');
+					}
 				} else {
 					this[src] = true;
+					if (that.selectedTab !== '地图展示') {
+						appcan.window.evaluatePopoverScript('index', 'pages/map-view/map-view.html', 'vm.closeMap()');
+					}
 					appcan.window.openPopover({
 						name: src,
 						dataType: 0,
@@ -159,6 +178,9 @@
 						height: height,
 					});
 				}
+			},
+			goToLogin: function () {
+				appcan.window.open('login', 'login.html', 0, 16, 0, 0, 0);
 			},
 			checkOut: function () { //退出应用
 				//监听手机物理返回键

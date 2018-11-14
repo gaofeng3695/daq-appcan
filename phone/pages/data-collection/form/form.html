@@ -13,13 +13,37 @@
 </style>
 
 <body>
-	<div class="_outer-wrapper " v-cloak>
-		<jas-header :title="title" right-icon="fa fa-qrcode" @clickright="clickright"></jas-header>
+	<div class="_outer-wrapper" v-cloak>
+		<jas-header :title="title" :right-icon="isBarcode? 'fa fa-qrcode' :''" @clickright="clickright"></jas-header>
 		<div v-setheight style="overflow: auto;">
 			<jas-form-items-group ref="mainForm" :fields-group="fieldsGroup" :fields-config="fieldsConfig" :form="form"></jas-form-items-group>
-			<jas-file-group is-edit="true" ref="files"></jas-file-group>
+			<jas-file-group v-show="fieldsGroup.length>0" is-edit="true" ref="files"></jas-file-group>
+			<mt-popup v-model="popupVisible" popup-transition="popup-fade">
+				<div style="min-height:200px; width:80vw;padding:10px 0;">
+					<jas-group title="管材信息">
+						<div style="padding: 0 10px;">
+							<template v-if=" barcodeType=='Z'">
+								<jas-detail-field v-for="item,index in pipeLabels" :label="item" :value="barcodeValues[index]"></jas-detail-field>
+							</template>
+							<template v-if="barcodeType=='RW'">
+								<jas-detail-field v-for="item,index in hotPipeLabels" :label="item" :value="barcodeValues[index]"></jas-detail-field>
+							</template>
+						</div>
+					</jas-group>
+					<div style="text-align: right;padding: 0 10px;">
+						<!-- <mt-button type="primary" style="margin-right:6px;" @click.native="popupVisible=false" size="small">取消</mt-button> -->
+						<mt-button type="primary" v-if="formType == 'coating_pipe'" @click.native="addPipeCode('pipe_oid')" size="small">填入钢管信息</mt-button>
+						<mt-button type="primary" v-if="formType == 'hot_bends'" @click.native="addPipeCode('hot_bends_oid')" size="small">填入弯管信息</mt-button>
+						<mt-button type="primary" v-if="formType == 'pipe_cold_bending'" @click.native="addPipeCode('pipeColdBendingOid')" size="small">填入冷弯管信息</mt-button>
+						<mt-button type="primary" v-if="formType == 'construction_weld'" style="margin-right:5px;" @click.native="addPipeCode('frontPipeOid')"
+						  size="small">填入前管件信息</mt-button>
+						<mt-button type="primary" v-if="formType == 'construction_weld'" @click.native="addPipeCode('backPipeOid')" size="small">填入后管件信息</mt-button>
+					</div>
+				</div>
+			</mt-popup>
+
 		</div>
-		<jas-button-footer :is-return="true" :buttons="['保存']" :buttons-color="['']" @click="saveBtn"></jas-button-footer>
+		<jas-button-footer :is-return="true" :buttons="[ '保存']" :buttons-color="[ '']" @click="saveBtn"></jas-button-footer>
 	</div>
 </body>
 <script src="./../../../appcan/js/appcan.js"></script>
@@ -31,14 +55,15 @@
 <script src="./../../user-center/data-sync/local-server.js"></script>
 <script src="./fields-config.js"></script>
 
-
 <script>
 	window.vm = new Vue({
 		el: '._outer-wrapper',
 		data: function () {
 			var that = this;
 			return {
+				popupVisible: false,
 				title: '数据录入',
+				formType: '',
 				formStatus: '本地新增',
 				value: '',
 				fieldsGroup: [],
@@ -46,37 +71,78 @@
 				form: {},
 				isOnline: false,
 				isAgain: false,
-			}
-		},
-		created: function () {
+				isBarcode: false,
+				barcodeType: '', // Z : 线路管材 ,  RW : 	感应加热弯管
+				barcodeValues: [],
+				pipeLabels: ['钢管编号', '炉批号', '管径*壁厚', '长度(m)', '重量(t)', '钢材等级', '钢管成型方式', '钢管生产厂家', '外防腐类型',
+					'防腐加工厂家', '出厂时间'
+				],
+				//'二维码标识', '项目编码',
 
+				hotPipeLabels: ['弯管编号', '炉批号', '管径*壁厚', '管材等级', '长度(m)', '曲线长度', '钢管成型方式', '弯制角度', '弯管生产厂家',
+					'外防腐类型', '出厂时间'
+				],
+				// '维码标识', '项目编码',
+
+
+			}
 		},
 		mounted: function () {
 			var that = this;
-
-
 			appcan.ready(function () {
 				var oParam = jasTools.base.getParamsInUrl();
 				that.setFormStatus(oParam);
 				that.setVueConfigData(oParam, FieldsConfig);
-				that.$nextTick(function () { // 在表单项加载完成后进行，数据装载
+				setTimeout(function () { // 在表单项加载完成后进行，数据装载
 					if (that.formStatus !== '本地新增') {
 						that.getDetail(that.oid);
 					} else {
 						that.resetForm();
 					}
-				});
+				}, 300);
 			});
 		},
-
 		methods: {
 			clickright: function () {
-				uexEfficientScanner.cbOpen = function (opCode, dataType, data) {
-					var resultData = JSON.parse(data);
-					var result = resultData.code;
-					var type = resultData.type;
-				};
-				uexEfficientScanner.open();
+				var that = this;
+				if (!this.isBarcode) return;
+				uexJasScanner.open(function (err, info) {
+					var aInfo = info.split(';');
+					if (aInfo.length < 3) {
+						that.$toast('错误的二维码信息');
+						return;
+					}
+					that.barcodeType = aInfo[0];
+					aInfo.shift();
+					aInfo.shift();
+					that.barcodeValues = aInfo;
+					if (that.formType == 'construction_weld') { // 只在汉口记录模块显示 信息窗口
+						that.popupVisible = true;
+					} else {
+						if (that.formType == 'coating_pipe') var name = 'pipe_oid';
+						if (that.formType == 'hot_bends') var name = 'hot_bends_oid';
+						if (that.formType == 'pipe_cold_bending') var name = 'pipeColdBendingOid';
+						that.addPipeCode(name);
+					}
+				});
+			},
+			addPipeCode: function (name) {
+				this.popupVisible = false;
+				var code = this.barcodeValues[0];
+				var options = this.fieldsConfig[name] && this.fieldsConfig[name].options;
+				var arr = options.filter(function (item) {
+					return item.label == code || item.label == code + '-LW';
+				});
+				if (arr.length > 0) {
+					var value = arr[0] && arr[0].value;
+					this.form[name] = value;
+					var pipeSize = this.barcodeValues[2].split('*');
+					if (this.form.hasOwnProperty('pipeDiameter')) this.form['pipeDiameter'] = pipeSize[0];
+					if (this.form.hasOwnProperty('wallThickness')) this.form['wallThickness'] = pipeSize[1];
+					if (this.form.hasOwnProperty('pipeLength')) this.form['pipeLength'] = this.barcodeValues[3];
+				} else {
+					this.$toast('未找到该管材');
+				}
 			},
 			resetForm: function () {
 				var that = this;
@@ -104,7 +170,7 @@
 				if (oParam.oid && oParam.isOnline == 1 && oParam.isAgain == 1) this.formStatus = '网上再来一条';
 				if (oParam.oid && oParam.isOnline == 0 && oParam.isAgain == 0) this.formStatus = '本地编辑';
 				if (oParam.oid && oParam.isOnline == 1 && oParam.isAgain == 0) this.formStatus = '网上编辑';
-				this.$toast(this.formStatus);
+				// this.$toast(this.formStatus);
 				return this.formStatus;
 			},
 			setVueConfigData: function (oParam, FieldsConfig) {
@@ -117,7 +183,11 @@
 					measured_result: 'weldMeasured',
 					anticorrosion_check: 'anticorrosionCheck',
 				};
+				if (['coating_pipe', 'hot_bends', 'pipe_cold_bending', 'construction_weld'].indexOf(oParam.title) > -1) {
+					this.isBarcode = true;
+				}
 				this.table = tableMap[oParam.title];
+				this.formType = oParam.title;
 				var config = FieldsConfig[oParam.title];
 
 				this.module = oParam.title;
@@ -141,10 +211,11 @@
 						oid: oid
 					}, function (data) {
 						if (data.status == 1 && data.rows.length > 0) {
-							// alert(JSON.stringify(data.rows[0], 4, 4))
 							that.form = data.rows[0];
+
 							// that.form.history = data.rows[0]; //存储历史的数据 用于进行改变焊口状态
 							if (status == '本地编辑') {
+							    that.form.isUpdate=true;
 								that.$refs.files.files = that.form.attachment;
 							}
 							if (status == '本地再来一条') {
@@ -161,8 +232,10 @@
 						oid: oid
 					}, function (data) {
 						that.form = data.data || data.rows[0];
+
 						// that.form.history = data.data || data.rows[0]; //存储历史的数据 用于进行改变焊口状态
 						if (status == '网上编辑') {
+						    that.form.isUpdate=true;
 							that.$refs.files.requestFile(oid);
 						}
 						if (status == '网上再来一条') {
@@ -179,41 +252,70 @@
 				that._formatForm();
 				var obj = that.$refs.mainForm.getSelectLabelValues();
 				jasTools.base.extend(that.form, obj);
+				// alert(JSON.stringify(that.form, 4, 4))
 				localServer[that.table][operation](that.form, function (data) {
-					// alert("本地保存成功"+JSON.stringify(data));
+					// alert("本地保存成功" + JSON.stringify(data));
 					if (data.status == 1) {
-						fnSuccess && fnSuccess();
+						fnSuccess && fnSuccess(data);
 					} else {
-						fnfail && fnfail();
+						fnfail && fnfail(data);
 					}
 				});
+
+
+			},
+			deleteAnduploadFiles: function (sBizId, fnSuccess, fnfail) {
+				var that = this;
+				var upload = function () {
+					var aFiles = that.form.attachment && that.form.attachment.map(function (item) {
+						return item.src;
+					}).filter(function(item){
+					    return item;
+					});
+					if (aFiles && aFiles.length > 0) {
+						jasTools.ajax.uploadFiles(sBizId, {
+							file: aFiles
+						}, function () {
+							fnSuccess && fnSuccess();
+						}, function () {
+							fnSuccess && fnSuccess(); // 附件上传失败依然执行成功方法
+						});
+					} else {
+						fnSuccess && fnSuccess();
+					}
+				};
+				var aDelete = that.$refs.files.filesToBeDelete;
+				if (aDelete && aDelete.length) {
+					jasTools.ajax.get("/attachment/delete.do", {
+						oids: aDelete.join(',') //that.$refs.files.filesToBeDelete
+					}, function (data) {
+						upload();
+					}, function () {
+						upload();
+					});
+				} else {
+					upload();
+				}
 			},
 			saveToServer: function (fnSuccess, fnfail) {
 				var that = this;
 				var uploadToServer = function () {
 					var url = that.formStatus == '网上编辑' ? that.updateUrl : that.addUrl;
+					that.form.attachment = that.$refs.files.files;
 					that._formatForm();
-					appcan.logs(that.form);
-					jasTools.ajax.post(url, that.form, function (data) {
+					// var obj = that.$refs.mainForm.getSelectLabelValues();
+					// alert(JSON.stringify(obj, 4, 4))
+					// jasTools.base.extend(that.form, obj);
+
+					jasTools.ajax.postByOldWay(url, that.form, function (data) {
 						var sBizId = data.data || that.oid;
 						that.UploadOid = data.data;
-						var aFiles = that.form.attachment && that.form.attachment.map(function (item) {
-							return item.src
-						});
-						if (aFiles && aFiles.length > 0) {
-							jasTools.ajax.uploadFiles(sBizId, {
-								file: aFiles
-							}, function () {
-								fnSuccess && fnSuccess();
-							}, function () {
-								fnSuccess && fnSuccess(); // 附件上传失败依然执行成功方法
-							});
-						} else {
+						that.deleteAnduploadFiles(sBizId, function () {
 							fnSuccess && fnSuccess();
-						}
-					}, function () {
-						fnfail && fnfail();
-					});
+						});
+					}, function (data) {
+						fnfail && fnfail(data);
+					}, true);
 				};
 
 				if (this.formStatus == '网上编辑') {
@@ -238,6 +340,7 @@
 
 			saveBtn: function (index) {
 				var that = this;
+
 				var result = this.$refs.mainForm.validate();
 				if (!result) return;
 				that.$indicator.open({
@@ -247,23 +350,30 @@
 				if (this.formStatus == '网上编辑') {
 					that.saveToServer(function () { //server success
 						that.handleResult('网上编辑成功');
+					}, function (data) {
+						that.handleResult('网上编辑失败', (data && data.msg) || '');
 					});
 				} else {
 					this.saveToLocal(function () { // local success
 						that.saveToServer(function () { //server success
 							that.deleteLocalForm();
 							that.handleResult('网上新增成功');
-						}, function () { //server fail
-							that.handleResult('本地成功');
+						}, function (data) { //server fail
+							// alert(JSON.stringify(data, 4, 4))
+							that.handleResult('本地成功', (data && data.msg) || '');
 						});
 					}, function () { // local fail
 						that.handleResult('本地失败');
 					});
 				}
+
+
 			},
-			handleResult: function (type) { // 本地失败,本地成功,网上新增成功,网上编辑成功,网上编辑失败
+			handleResult: function (type, info) { // 本地失败,本地成功,网上新增成功,网上编辑成功,网上编辑失败
 				var that = this;
-				that.$indicator.close();
+				setTimeout(function(){
+				  that.$indicator.close();  
+				},0);
 				if (type == '本地失败') {
 					that.$messagebox({
 						title: '保存失败',
@@ -274,6 +384,10 @@
 					that.$indicator.close();
 					that.$toast('保存成功');
 					that._closePage(300);
+				}
+				if (type == '网上编辑失败') {
+					that.$indicator.close();
+					that.$toast('保存失败，' + info);
 				}
 				if (type == '网上新增成功') {
 					this.$messagebox({
@@ -296,12 +410,16 @@
 						} else {
 							that._closePage(300);
 						}
+						if (that.formStatus == '本地编辑') {
+							appcan.window.evaluateScript('collection-detail', 'appcan.window.close()')
+						}
 					});
 				}
 				if (type == '本地成功') {
+					(info.indexOf('<br') == -1) && (info += '<br/>');
 					this.$messagebox({
 						title: '保存到本地',
-						message: '数据已经保存到手机本地，是否再录一条?',
+						message: info + '数据已经保存到手机本地，是否再录一条?',
 						confirmButtonText: '再录一条',
 						cancelButtonText: '返回',
 						showCancelButton: true,
@@ -329,11 +447,13 @@
 				}, time);
 			},
 			_formatForm: function () {
-				for (var key in this.form) {
-					if (this.form[key] === '') {
-						this.form[key] = null;
-					}
-				}
+				this.form.approveStatus = 0;
+				this.form.approve_status = 0;
+				// for (var key in this.form) {
+				// 	if (this.form[key] === '') {
+				// 		this.form[key] = null;
+				// 	}
+				// }
 			},
 
 

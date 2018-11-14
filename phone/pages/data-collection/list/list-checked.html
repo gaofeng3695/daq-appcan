@@ -114,6 +114,10 @@
 	.clr999 {
 		color: #999;
 	}
+
+	.footerBtn {
+		min-width: 25vw;
+	}
 </style>
 
 <body>
@@ -129,23 +133,26 @@
 			<div style="height:100%;overflow: scroll" class="listWrapper">
 				<mt-loadmore ref="loadmore" :top-method="refresh" :auto-fill="false" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded">
 					<ul>
-						<li v-for="item in typeList" v-show="topSearchForm.status=='0,1,-1,2'">
+						<li v-for="item in typeList" v-show="topSearchForm.status=='0,1,-1,2'" @click="goToDetail(item)">
 							<div class="type ub bottomLine">
-								<div class="ub-f1 ulim100 clr999">{{item.code}}</div>
-								<div class="clr333">
+								<div class="ub-f1 ulim100 clr999">
+									<span>{{codeName+': '}}</span>
+									<span class="clr333">{{item.code}}</span>
+								</div>
+								<div class="clr333" v-show="topSearchForm.status != 3">
 									<span class=" bage borblue" v-show="item.approveStatus==1">审核中</span>
 									<span class=" bage borgreen" v-show="item.approveStatus==2">通过</span>
 									<span class=" bage borRed" v-show="item.approveStatus==-1">被驳回</span>
 									<span class=" bororgane bage" v-show="item.approveStatus==0">待上报</span>
 								</div>
 							</div>
-							<div class="content ub" @click="goToDetail(item)">
+							<div class="content ub">
 								<div class="w40 ub-f1 ulim100">{{item.tenders_name||item.tendersName}}</div>
 								<div class="w40 ub-f1 ulim100  txt-r">{{item.construct_unit_name||item.constructUnitName||item.unitName}}</div>
 							</div>
 							<div class="btns ub">
 								<div>
-									{{item.createTime}}
+									<span class="clr999">{{dateName+': '}}</span>{{item[dateCode]}}
 								</div>
 								<div class="ub-f1" v-show="item.approveStatus!='-1'">
 									<!--<mt-button v-show="topSearchForm.status=='3'" size="small" type="primary" @click="approve(item)">上传</mt-button>
@@ -155,9 +162,12 @@
 							</div>
 						</li>
 						<li v-for="item in typeList" v-show="topSearchForm.status=='-1'||topSearchForm.status=='0'||topSearchForm.status=='3'">
-							<div class="type ub bottomLine">
-								<div class="ub-f1 ulim100 clr999">{{item.code}}</div>
-								<div class="clr333">
+							<div class="type ub bottomLine" @click="goToDetail(item)">
+								<div class="ub-f1 ulim100 clr999">
+									<span>{{codeName+': '}}</span>
+									<span class="clr333">{{item.code}}</span>
+								</div>
+								<div class="clr333" v-show="topSearchForm.status != 3">
 									<span class=" borblue bage " v-show="item.approveStatus==1">审核中</span>
 									<span class="bage borgreen" v-show="item.approveStatus==2">通过</span>
 									<span class=" bage borRed" v-show="item.approveStatus==-1">被驳回</span>
@@ -172,9 +182,9 @@
 											<spn>{{item.construct_unit_name||item.constructUnitName||item.unitName}}</spn>
 										</div>
 									</div>
-									<div class="btns ub">
+									<div class="btns ub" @click="goToDetail(item)">
 										<div>
-											{{item.createTime}}
+											<span class="clr999">{{dateName+': '}}</span>{{item[dateCode]}}
 										</div>
 										<div class="ub-f1" v-show="item.approveStatus!='-1'">
 											<mt-button size="small" type="primary" @click="copyobject(item)">再来一条</mt-button>
@@ -190,10 +200,9 @@
 		<div class="jas-button-footer" v-show="topSearchForm.status!='0,1,-1,2'">
 			<jas-checkbox :checked="allchecked" @clickitem="chooseAll" :is-all='true'>
 				<div slot="options" class="txt-r ub-f1" style="line-height: 47px;">
-					<mt-button type="primary" size="small" v-show="topSearchForm.status=='3'" @click="submit">上传</mt-button>
-					<mt-button style="background:#FF5722" type="primary" size="small" v-show="topSearchForm.status=='0'||topSearchForm.status=='-1'"
-					  @click="changestatus">上报</mt-button>
-					<mt-button type="primary" size="small" @click="deletes">删除</mt-button>
+					<mt-button class="footerBtn" style="background:#ef4f4f;margin-right:6px;" type="primary" size="small" @click="deletes">删除</mt-button>
+					<mt-button class="footerBtn" type="primary" size="small" v-show="topSearchForm.status=='3'" @click="submit">上传</mt-button>
+					<mt-button class="footerBtn" type="primary" size="small" v-show="topSearchForm.status=='0'||topSearchForm.status=='-1'" @click="changestatus">上报</mt-button>
 				</div>
 			</jas-checkbox>
 		</div>
@@ -218,28 +227,30 @@
 					module: '',
 					status: '',
 				},
-				modules: [{
-					value: 'coating_pipe',
-					label: '防腐管检查'
-				}, {
-					value: 'hot_bends',
-					label: '热煨弯管检查'
-				}, {
-					value: 'pipe_cold_bending',
-					label: '冷弯管检查'
-				}, {
-					value: 'construction_weld',
-					label: '焊口记录'
-				}, {
-					value: 'rework_weld',
-					label: '焊口返修'
-				}, {
-					value: 'measured_result',
-					label: '焊口测量'
-				}, {
-					value: 'anticorrosion_check',
-					label: '补口记录'
-				}, ],
+				modules: [ //
+					{
+						value: 'coating_pipe',
+						label: '防腐管检查'
+					}, {
+						value: 'hot_bends',
+						label: '热煨弯管检查'
+					}, {
+						value: 'pipe_cold_bending',
+						label: '冷弯管检查'
+					}, {
+						value: 'construction_weld',
+						label: '焊口记录'
+					}, {
+						value: 'rework_weld',
+						label: '焊口返修'
+					}, {
+						value: 'measured_result',
+						label: '焊口测量'
+					}, {
+						value: 'anticorrosion_check',
+						label: '补口记录'
+					},
+				],
 				statuses: [ //
 					{
 						value: '0,1,-1,2',
@@ -255,13 +266,15 @@
 						label: '被驳回'
 					}
 				],
-				statuses1: [{
-					value: '0,1,-1,2',
-					label: '已录入'
-				}, {
-					value: '3',
-					label: '待上传'
-				}],
+				statuses1: [ //
+					{
+						value: '0,1,-1,2',
+						label: '已录入'
+					}, {
+						value: '3',
+						label: '待上传'
+					}
+				],
 				statuses2: [{
 					value: '3',
 					label: '待上传'
@@ -278,6 +291,9 @@
 						chooseStatues: "statuses1",
 						type: "防腐管检查",
 						code: "pipe_code",
+						codeName: '钢管编号',
+						dateCode: "checked_date",
+						dateName: "检查日期",
 						searchObj: {
 							page: 1,
 							rows: 10
@@ -294,6 +310,9 @@
 						chooseStatues: "statuses1",
 						type: "热煨弯管检查",
 						code: "hot_bends_code",
+						codeName: '热煨弯管编号',
+						dateCode: "checked_date",
+						dateName: "检查日期",
 						searchObj: {
 							page: 1,
 							rows: 10
@@ -309,6 +328,9 @@
 						addURL: "/jdbc/commonData/checkPipeColdBending/save.do",
 						chooseStatues: "statuses1",
 						code: "pipeColdBendingCode",
+						codeName: '冷弯管编号',
+						dateCode: "checkedDate",
+						dateName: "检查日期",
 						type: "冷弯管检查"
 					},
 					construction_weld: {
@@ -322,7 +344,10 @@
 						addURL: "/jdbc/commonData/constructionWeld/save.do",
 						chooseStatues: "statuses",
 						code: "weldCode",
-						type: "焊口记录"
+						codeName: '焊口编号',
+						type: "焊口记录",
+						dateCode: "constructDate",
+						dateName: "施工日期",
 					},
 					rework_weld: {
 						id: "rework_weld",
@@ -334,7 +359,10 @@
 						addURL: "/jdbc/commonData/reworkWeld/save.do",
 						chooseStatues: "statuses",
 						code: "weldCode",
+						codeName: '焊口编号',
 						type: "焊口返修",
+						dateCode: "weldDate",
+						dateName: "焊接日期",
 						className: "cn.jasgroup.jasframework.acquisitiondata.weld.reworkweld.dao.entity.ReworkWeld"
 					},
 					measured_result: {
@@ -346,8 +374,11 @@
 						deleteURL: "/jdbc/commonData/weldMeasuredResult/delete.do",
 						addURL: "/jdbc/commonData/weldMeasuredResult/save.do",
 						chooseStatues: "statuses",
-						code: "medianStakeCode",
+						code: "weldCode",
+						codeName: '焊口编号',
 						type: "焊口测量",
+						dateCode: "surveyDate",
+						dateName: "测量日期",
 						className: "cn.jasgroup.jasframework.acquisitiondata.weld.measuredresult.dao.entity.WeldMeasuredResult"
 					},
 					anticorrosion_check: {
@@ -361,8 +392,11 @@
 						chooseStatues: "statuses",
 						type: "补口记录",
 						functionCode: "F000036",
-						code: "weldCode",
-						code1: "weld_code",
+						code: "weld_code",
+						code1: "weldCode",
+						codeName: '焊口编号',
+						dateCode: "buckle_date",
+						dateName: "补口日期",
 						searchObj: {
 							page: 1,
 							rows: 10,
@@ -381,6 +415,9 @@
 				allLoaded: false,
 				type: "",
 				code: "",
+				codeName: "",
+				dateCode: "",
+				dateName: "",
 				record: 0,
 				isConnectNet: 1, //是否连接网络，0表示无网络
 				index: 0, //表示此时上传的条数
@@ -401,6 +438,9 @@
 					that.currentUrl = that.typeUrl[that.topSearchForm.module];
 					that.type = that.typeUrl[that.topSearchForm.module].type;
 					that.code = that.typeUrl[that.topSearchForm.module].code;
+					that.codeName = that.typeUrl[that.topSearchForm.module].codeName;
+					that.dateName = that.typeUrl[that.topSearchForm.module].dateName;
+					that.dateCode = that.typeUrl[that.topSearchForm.module].dateCode;
 					if (that.typeUrl[that.topSearchForm.module].searchObj) {
 						that.searchObj = that.typeUrl[that.topSearchForm.module].searchObj
 					}
@@ -453,35 +493,45 @@
 				} else {
 					that.searchObj.page = 1;
 				}
-				that.typeList = [];
+				// that.typeList = [];
 				that.allLoaded = false;
 				that.allchecked = false;
 				that.requestList(true);
 			},
 			requestList: function (isFresh) {
 				var that = this;
+				that.$indicator.open({
+					text: '正在加载数据...',
+					spinnerType: 'fading-circle'
+				});
 				if (that.topSearchForm.status == '3') { //待上传
-					that.requestByLoacl(); //请求本地列表
+					that.requestByLocal(); //请求本地列表
 				} else {
 					that.requestByServer(isFresh); //请求服务器数据
 				}
 			},
-			requestByLoacl: function () {
+			requestByLocal: function () {
 				var that = this;
 				if (that.currentUrl.localURl) {
 					localServer[that.currentUrl.localURl].query({
 						projectOid: localStorage.getItem("defaultProject")
 					}, function (data) {
+						setTimeout(function () {
+						      that.$indicator.close();
+							($('.listWrapper')[0].scrollTop = 0);
+						}, 10);
 						if (data.status == 1) {
-							data.rows.forEach(function (item, index) {
+							that.typeList = data.rows.map(function (item, index) {
 								item.code = item[that.code] || item[that.code1];
 								item.checked = false;
-								that.typeList.push(item);
+								// that.typeList.push(item);
+								return item;
 							});
 						} else {
 							that.$toast("网络异常，请稍候尝试");
 						}
-
+						that.$refs.loadmore.onTopLoaded();
+						that.$refs.loadmore.onBottomLoaded();
 					});
 				} else {
 					that.$toast("暂无接口");
@@ -493,6 +543,8 @@
 				that.searchObj.project_oid = localStorage.getItem("defaultProject");
 				// alert(JSON.stringify(that.searchObj));
 				jasTools.ajax.post(that.currentUrl.url, that.searchObj, function (data) {
+					that.$indicator.close();
+
 					if (data.status == 1) {
 						setTimeout(function () {
 							isFresh && ($('.listWrapper')[0].scrollTop = 0);
@@ -502,8 +554,8 @@
 								that.typeList = [];
 								data.rows.forEach(function (item) {
 									item.code = item[that.code];
-									var time = item.createDatetime || item.create_datetime;
-									item.createTime = time.split(" ")[0];
+									// var time = item.createDatetime || item.create_datetime;
+									// item.createTime = time && time.split(" ")[0];
 									item.checked = false;
 								});
 								that.typeList = data.rows;
@@ -521,8 +573,8 @@
 							if (data.rows.length > 0) {
 								data.rows.forEach(function (item, index) {
 									item.code = item[that.code];
-									var time = item.createDatetime || item.create_datetime;
-									item.createTime = time.split(" ")[0];
+									// var time = item.createDatetime || item.create_datetime;
+									// item.createTime = time && time.split(" ")[0];
 									item.checked = false;
 									that.typeList.push(item);
 								});
@@ -542,6 +594,8 @@
 					that.$refs.loadmore.onTopLoaded();
 					that.$refs.loadmore.onBottomLoaded();
 				}, function () {
+					that.$indicator.close();
+
 					that.$refs.loadmore.onTopLoaded();
 					that.$refs.loadmore.onBottomLoaded();
 				});
@@ -614,10 +668,11 @@
 					fnfail && fnfail(data);
 				}, true);
 			},
-			deleteLocalForm: function (form, callback) {
+			deleteLocalForm: function (form, callback) { // 0 : 真删除 1 : 上传到服务器后的假删除
 				var that = this;
 				localServer[that.currentUrl.localURl].delete({
-					oid: form.oid
+					oid: form.oid,
+					deleteType: 1
 				}, function (data) {
 					callback && callback();
 					that.refresh();
@@ -666,7 +721,7 @@
 			deletes: function () {
 				var that = this;
 				var idList = [];
-				var objList=[];
+				var objList = [];
 				that.typeList.forEach(function (item) {
 					if (item.checked) {
 						objList.push(item);
@@ -684,14 +739,14 @@
 				}, function (value) {
 					if (value == 'confirm') {
 						if (that.topSearchForm.status == '3') {
-							that.deleteByLocal(idList,objList);
+							that.deleteByLocal(idList, objList);
 						} else {
 							that.deleteByServer(idList);
 						}
 					}
 				});
 			},
-			deleteByLocal: function (ids,objList) { //本地批量删除
+			deleteByLocal: function (ids, objList) { //本地批量删除
 				var that = this;
 				var id = '';
 				ids.forEach(function (item) {
@@ -700,7 +755,7 @@
 				id = id.substring(0, id.length - 1);
 				localServer[that.currentUrl.localURl].deleteBatch({
 					"ids": id,
-					"objectList":objList
+					"objectList": objList,
 				}, function (data) {
 					if (data.status == 1) {
 						that.$toast("删除成功");
@@ -781,7 +836,11 @@
 			},
 			goToDetail: function (obj) {
 				var that = this;
-				appcan.window.open('collection-detail', 'detail.html?obj=' + JSON.stringify(obj) + "&currentRequestUrl=" + JSON
+				var _obj = {
+					oid: obj.oid,
+					approveStatus: obj.approveStatus,
+				};
+				appcan.window.open('collection-detail', 'detail.html?obj=' + JSON.stringify(_obj) + "&currentRequestUrl=" + JSON
 					.stringify(that.currentUrl) + "&currentStatus=" + that.topSearchForm.status, 10, 16, 0, 0, 0);
 			}
 

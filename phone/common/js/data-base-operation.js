@@ -69,5 +69,8 @@ DataBaseOperation.prototype = {
 				callback(error); //0:表示成功  1:表示失败
 			}
 		});
+	},
+	dbGetBaseName: function () {
+		return dbName;
 	}
 }

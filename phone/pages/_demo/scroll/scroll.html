@@ -32,7 +32,14 @@
 					</jas-scroll-list-box>
 				</mt-tab-container-item>
 				<mt-tab-container-item id="second">
-					<mt-cell v-for="n in 4" :title="'测试 ' + n" />
+
+					<mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" ref="loadmore">
+						<ul>
+							<!-- <li v-for="item in num">{{ item }}</li> -->
+							<mt-cell v-for="n in num" :title="'测试 ' + n" />
+						</ul>
+					</mt-loadmore>
+
 				</mt-tab-container-item>
 
 			</mt-tab-container>
@@ -55,6 +62,8 @@
 		el: '._outer-wrapper',
 		data: function () {
 			return {
+				num: 10,
+				allLoaded: false,
 				params: {
 					medianStakeCode: "",
 					pipelineOid: "",
@@ -75,8 +84,19 @@
 			});
 		},
 		methods: {
-
-
+			loadTop() {
+				// ... // 加载更多数据
+				this.num = 10;
+				this.$refs.loadmore.onTopLoaded();
+			},
+			loadBottom() {
+				// ... // 加载更多数据
+				this.num += 10;
+				if (this.num > 40) {
+					this.allLoaded = true; // 若数据已全部获取完毕
+				}
+				this.$refs.loadmore.onBottomLoaded();
+			}
 		},
 	});
 </script>

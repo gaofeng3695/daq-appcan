@@ -1,4 +1,5 @@
-var fieldConfigs = [{
+var fieldConfigs = [ //
+  {
     "name": "冷弯信息",
     "fields": [{
       "groupName": "基础数据",
@@ -97,12 +98,6 @@ var fieldConfigs = [{
           "field": "produceDate"
         }
       ]
-    }, {
-      "groupName": "其他",
-      "fileds": [{
-        "name": "备注",
-        "field": "remarks"
-      }]
     }]
   },
   {
@@ -410,7 +405,7 @@ var fieldConfigs = [{
           "field": "constructUnitName"
         }, {
           "name": "施工机组代号",
-          "field": "workUnitName"
+          "field": "workUnitCode"
         },
         {
           "name": "监理单位",
@@ -883,7 +878,7 @@ var fieldConfigs = [{
       }]
     }, {
       "groupName": "缺陷信息",
-      "groupS":"faUltrasonicSubList",
+      "groupS": "faUltrasonicSubList",
       "fileds": [{
         "field": "defectPosition",
         "name": "缺陷位置"
@@ -1709,6 +1704,15 @@ var fieldConfigs = [{
       }, {
         "name": "穿越最大深度(m)",
         "field": "crossMaxLength"
+      }, {
+        "name": "稳管措施",
+        "field": "steadyTubeMeasures"
+      }, {
+        "name": "钻爆围堰等级",
+        "field": "cofferdamGrade"
+      }, {
+        "name": "衬砌形式",
+        "field": "liningType"
       }]
     }]
   }, {
@@ -2017,35 +2021,33 @@ var fieldConfigs = [{
     }, {
       "groupName": "阴极保护数据",
       "fileds": [{
-          "name": "阴保电缆编号",
-          "field": "cableCode"
-        }, {
-          "name": "电缆规格型号",
-          "field": "cableSpecification"
-        }, {
-          "name": "电缆盘号",
-          "field": "cableTrayNum"
-        }, {
-          "name": "电缆批次",
-          "field": "cableBatche"
-        }, {
-          "name": "电缆保护结构",
-          "field": "cableStructionName"
-        }, {
-          "name": "电缆敷设方式",
-          "field": "cableLayingMethodName"
-        }, {
-          "name": "电缆长度(m)",
-          "field": "cableLength"
-        }, {
-          "name": "电缆用途",
-          "field": "cableUseName"
-        },
-        {
-          "name": "电缆敷设图编号",
-          "field": "cableLayoutCode"
-        }
-      ]
+        "name": "阴保电缆编号",
+        "field": "cableCode"
+      }, {
+        "name": "电缆规格型号",
+        "field": "cableSpecification"
+      }, {
+        "name": "电缆盘号",
+        "field": "cableTrayNum"
+      }, {
+        "name": "电缆批次",
+        "field": "cableBatche"
+      }, {
+        "name": "电缆保护结构",
+        "field": "cableStructionName"
+      }, {
+        "name": "电缆敷设方式",
+        "field": "cableLayingMethodName"
+      }, {
+        "name": "电缆长度(m)",
+        "field": "cableLength"
+      }, {
+        "name": "电缆敷设图编号",
+        "field": "cableLayoutCode"
+      }, {
+        "name": "电缆用途",
+        "field": "cableUseName"
+      }]
     }]
   }, {
     "name": "牺牲阳极",
@@ -3267,7 +3269,7 @@ var fieldConfigs = [{
     }]
 
   }, {
-    "name": "防腐伤信息记录",
+    "name": "防腐补伤信息记录",
     "fields": [{
       "groupName": "防腐补伤信息",
       "fileds": [{
@@ -3441,7 +3443,7 @@ var fieldConfigs = [{
           "field": "measured_current"
         }, {
           "name": "施工单位",
-          "field": "construct_unit_name"
+          "field": "unit_name"
         },
         {
           "name": "监理单位",
@@ -3514,3 +3516,13 @@ var fieldConfigs = [{
     }]
   }
 ];
+
+fieldConfigs.forEach(function (item) {
+  item.fields.push({
+    "groupName": "其他信息",
+    "fileds": [{
+      "name": "备注",
+      "field": "remarks"
+    }]
+  })
+})

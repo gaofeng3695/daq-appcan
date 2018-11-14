@@ -331,24 +331,39 @@ Vue.component('jas-select-field', {
                 val = item;
               }
             });
+          } else {
+            if (this.value) {
+              var isExist = false;
+              var isTested = false;
+              that.options && that.options.forEach(function (item) {
+                isTested = true;
+                if (item.value === val || item == val) {
+                  isExist = true;
+                }
+              });
+              if (isTested && !isExist) {
+                val = null;
+              }
+            }
           }
           return val;
         }
       },
       set: function (newval) {
-        if (this.isMulti) {
+        var that = this;
+        if (that.isMulti) {
           var arr = newval ? newval.join(',') : '';
-          this.$emit('input', arr)
-          this.$emit('change', arr);
+          that.$emit('input', arr)
+          that.$emit('change', arr);
         } else {
-          this.popupVisible = false;
+          that.popupVisible = false;
 
           if ($.isPlainObject(newval)) {
-            this.$emit('input', 0)
+            that.$emit('input', 0)
           } else {
-            this.$emit('input', newval)
+            that.$emit('input', newval)
           }
-          this.$emit('change', newval);
+          that.$emit('change', newval);
         }
       }
     },
@@ -392,7 +407,7 @@ Vue.component('jas-select-field', {
     '    </div>',
     '    <div @click="showOptions" class="mint-cell-value" style=" padding:4px 0 0 10px;line-height:1.4;">',
     '      <span>{{labelvalue}}</span>',
-    '      <span v-show="!labelvalue" style="color:#757575;">{{placeholder || ( \'请选择\'+ label)}}</span>',
+    '      <span v-show="!labelvalue" style="color: rgb(192, 192, 192)">{{placeholder || ( \'请选择\'+ label)}}</span>',
     '    </div>',
     '    <span v-show="!disabled" style="color:#888;" @click="showOptions">',
     '      <i class="fa fa-angle-down" aria-hidden="true"></i>',
@@ -419,7 +434,7 @@ Vue.component('jas-select-field', {
   ].join(''),
   methods: {
     clearValue: function () {
-      this._value = undefined;
+      this._value = null;
     },
     showOptions: function () {
       if (this.disabled) return;
@@ -556,6 +571,7 @@ Vue.component('jas-form-items-group', {
       this.allFields = arr;
       if (arr.length > 0) {
         appcan.ready(function () {
+
           that.resetFieldsConfig(arr, that.fieldsConfig);
         });
       }
@@ -563,11 +579,12 @@ Vue.component('jas-form-items-group', {
   },
   mounted: function () {
     var that = this;
-    var arr = [];
+    var arr = [];  
     this.fieldsGroup.forEach(function (group) {
       arr = arr.concat(group.fields);
     });
     this.allFields = arr;
+
     if (arr.length > 0) {
       appcan.ready(function () {
         that.resetFieldsConfig(arr, that.fieldsConfig);
@@ -595,7 +612,7 @@ Vue.component('jas-form-items-group', {
       var aTip = [];
 
       that.allFields.forEach(function (item) {
-        if (!that.form[item] && that.fieldsConfig[item].required) {
+        if (!that.form[item] && that.fieldsConfig[item].required && that.form[item] !== 0) {
           aTip.push(that.fieldsConfig[item].name + '不能为空');
         }
       });
@@ -626,7 +643,7 @@ Vue.component('jas-form-items-group', {
       this.isInited = true;
       fields.forEach(function (field) {
         if (!fieldsConfig.hasOwnProperty(field)) {
-          console.log(field);
+          // console.log(field);
           return;
         }
         var config = fieldsConfig[field];
@@ -640,7 +657,7 @@ Vue.component('jas-form-items-group', {
           that.fatherSelectList.push(field);
         }
         /* 请求阈值 */
-        if (config.domainName) {
+        if (config.domainName && !config.isChildSelect) {
           (function (field, config) {
             if (that.isLocal) {
               localServer.sysDomain.get({
@@ -656,6 +673,7 @@ Vue.component('jas-form-items-group', {
                       value: item.key,
                     }
                   });
+                  
                 } else {
                   window.Vue && Vue.prototype.$toast("本地数据出错，请同步本地数据");
                 }
@@ -674,7 +692,6 @@ Vue.component('jas-form-items-group', {
               obj = jasTools.base.extend(obj, config.requestParams);
             }
             if (that.isLocal) {
-
               localServer[config.optionTable].get(obj, function (data) {
                 if (data.status == 1) {
                   if (data.rows.length == 0) {
@@ -725,9 +742,18 @@ Vue.component('jas-form-items-group', {
       var that = this;
       var fieldConfig = this.fieldsConfig[fatherField];
       var form = this.form;
+     
       var setChildOptionsAndValue = function (childField, options) { // 入参下拉选项
         if (that.fieldsConfig[childField].options && that.fieldsConfig[childField].options.length > 0) {
           form[childField] = ''
+        }
+        if(childField == "weldOid"&&that.form.isUpdate){
+           // appcan.logs(that.form.weldOid);
+             delete that.form.isUpdate;
+             options.push({
+               label:form.weldCode,
+               value:form.weldOid 
+            });
         }
         that.fieldsConfig[childField].options = options;
         if (options.length === 1) { //只有一个选项就自动复制
@@ -744,30 +770,59 @@ Vue.component('jas-form-items-group', {
           };
           var fieldConfig = that.fieldsConfig[childField];
           if (fieldConfig.requestParams) {
-            obj = jasTools.base.extend(obj, fieldConfig.requestParams);
+            var newParams = jasTools.base.extend({}, fieldConfig.requestParams);
+            for (var key in newParams) {
+              if (!newParams[key]) {
+                newParams[key] = form[key]
+              }
+            }
+            obj = jasTools.base.extend(obj, newParams);
           }
 
           obj[jasTools.base.switchToCamelCase(fatherField)] = fatherValue;
 
           if (that.isLocal) {
-
-            localServer[requestTable].get(obj, function (data) {
-              if (data.status == 1) {
-                if (data.rows.length == 0) {
-                  window.Vue && Vue.prototype.$toast("本地数据为空，请进行数据同步");
-                }
-                setChildOptionsAndValue(childField, data.rows.map(function (item) {
-                  return {
-                    label: item.value,
-                    value: item.key,
+            if (requestUrl === 'domainName') {
+              localServer.sysDomain.get({
+                domainName: that.fieldsConfig[childField].domainName
+              }, function (data) {
+                if (data.status == 1) {
+                  if (data.rows.length == 0) {
+                    window.Vue && Vue.prototype.$toast(that.fieldsConfig[childField].name + "数据为空，请检查本地数据");
                   }
-                }));
-              } else {
-                window.Vue && Vue.prototype.$toast("本地数据出错，请同步本地数据");
-              }
-            });
+                  setChildOptionsAndValue(childField, data.rows.map(function (item) {
+                    return {
+                      label: item.value,
+                      value: item.key,
+                    }
+                  }));
+                } else {
+                  setChildOptionsAndValue(childField, []);
+                  window.Vue && Vue.prototype.$toast(that.fieldsConfig[childField].name + "数据为空，请检查本地数据");
+                }
+              });
+            } else {
+              localServer[requestTable].get(obj, function (data) {
+                if (data.status == 1) {
+                  if (data.rows.length == 0) {
+                    window.Vue && Vue.prototype.$toast(that.fieldsConfig[childField].name + "数据为空，请检查本地数据");
+                  }
+                  setChildOptionsAndValue(childField, data.rows.map(function (item) {
+                    return {
+                      label: item.value,
+                      value: item.key,
+                    }
+                  }));
+                } else {
+                  setChildOptionsAndValue(childField, []);
+                  window.Vue && Vue.prototype.$toast(that.fieldsConfig[childField].name + "数据为空，请检查本地数据");
+                }
+              });
+            }
           } else {
+
             jasTools.ajax.post("/" + requestUrl, obj, function (data) {
+          
               setChildOptionsAndValue(childField, data.rows.map(function (item) {
                 return {
                   label: item.value,
@@ -823,8 +878,10 @@ Vue.component('jas-form-items-group', {
     },
     requestDomainFromBizTable: function (url, obj, cb) {
       var that = this;
+  
       // var url = jasTools.base.rootPath + url;
       jasTools.ajax.post(url, obj, function (data) {
+
         cb && cb(data.rows);
       }, function () {
         cb && cb([]);

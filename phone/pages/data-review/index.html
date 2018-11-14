@@ -101,14 +101,20 @@
 
 	/*提示窗口样式*/
 
-	.tooltipWindos {
-		display: none;
+	.tooltipWindows {
+		/* display: none; */
 		/*进行下面样式的隐藏*/
-		border-top: 1px solid #39F;
+		border-top: 1px solid #d9d9d9;
+		border-bottom: 1px solid #d9d9d9;
+		border-left: 1px solid #d9d9d9;
+		border-right: 1px solid #d9d9d9;
+		border-radius: 0 0 14px 14px;
 		background-color: #FFF;
 		position: relative;
-		height: 10px;
-		background: #eee;
+		height: 4px;
+		margin: 0 2px;
+		/* height: 10px; */
+		/* background: #eee; */
 	}
 
 	/*倒置三角样式*/
@@ -155,9 +161,7 @@
 	}
 
 	.item-line {
-		background: #fff;
-		padding-top: 10px;
-		margin-top: 10px;
+		margin-bottom: 10px;
 	}
 
 	.line {
@@ -169,94 +173,69 @@
 	.paddBottom {
 		padding-bottom: 10px;
 	}
+
+	.child .mint-cell-text {
+		font-size: 14px;
+	}
+
+	.child .mint-cell {
+		/* background-color: #eefaff; */
+	}
+
+	.firstLine {
+		padding-right: 24px;
+		background-color: #fff;
+		/* background-color: rgb(232, 245, 255); */
+		padding-top: 10px;
+		/* border-bottom: 1px solid #d9d9d9; */
+		-webkit-box-shadow: 1px 2px 5px #878787;
+		box-shadow: 1px 2px 5px #878787;
+	}
 </style>
 
 <body>
 	<div id="total" class="_outer-wrapper" v-cloak>
 		<div style="overflow: hidden;">
-			<div style="overflow: hidden;background: #fff;">
+			<div style="overflow: hidden;background: #fff;margin-bottom:10px;">
 				<jas-select-field label="数据分类" :is-search="true" v-model="searchObj.unit" :options="units"></jas-select-field>
 			</div>
 		</div>
 
 		<div v-setheight style="overflow: auto;">
 			<div v-show="isData" style="color:#999;font-size:14px;padding:10px;height:26px;text-align: center">没有需要审核的数据 </div>
-			<div class="item-line " v-for="item in reviewList">
-				<div @click="item.isShow=!item.isShow">
+			<div class="item-line" v-for="item in reviewList">
+				<div @click="item.isShow=!item.isShow;openMap[item.code]=item.isShow;" class="firstLine" :style="{backgroundColor:item.isShow?'rgb(232, 245, 255)':'#FFF'}">
 					<div class="line ub">
-						<div class="ub-f1 ulim100 clr333">{{item.cnName}}</div>
+						<div class="ub-f1 ulim100 clr333" style="font-size: 16px;">{{item.cnName}}</div>
 						<div class="w50 clrb f20"> {{item.total}}</div>
 						<div class="w50 clrr f20">{{item.unaudited}}</div>
 					</div>
-					<div class="line ub ">
+					<div class="line ub">
 						<div class="ub-f1 ulim100 clr999">{{unitName}}</div>
 						<div class="w50 clr333">总条目</div>
 						<div class="w50 clr333">未审条目</div>
 					</div>
 				</div>
 				<div class="child" v-show="item.isShow">
-					<ul>
-						<li class="ub topLine" v-for="childItem in item.dataApproveSubBoList" @click="goToDetail(childItem)" class="topLine">
+					<ul style="padding-left:10px nm;">
+						<!-- <li class="ub topLine" v-for="childItem in item.dataApproveSubBoList" @click="goToDetail(childItem)" class="topLine">
 							<div class="ub-f1 ulim100 clr333">{{childItem.cnName}}</div>
 							<div class="w50 clrb f20"> {{childItem.total}}</div>
 							<div class="w50 clrr f20">{{childItem.unaudited}}</div>
-						</li>
+						</li> -->
+						<mt-cell v-for="childItem in item.dataApproveSubBoList" @click.native="goToDetail(childItem)" :title="childItem.cnName" is-link>
+							<div class="w50 clrb f20"> {{childItem.total}}</div>
+							<div class="w50 clrr f20">{{childItem.unaudited}}</div>
+						</mt-cell>
 					</ul>
 				</div>
-				<div class="tooltipWindos" v-show="!item.isShow">
-					<div class="invertedTriangle mainTriangle"></div>
-					<div class="invertedTriangle backgroundTriangle"></div>
+				<div class="tooltipWindows" v-show="!item.isShow">
+					<!-- <div class="invertedTriangle mainTriangle"></div>
+					<div class="invertedTriangle backgroundTriangle"></div> -->
 				</div>
 			</div>
 		</div>
-		<!--<div class="item" v-for="item in reviewList">
-			<div class="title bottomLine">
-			<div class="line ub">
-					<div class="ub-f1 ulim100 clr333">管道焊接/补口</div>
-					<div class="w50 clrb f20">260</div>
-					<div class="w50 clrr f20">260</div>
-				</div>
-				<div class="line ub">
-					<div class="ub-f1 ulim100 clr999">xxxxx对对对得到顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶大大大多</div>
-					<div class="w50 clr333">总条目</div>
-					<div class="w50 clr333">未审条目</div>
-				</div>
-			</div>
-			<div class="content" @click="item.isShow=!item.isShow">
-				<div class="fl w45 txt-c">
-					<div class="top clrb">
-						{{item.total}}
-					</div>
-					<div class="desc">
-						总条目
-					</div>
-				</div>
-				<div class="fr w45 txt-c">
-					<div class="top clrr">
-						{{item.unaudited}}
-					</div>
-					<div class="desc">
-						未审条目
-					</div>
-				</div>
-			</div>
-			<div class="child" v-show="item.isShow">
-				<ul>
-					<li v-for="childItem in item.dataApproveSubBoList" @click="goToDetail(childItem)" class="topLine">
-						<div class="fl w50 ulim100">{{childItem.cnName}}</div>
-						<div class="fl w15">{{childItem.total}}</div>
-						<div class="fl w15 clrb">{{childItem.unaudited}}</div>
-					</li>
-				</ul>
-			</div>
-			<div class="tooltipWindos" v-show="!item.isShow">
-				<div class="invertedTriangle mainTriangle"></div>
-				<div class="invertedTriangle backgroundTriangle"></div>
-			</div>
-		<div class="fa  fa-angle-down fastyle" style="color:#26a3ff;font-size:16px;">
 
-				</div>-->
-		<!--</div>-->
 	</div>
 
 </body>
@@ -277,7 +256,15 @@
 				unitName: "",
 				units: [],
 				reviewList: [],
-				isData: false
+				isData: false,
+				openMap: {
+					pipe_weld: false,
+					pipe_inspection: false,
+					pipe_lay: false,
+					pipe_cross: false,
+					pipe_cathode_protection: false,
+					appendage: false,
+				},
 			}
 		},
 		watch: {
@@ -290,6 +277,7 @@
 							that.type = item.type;
 						}
 					});
+					that.resetOpenMap();
 					that.requestTotalNum();
 				}
 			}
@@ -298,7 +286,6 @@
 			var that = this;
 			appcan.ready(function () {
 				that.initPage();
-				// that.requestTotalNum(); //请求统计数据
 			});
 		},
 		methods: {
@@ -358,11 +345,17 @@
 			},
 			requestTotalNum: function () {
 				var that = this;
+				if (!that.searchObj.unit) return;
 				var url = "/statistics/dataAuditing.do";
+				that.$indicator.open({
+					text: '正在加载数据...',
+					spinnerType: 'fading-circle'
+				});
 				jasTools.ajax.get(url, {
 					'unitId': that.searchObj.unit,
 					'projectOid': localStorage.getItem("defaultProject")
 				}, function (data) {
+					that.$indicator.close();
 					that.reviewList = [];
 					data.data.forEach(function (item) {
 						if (that.type == 2 && item.code == "pipe_inspection") {
@@ -370,7 +363,7 @@
 							that.reviewList.push(item);
 						}
 						if (that.type == 1 && item.code != "pipe_inspection") {
-							item.isShow = false;
+							item.isShow = that.openMap[item.code];
 							that.reviewList.push(item);
 						}
 					});
@@ -380,6 +373,16 @@
 				var that = this;
 				appcan.window.open('checkList', 'checkList/checkList.html?obj=' + JSON.stringify(obj) + "&constructUnit=" + that
 					.searchObj.unit, 10, 16, 0, 0, 0);
+			},
+			resetOpenMap: function () {
+				this.openMap = {
+					pipe_weld: false,
+					pipe_inspection: false,
+					pipe_lay: false,
+					pipe_cross: false,
+					pipe_cathode_protection: false,
+					appendage: false,
+				};
 			}
 		},
 	});
