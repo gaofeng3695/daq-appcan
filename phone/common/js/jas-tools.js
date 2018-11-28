@@ -235,8 +235,8 @@
 
 	//
 	var ajax = (function (appcan) {
-		var protocolConfig = appcan.locStorage.getVal('serverProtocol') || 'http://'; //协议
-		var host = appcan.locStorage.getVal('serverIP') || '192.168.100.43'; //主机
+		var protocolConfig = appcan.locStorage.getVal('serverProtocol') || 'https://'; //协议
+		var host = appcan.locStorage.getVal('serverIP') || 'daq.zyax.cn'; //主机
 		var portConfig = appcan.locStorage.getVal('serverPort') || ''; //端口号
 
 		var serverURL = protocolConfig + host + (portConfig ? ':' : '') + portConfig + '/';
@@ -389,8 +389,8 @@
 			serverURL: serverURL,
 			completeURL: completeURL,
 			refreshIpConfig: function () {
-				protocolConfig = appcan.locStorage.getVal('serverProtocol') || 'http://'; //协议
-				host = appcan.locStorage.getVal('serverIP') || '192.168.100.43'; //主机
+				protocolConfig = appcan.locStorage.getVal('serverProtocol') || 'https://'; //协议
+				host = appcan.locStorage.getVal('serverIP') || 'daq.zyax.cn'; //主机
 				portConfig = appcan.locStorage.getVal('serverPort') || ''; //端口号
 				serverURL = protocolConfig + host + (portConfig ? ':' : '') + portConfig + '/';
 				completeURL = serverURL + routeURL;

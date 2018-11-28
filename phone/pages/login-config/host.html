@@ -39,14 +39,14 @@
 <script src="../../lib/vue/vue.js"></script>
 <script src="../../lib/mint-ui/index.js"></script>
 <script src="../../common/js/jas-tools.js"></script>
+<script src="../../common/js/data-base-operation.js"></script>
 <script src="../../common/components/jas-components.js"></script>
 
 
 <script>
-	var protocolConfig = appcan.locStorage.getVal('serverProtocol') || 'http://'; //协议
-	var host = appcan.locStorage.getVal('serverIP') || '192.168.100.43'; //主机
+	var protocolConfig = appcan.locStorage.getVal('serverProtocol') || 'https://'; //协议
+	var host = appcan.locStorage.getVal('serverIP') || 'daq.zyax.cn'; //主机
 	var portConfig = appcan.locStorage.getVal('serverPort') || ''; //端口号
-
 	var vm = new Vue({
 		el: '._outer-wrapper',
 		data: function () {
@@ -77,14 +77,32 @@
 		mounted: function () {},
 		methods: {
 			confirm: function () {
+				var that = this;
 				appcan.locStorage.setVal('serverProtocol', this.form.protocolConfig);
 				appcan.locStorage.setVal('serverIP', this.form.host);
 				appcan.locStorage.setVal('serverPort', this.form.portConfig);
-				this.$toast('修改成功');
-				setTimeout(function () {
-					appcan.window.close();
-				}, 600);
+				that.faceInit();
+				
 			},
+			faceInit: function () {
+				var that = this;
+				var param = {
+					protocol: this.form.protocolConfig,
+					ip: this.form.host,
+					port: this.form.portConfig,
+					dataBaseName: (new DataBaseOperation()).dbGetBaseName()
+				};
+				try {
+					uexFaceRecognition.init(JSON.stringify(param), function (err, info) {
+						that.$toast('修改成功');
+                        setTimeout(function () {
+                            appcan.window.close();
+                        }, 600);
+					});
+				} catch (e) {
+					alert(e);
+				}
+			}
 		},
 	});
 </script>

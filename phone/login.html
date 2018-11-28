@@ -198,7 +198,8 @@
 						localStorage.setItem('lastUsername', that.form.username);
 						localStorage.setItem('lastPassword', that.form.password);
 						// alert(JSON.stringify(data.user, 4, 4))
-
+                        localStorage.setItem("isFaceInfo",data.isFaceInfo);//人脸采集信息设置
+                        
 						localStorage.setItem("token", data.token);
 						data.user.unitType = data.unitType;
 						localStorage.setItem("user", JSON.stringify(data.user));

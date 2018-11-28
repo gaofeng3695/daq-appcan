@@ -110,7 +110,13 @@
 				jasTools.ajax.get(url, {
 					projectId: this.projectId,
 				}, function (data) {
-					// alert(JSON.stringify(data, 4, 4))
+					// alert(JSON.stringify(data.data, 4, 4))
+					for (var item in data.data) {
+						for (var item0 in data.data[item]) {
+							data.data[item][item0] = +((+data.data[item][item0]/1000).toFixed(3));
+						}
+					}
+					// alert(JSON.stringify(data.data, 4, 4))
 					var aData = that._formatChartData(data.data);
 					that.renderComplateChart(aData, 'myChart');
 				});
@@ -122,6 +128,16 @@
 					projectId: this.projectId,
 				}, function (data) {
 					// alert(JSON.stringify(data, 4, 4))
+					data.data.forEach(function (item) {
+						for (var item0 in item.statsResult) {
+							// item.statsResult[item0] = (+item.statsResult[item0]).toFixed(3);
+							for (var item1 in item.statsResult[item0]) {
+								item.statsResult[item0][item1] = +((+item.statsResult[item0][item1]/1000).toFixed(3));
+							}
+						}
+					});
+					// alert(JSON.stringify(data, 4, 4))
+
 					that.detail = data.data;
 					that.$nextTick(function () {
 						that.detail.forEach(function (item) {

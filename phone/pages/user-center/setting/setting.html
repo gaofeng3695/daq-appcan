@@ -131,13 +131,18 @@
 				var obj = {
 					loginName: JSON.parse(localStorage.getItem("user")).loginName
 				};
+/*
 				localServer.userFaceInfo.getUserFaceCount(obj, function (data) {
 					if (data.status == 1) {
 						if (data.rows[0].total != 0) {
 							that.setList[1].style = "display:none";
 						}
 					}
-				});
+				});*/
+
+				if(localStorage.getItem("isFaceInfo")==1){
+                    that.setList[1].style = "display:none";
+                }
 			},
 			_setFaceInfo: function () {
 				var that=this;
@@ -149,6 +154,7 @@
 					uexFaceRecognition.setFaceInfo(JSON.stringify(param), function (err, info) {
 						if (err == 1) {
 							that.setList[1].style = "display:none";
+							localStorage.setItem("isFaceInfo",1);
 							window.Vue && Vue.prototype.$toast('采集成功');
 						} else {
 							// that.setList[1].style = "display:block";

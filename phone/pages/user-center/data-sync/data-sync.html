@@ -21,6 +21,12 @@
 		<div v-setheight style="overflow: auto;">
 			<div>
                 <br />
+				<mt-button type="primary" @click.native="queryPipeFitting">前后管件</mt-button>
+                <br />
+                <br />
+				<mt-button type="primary" @click.native="isColdBending">是否冷弯</mt-button>
+                <br />
+                <br />
 				<mt-button type="primary" @click.native="getUserFaceCount">获取人脸识别条数</mt-button>
                 <br />
                 <br />
@@ -1116,6 +1122,25 @@
                     "loginName":"张毅"
                 }
                 localServer.userFaceInfo.getUserFaceCount(obj1,callback);
+            },
+            isColdBending: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data,4,4))
+                }
+                var obj1={
+                    "pipeCode":"GG-016"
+                }
+                localServer.materialPipe.isColdBending(obj1,callback);
+            },
+            queryPipeFitting: function(obj){
+                var callback = function(data){
+                    alert(JSON.stringify(data,4,4))
+                }
+                var obj1={
+                    "frontPipeType":"pipe_type_code_008",
+                    "projectOid":"f440af6b-7dac-4ee5-927d-c2c871bffc7f"
+                }
+                localServer.queryPipeFittingList.get(obj1,callback);
             },
         }  
 	});

@@ -341,6 +341,33 @@ var localServer = (function (jasTools, DataBaseOperation) {
                 var querySql = "select count(*) as total,lastUpdateTime from DaqMaterialPipe where userId='" + userId + "'";
                 getCount(querySql, callback);
             },
+            isColdBending: function(obj,callback){
+                var result = {
+                    "status": 1,
+                    "code": 200,
+                    "msg": "ok",
+                    "isColdBend":false
+                }
+                var sql = "select isColdBend from DaqMaterialPipe where pipeCode='"+obj.pipeCode+"'";
+                // alert(sql)
+                getData(sql,function(data){
+                    // alert(JSON.stringify(data,4,4))
+                    if (null != data.rows[0]) {
+                        var isColdBend = data.rows[0].isColdBend;
+                        if (isColdBend == "1") {
+                            result.isColdBend = true;
+                            callback(result);
+                        } else{
+                            callback(result);
+                        };
+                    } else{
+                        result.status = -1;
+                        result.code = 400;
+                        result.msg = "err";
+                        callback(result);
+                    };
+                })
+            }
         },
         coldBending: { // 冷弯管----------------------------------------------------------------------------
             add: function (coldBendingData, cb) {
@@ -1554,7 +1581,7 @@ var localServer = (function (jasTools, DataBaseOperation) {
                     "rows": []
                 };
                 var projectOid = localStorage.getItem("defaultProject");
-                var pipeSegmentOrCrossOid = obj.pipeSegmentOrCrossOid;
+                // var pipeSegmentOrCrossOid = obj.pipeSegmentOrCrossOid;
                 var pipeTypeCode = obj.frontPipeType || obj.backPipeType;
                 var userId = JSON.parse(localStorage.getItem("user")).oid;
                 var sql = "";
@@ -1597,11 +1624,11 @@ var localServer = (function (jasTools, DataBaseOperation) {
                         break;
                     case "pipe_type_code_008":
                         //前冷弯管
-                        sql = "select oid as key,clodBendingPipeCode as value from DaqClodBendingPipe   where frontIsUse=0 and pipeSegmentOrCrossOid='" + pipeSegmentOrCrossOid + "' and approveStatus=2";
+                        sql = "select oid as key,clodBendingPipeCode as value from DaqClodBendingPipe   where frontIsUse=0 and projectOid='" + projectOid + "' and approveStatus=2";
                         break;
                     case "pipe_type_code_0081":
                         //后冷弯管
-                        sql = "select oid as key,clodBendingPipeCode as value from DaqClodBendingPipe   where backIsUse=0 and pipeSegmentOrCrossOid='" + pipeSegmentOrCrossOid + "' and approveStatus=2";
+                        sql = "select oid as key,clodBendingPipeCode as value from DaqClodBendingPipe   where backIsUse=0 and projectOid='" + projectOid + "' and approveStatus=2";
                         break;
                 }
 

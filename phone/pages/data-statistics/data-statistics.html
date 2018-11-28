@@ -23,73 +23,75 @@
 			</div>
 		</div>
 		<div v-setheight style="overflow: auto;">
+			<mt-loadmore :top-method="refresh" :bottom-all-loaded="true" ref="loadmore" :auto-fill="false">
 
-			<jas-group title="昨日进度统计">
-				<div style="margin:0 5px;padding:0 0 5px;overflow: hidden;">
-					<div v-for="item,key in progress.config" style="width:25%;float:left;padding:5px;">
-						<div style="height:100%; padding:5px 0;background-color: rgb(232, 245, 255);" :class="{'item_active':(key == progress.currentItem)}"
-						  @click="switchItem(key)">
-							<div style="text-align: center;line-height:24px;font-size:14px;color:#333;">{{item.name}}</div>
-							<div style="text-align: center;height:30px;line-height:30px;font-size:16px;color:#26a2ff;" v-text="progressStateNum(item)"></div>
-							<div style="text-align: right;line-height:1.2;font-size:12px;color:#999;padding-right:10px;">{{item.unit}}</div>
+				<jas-group title="昨日进度统计">
+					<div style="margin:0 5px;padding:0 0 5px;overflow: hidden;">
+						<div v-for="item,key in progress.config" style="width:25%;float:left;padding:5px;">
+							<div style="height:100%; padding:5px 0;background-color: rgb(232, 245, 255);" :class="{'item_active':(key == progress.currentItem)}"
+							  @click="switchItem(key)">
+								<div style="text-align: center;line-height:24px;font-size:14px;color:#333;">{{item.name}}</div>
+								<div style="text-align: center;height:30px;line-height:30px;font-size:16px;color:#26a2ff;" v-text="progressStateNum(item)"></div>
+								<div style="text-align: right;line-height:1.2;font-size:12px;color:#999;padding-right:10px;">{{item.unit}}</div>
+							</div>
 						</div>
 					</div>
-				</div>
-				<div v-if="progress.currentItem">
-					<!-- <mt-cell v-show="progress.config[progress.currentItem].detail.length==0" value="暂无数据"></mt-cell> -->
-					<template v-for="detail in progress.config[progress.currentItem].detail">
-						<mt-cell :title="detail.constructName">
-							<div v-text="formatProgressDetail(detail)"></div>
-						</mt-cell>
-					</template>
-				</div>
-			</jas-group>
-			<jas-group title="近一周完成情况统计" btn-name="更多>" @clickbtn="goToMore">
-				<div>
-					<div>
-						<canvas id="myChart" :width="canvasWidth" :height="250"></canvas>
-					</div>
-				</div>
-			</jas-group>
-			<jas-group title="焊口检测情况统计" :btn-name="isClosed?'展开':'收起'" @clickbtn="showToMorePie">
-				<div>
-					<div style="overflow: hidden;">
-						<div class="rightLine" style="float:left;background-size: 1px 70%">
-							<div v-show="isPie01Show">
-								<canvas id="pie01" :width="canvasWidth/2" :height="200"></canvas>
-							</div>
-							<div v-show="!isPie01Show" style="height:200px;text-align: center;width:50vw;line-height: 180px;color:#999;">暂无数据</div>
-						</div>
-						<div style="float:left;">
-							<div v-show="isPie02Show">
-								<canvas id="pie02" :width="canvasWidth/2" :height="200"></canvas>
-							</div>
-							<div v-show="!isPie02Show" style="height:200px;text-align: center;width:50vw;line-height: 180px;color:#999;">暂无数据</div>
-						</div>
-					</div>
-					<div v-show="!isClosed">
-						<mt-cell :title="projectName" :label="formatDetail(totalWeldCheck)" style="background-color: rgb(232, 245, 255);">
-							<div>
-								<span style="color:#999;font-size:12px; ">一次合格率</span>
-								<span v-text="totalWeldCheck.onceQualifiedRate "></span>
-							</div>
-						</mt-cell>
-						<template v-for="detail in WeldCheckDetails ">
-							<mt-cell :title="detail.unitName" :label="formatDetail(detail) ">
-								<div>
-									<span style="color:#999;font-size:12px; ">一次合格率</span>
-									<span v-text="detail.onceQualifiedRate "></span>
-								</div>
+					<div v-if="progress.currentItem">
+						<!-- <mt-cell v-show="progress.config[progress.currentItem].detail.length==0" value="暂无数据"></mt-cell> -->
+						<template v-for="detail in progress.config[progress.currentItem].detail">
+							<mt-cell :title="detail.constructName">
+								<div v-text="formatProgressDetail(detail)"></div>
 							</mt-cell>
 						</template>
 					</div>
-				</div>
-			</jas-group>
-			<jas-group title="数据录入及审核情况统计 ">
-				<div style=" ">
-					<canvas id="myChart02" :width="canvasWidth" :height="250 "></canvas>
-				</div>
-			</jas-group>
+				</jas-group>
+				<jas-group title="近一周完成情况统计" btn-name="更多>" @clickbtn="goToMore">
+					<div>
+						<div>
+							<canvas id="myChart" :width="canvasWidth" :height="250"></canvas>
+						</div>
+					</div>
+				</jas-group>
+				<jas-group title="焊口检测情况统计" :btn-name="isClosed?'展开':'收起'" @clickbtn="showToMorePie">
+					<div>
+						<div style="overflow: hidden;">
+							<div class="rightLine" style="float:left;background-size: 1px 70%">
+								<div v-show="isPie01Show">
+									<canvas id="pie01" :width="canvasWidth/2" :height="200"></canvas>
+								</div>
+								<div v-show="!isPie01Show" style="height:200px;text-align: center;width:50vw;line-height: 180px;color:#999;">暂无数据</div>
+							</div>
+							<div style="float:left;">
+								<div v-show="isPie02Show">
+									<canvas id="pie02" :width="canvasWidth/2" :height="200"></canvas>
+								</div>
+								<div v-show="!isPie02Show" style="height:200px;text-align: center;width:50vw;line-height: 180px;color:#999;">暂无数据</div>
+							</div>
+						</div>
+						<div v-show="!isClosed">
+							<mt-cell :title="projectName" :label="formatDetail(totalWeldCheck)" style="background-color: rgb(232, 245, 255);">
+								<div>
+									<span style="color:#999;font-size:12px; ">一次合格率</span>
+									<span v-text="totalWeldCheck.onceQualifiedRate "></span>
+								</div>
+							</mt-cell>
+							<template v-for="detail in WeldCheckDetails ">
+								<mt-cell :title="detail.unitName" :label="formatDetail(detail) ">
+									<div>
+										<span style="color:#999;font-size:12px; ">一次合格率</span>
+										<span v-text="detail.onceQualifiedRate "></span>
+									</div>
+								</mt-cell>
+							</template>
+						</div>
+					</div>
+				</jas-group>
+				<jas-group title="数据录入及审核情况统计 ">
+					<div style=" ">
+						<canvas id="myChart02" :width="canvasWidth" :height="250 "></canvas>
+					</div>
+				</jas-group>
+			</mt-loadmore>
 
 		</div>
 
@@ -167,6 +169,27 @@
 			}
 		},
 		methods: {
+			refresh: function () {
+				var that = this;
+				this.initData();
+				this.clearAllChart();
+				var n = 0;
+				var callback = function () {
+					n++;
+					if (n == 4) {
+						that.$indicator.close();
+						that.$refs.loadmore.onTopLoaded();
+					}
+				};
+				that.$indicator.open({
+					text: '加载中...',
+					spinnerType: 'fading-circle'
+				});
+				this.requestYesterdayProcess(callback);
+				this.requestLatestWeekCumulativeProcess(callback);
+				this.requeststatsWeldCheck(callback);
+				this.requestStatsDateEntryAndAuditing(callback);
+			},
 			initData: function () {
 				this.isClosed = true;
 				this.isPie01Show = true;
@@ -215,6 +238,7 @@
 				this.recordChart && (this.recordChart.destroy() || (this.recordChart = ''));
 			},
 			progressStateNum: function (item) {
+				// item.statsResult = (+item.statsResult/1000).toFixed(3)
 				if (item.name === '管材' || item.name === '回填') {
 					return item.statsResult;
 				} else {
@@ -285,7 +309,7 @@
 					that.projectId = that.projectList[0] && that.projectList[0].value;
 				});
 			},
-			requestYesterdayProcess: function () {
+			requestYesterdayProcess: function (cb) {
 				var that = this;
 				var url = "/statistics/statsYesterdayProcess.do";
 				jasTools.ajax.get(url, {
@@ -293,8 +317,11 @@
 				}, function (data) {
 					// alert(JSON.stringify(data, 4, 4))
 					data.data.forEach(function (item) {
+						// alert((item.statsResult/1000).toFixed(3))
+						item.statsResult = (item.statsResult / 1000).toFixed(3);
 						that.progress.config[item.statsType].statsCount = item.statsCount || 0;
 						that.progress.config[item.statsType].statsResult = item.statsResult || 0;
+						cb && cb();
 					});
 				});
 			},
@@ -306,12 +333,15 @@
 					projectId: this.projectId,
 					statsType: name
 				}, function (data) {
-					// alert(JSON.stringify(data, 4, 4))
+					//alert(JSON.stringify(data.data, 4, 4))
+					data.data.forEach(function (item) {
+						item.statsResult = (item.statsResult / 1000).toFixed(3);
+					})
 					that.progress.config[name].detail = data.data;
 					callback && callback();
 				});
 			},
-			requestLatestWeekCumulativeProcess: function () {
+			requestLatestWeekCumulativeProcess: function (cb) {
 				var that = this;
 				var url = "/statistics/statsLatestWeekCumulativeProcess.do";
 				jasTools.ajax.get(url, {
@@ -324,7 +354,7 @@
 							aData.push({
 								type: that.progress.config[key].name,
 								date: date,
-								value: data.data[key][date],
+								value: +((data.data[key][date] / 1000).toFixed(3)),
 								index: that.progress.fields.indexOf(key)
 							});
 						}
@@ -333,9 +363,10 @@
 						return a.index - b.index
 					});
 					that.renderComplateChart(aData);
+					cb && cb();
 				});
 			},
-			requeststatsWeldCheck: function () {
+			requeststatsWeldCheck: function (cb) {
 				var that = this;
 				var url = "/statistics/statsWeldCheck.do";
 				jasTools.ajax.get(url, {
@@ -344,9 +375,10 @@
 					// alert(JSON.stringify(data, 4, 4))
 					that.renderPie01(data.data.weldCount, data.data.checkedCount);
 					that.renderPie02(data.data.checkedCount, data.data.qualifiedCount);
+					cb && cb();
 				});
 			},
-			requeststatsWeldCheckDetail: function () {
+			requeststatsWeldCheckDetail: function (cb) {
 				var that = this;
 				var url = "/statistics/statsWeldCheckDetail.do";
 				jasTools.ajax.get(url, {
@@ -354,9 +386,10 @@
 				}, function (data) {
 					// alert(JSON.stringify(data, 4, 4))
 					that.WeldCheckDetails = data.data;
+					cb && cb();
 				});
 			},
-			requestStatsDateEntryAndAuditing: function () {
+			requestStatsDateEntryAndAuditing: function (cb) {
 				var that = this;
 				var url = "/statistics/statsDateEntryAndAuditing.do";
 				jasTools.ajax.get(url, {
@@ -378,6 +411,7 @@
 						return a.index - b.index;
 					})
 					that.renderRecordChart(aData);
+					cb && cb();
 				});
 			},
 			renderComplateChart: function (aData) {

@@ -126,22 +126,64 @@
 					}
 				});
 			},
-			addPipeCode: function (name) {
-				this.popupVisible = false;
-				var code = this.barcodeValues[0];
-				var options = this.fieldsConfig[name] && this.fieldsConfig[name].options;
-				var arr = options.filter(function (item) {
-					return item.label == code || item.label == code + '-LW';
-				});
-				if (arr.length > 0) {
-					var value = arr[0] && arr[0].value;
-					this.form[name] = value;
-					var pipeSize = this.barcodeValues[2].split('*');
-					if (this.form.hasOwnProperty('pipeDiameter')) this.form['pipeDiameter'] = pipeSize[0];
-					if (this.form.hasOwnProperty('wallThickness')) this.form['wallThickness'] = pipeSize[1];
-					if (this.form.hasOwnProperty('pipeLength')) this.form['pipeLength'] = this.barcodeValues[3];
+			addPipeCode: function (name) { // 字段名称
+				var that = this;
+				that.popupVisible = false;
+				var setValues = function () {
+					that.$indicator.close();
+					var code = that.barcodeValues[0];
+					var options = that.fieldsConfig[name] && that.fieldsConfig[name].options;
+					var arr = options.filter(function (item) {
+						return item.label == code || item.label == code + '-LW';
+					});
+					if (arr.length > 0) {
+						var value = arr[0] && arr[0].value;
+						that.form[name] = value;
+						var pipeSize = that.barcodeValues[2].split('*');
+						if (that.form.hasOwnProperty('pipeDiameter')) that.form['pipeDiameter'] = pipeSize[0];
+						if (that.form.hasOwnProperty('wallThickness')) that.form['wallThickness'] = pipeSize[1];
+						if (that.form.hasOwnProperty('pipeLength')) that.form['pipeLength'] = that.barcodeValues[3];
+						// that.$toast('填入成功');
+					} else {
+						that.form[name] = undefined;
+						that.$toast('未找到该管材');
+					}
+				};
+
+				if (this.formType == 'construction_weld') {
+					that.$indicator.open({
+						spinnerType: 'fading-circle'
+					});
+					var typeValue = this.barcodeType == 'Z' ? 'pipe_type_code_001' : 'pipe_type_code_002';
+					if (this.barcodeType == 'Z') { // 检查直管是否被冷弯，重新设定 管件类型
+						localServer.materialPipe.isColdBending({
+							pipeCode: that.barcodeValues[0]
+						}, function (data) {
+							if (data.isColdBend) {
+								typeValue = 'pipe_type_code_008'
+							}
+							var typeName = name == 'frontPipeOid' ? 'frontPipeType' : 'backPipeType';
+							if (typeName == 'backPipeType') { // 后管件的类型值+1
+								typeValue = typeValue + '1';
+							}
+							that.form[typeName] = typeValue; // 设定之后，触发本地请求下拉选
+							setTimeout(function () { // 等待请求成功之后再设定操作
+								setValues();
+							}, 400);
+						});
+					} else {
+						var typeName = name == 'frontPipeOid' ? 'frontPipeType' : 'backPipeType';
+						if (typeName == 'backPipeType') { // 后管件的类型值+1
+							typeValue = typeValue + '1';
+						}
+						that.form[typeName] = typeValue;
+						setTimeout(function () {
+							setValues();
+						}, 400);
+					}
+
 				} else {
-					this.$toast('未找到该管材');
+					setValues();
 				}
 			},
 			resetForm: function () {
@@ -211,15 +253,17 @@
 						oid: oid
 					}, function (data) {
 						if (data.status == 1 && data.rows.length > 0) {
-							that.form = data.rows[0];
+							var newForm = data.rows[0];
 
 							// that.form.history = data.rows[0]; //存储历史的数据 用于进行改变焊口状态
 							if (status == '本地编辑') {
-							    that.form.isUpdate=true;
+								that.form = newForm;
+								that.form.isUpdate = true;
 								that.$refs.files.files = that.form.attachment;
 							}
 							if (status == '本地再来一条') {
 								that.oid = that.form.oid = jasTools.base.createuuid();
+								that.form = that.resetFormValue(newForm);
 							}
 						}
 					})
@@ -231,18 +275,40 @@
 					jasTools.ajax.post(this.detailUrl, {
 						oid: oid
 					}, function (data) {
-						that.form = data.data || data.rows[0];
+						var newForm = data.data || data.rows[0];
 
 						// that.form.history = data.data || data.rows[0]; //存储历史的数据 用于进行改变焊口状态
 						if (status == '网上编辑') {
-						    that.form.isUpdate=true;
+							that.form = newForm;
+							that.form.isUpdate = true;
 							that.$refs.files.requestFile(oid);
 						}
 						if (status == '网上再来一条') {
 							that.oid = that.form.oid = jasTools.base.createuuid();
+							that.form = that.resetFormValue(newForm);
 						}
 					});
 				}
+			},
+			resetFormValue: function (newForm) {
+
+				for (var key in this.form) {
+					if (this.fieldsConfig[key] && this.fieldsConfig[key].placeholder === '请选择是否合格') {
+						this.form[key] = this.fieldsConfig[key].options[0].value;
+					}
+				}
+
+				for (var key in newForm) {
+					if (newForm.hasOwnProperty(key)) {
+						if (this.fieldsConfig[key] && this.fieldsConfig[key].isAgain) {
+							this.form[key] = newForm[key];
+						}
+					}
+				}
+
+
+
+				return this.form;
 			},
 			saveToLocal: function (fnSuccess, fnfail) { // 新增本地，更新本地
 				var that = this;
@@ -269,8 +335,8 @@
 				var upload = function () {
 					var aFiles = that.form.attachment && that.form.attachment.map(function (item) {
 						return item.src;
-					}).filter(function(item){
-					    return item;
+					}).filter(function (item) {
+						return item;
 					});
 					if (aFiles && aFiles.length > 0) {
 						jasTools.ajax.uploadFiles(sBizId, {
@@ -371,9 +437,9 @@
 			},
 			handleResult: function (type, info) { // 本地失败,本地成功,网上新增成功,网上编辑成功,网上编辑失败
 				var that = this;
-				setTimeout(function(){
-				  that.$indicator.close();  
-				},0);
+				setTimeout(function () {
+					that.$indicator.close();
+				}, 0);
 				if (type == '本地失败') {
 					that.$messagebox({
 						title: '保存失败',

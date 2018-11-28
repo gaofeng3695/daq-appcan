@@ -58,6 +58,7 @@ var FieldsConfig = (function () {
           optionUrl: '/daq/privilege/getProjectList.do',
           childSelect: ['tenders_oid', 'construct_unit'],
           childUrl: ['/daq/privilege/getTendersList.do', '/daq/privilege/getCurrentUnitId.do'],
+          isAgain: true,
         },
         'tenders_oid': {
           name: '标段名称',
@@ -65,13 +66,15 @@ var FieldsConfig = (function () {
           labelfield: 'tenders_name',
           required: true,
           options: [],
+          isAgain: true,
         },
         'construct_unit': {
           name: '施工单位',
           type: 'select',
           labelfield: 'construct_unit_name',
           required: true,
-          options: []
+          options: [],
+          isAgain: true,
         },
         'pipe_oid': {
           name: '钢管编号',
@@ -132,11 +135,13 @@ var FieldsConfig = (function () {
         'checked_by': {
           name: '检查人',
           type: 'text',
+          isAgain: true,
         },
         'checked_date': {
           name: '检查日期',
           type: 'date',
           required: true,
+          isAgain: true,
         },
         'remarks': {
           name: '备注',
@@ -180,22 +185,24 @@ var FieldsConfig = (function () {
           labelfield: 'project_name',
           required: true,
           disabled: true,
-
           optionUrl: '/daq/privilege/getProjectList.do',
           childSelect: ['tenders_oid', 'construct_unit'],
           childUrl: ['/daq/privilege/getTendersList.do', '/daq/privilege/getCurrentUnitId.do'],
+          isAgain: true,
         },
         'tenders_oid': {
           name: '标段名称',
           type: 'select',
           labelfield: 'tenders_name',
           required: true,
+          isAgain: true,
         },
         'construct_unit': {
           name: '施工单位',
           type: 'select',
           labelfield: 'construct_unit_name',
           required: true,
+          isAgain: true,
         },
         'hot_bends_oid': {
           name: '弯管编号',
@@ -248,6 +255,7 @@ var FieldsConfig = (function () {
           name: '检查日期',
           type: 'date',
           required: true,
+          isAgain: true,
         },
         'remarks': {
           name: '备注',
@@ -300,6 +308,7 @@ var FieldsConfig = (function () {
           optionUrl: '/daq/privilege/getProjectList.do',
           childSelect: ['tendersOid', 'constructUnit'],
           childUrl: ['/daq/privilege/getTendersList.do', '/daq/privilege/getCurrentUnitId.do'],
+          isAgain: true,
         },
         'tendersOid': {
           name: '标段名称',
@@ -308,12 +317,14 @@ var FieldsConfig = (function () {
           required: true,
           childSelect: ['pipeColdBendingOid'],
           childUrl: ['/daq/clodBendingPipe/getList.do'],
+          isAgain: true,
         },
         'constructUnit': {
           name: '施工单位',
           type: 'select',
           labelfield: 'constructUnitName',
           required: true,
+          isAgain: true,
         },
         'certificateNum': {
           name: '合格证编号',
@@ -333,10 +344,12 @@ var FieldsConfig = (function () {
         'pipeDiameter': {
           name: ' 管径(mm)',
           type: 'number',
+          isAgain: true,
         },
         'wallThickness': {
           name: '壁厚(mm)',
           type: 'number',
+          isAgain: true,
         },
         'productionUnit': {
           name: '弯制单位',
@@ -379,11 +392,13 @@ var FieldsConfig = (function () {
         'checkedBy': {
           name: '检查人',
           type: 'text',
+          isAgain: true,
         },
         'checkedDate': {
           name: '检查日期',
           type: 'date',
           required: true,
+          isAgain: true,
         },
         'remarks': {
           name: '备注',
@@ -461,6 +476,7 @@ var FieldsConfig = (function () {
           optionUrl: '/daq/privilege/getProjectList.do',
           childSelect: ['tendersOid', 'constructUnit', 'workUnitOid', 'weldProduce'],
           childUrl: ['/daq/privilege/getTendersList.do', '/daq/privilege/getCurrentUnitId.do', '/daq/workUnit/getWorkUnitList.do', '/daq/weldProduct/getListByCondition.do'],
+          isAgain: true,
         },
         'tendersOid': {
           name: '标段名称',
@@ -469,11 +485,13 @@ var FieldsConfig = (function () {
           required: true,
           childSelect: ['supervisionUnit', 'pipelineOid'],
           childUrl: ['/daq/privilege/getSupervisionUnitByTendersOid.do', '/daq/privilege/getPipelineListByTendersOid.do'],
+          isAgain: true,
         },
         'constructUnit': {
           name: '施工单位',
           type: 'select',
           labelfield: 'constructUnitName',
+          isAgain: true,
           required: true,
         },
         'pipelineOid': {
@@ -482,21 +500,24 @@ var FieldsConfig = (function () {
           labelfield: 'pipelineName',
           childSelect: ['pipeSegmentOrCrossOid'],
           childUrl: ['/daq/privilege/getPipeSegmentOrCrossList.do'],
+          isAgain: true,
           required: true,
         },
         'pipeSegmentOrCrossOid': {
           name: '线路段/穿跨越',
           type: 'select',
           labelfield: 'pipeSegmentOrCrossName',
-          childSelect: ['medianStakeOid', 'frontPipeType', 'backPipeType'],
-          childUrl: ['/daq/privilege/getMedianStakeList.do', 'domainName', 'domainName'],
+          childSelect: ['medianStakeOid'],
+          childUrl: ['/daq/privilege/getMedianStakeList.do'],
           required: true,
+          isAgain: true,
         },
         'medianStakeOid': {
           name: '桩号',
           type: 'select',
           labelfield: 'medianStakeCode',
           required: true,
+          isAgain: true,
         },
         'workUnitOid': {
           name: '施工机组代号',
@@ -508,46 +529,52 @@ var FieldsConfig = (function () {
             types: "work_unit_type_code_001,work_unit_type_code_010,work_unit_type_code_012",
           },
           required: true,
+          isAgain: true,
         },
         'coverOid': {
           name: '盖面人员',
           labelfield: 'coverName',
           type: 'multiSelect',
+          isAgain: true,
         },
         'padderOid': {
           name: '填充人员',
           labelfield: 'padderName',
           type: 'multiSelect',
+          isAgain: true,
         },
         'renderOid': {
           name: '打底人员',
           labelfield: 'renderName',
           type: 'multiSelect',
+          isAgain: true,
         },
         'supervisionUnit': {
           name: '监理单位',
           type: 'select',
           labelfield: 'supervisionUnitName',
           required: true,
+          isAgain: true,
         },
         'weldMethod': {
           name: '焊接方式',
           type: 'select',
           labelfield: 'weldMethodName',
           domainName: 'welding_method_temp_domain',
+          isAgain: true,
         },
         'weldType': {
           name: '焊口类型',
           type: 'select',
           labelfield: 'weldTypeName',
           domainName: 'weld_type_domain',
+          isAgain: true,
         },
         'frontPipeType': {
           name: '前管件类型',
           type: 'select',
           labelfield: 'frontPipeTypeName',
           domainName: 'pipe_type_domain',
-          isChildSelect: true,
           childSelect: ['frontPipeOid'],
           childUrl: ['queryPipeFittingList'],
           required: true,
@@ -556,9 +583,6 @@ var FieldsConfig = (function () {
           name: '前管件编号',
           type: 'select',
           labelfield: 'frontPipeCode',
-          requestParams: {
-            pipeSegmentOrCrossOid: ""
-          },
           required: true,
         },
         'backPipeType': {
@@ -566,7 +590,6 @@ var FieldsConfig = (function () {
           type: 'select',
           labelfield: 'backPipeTypeName',
           domainName: 'back_pipe_type_domain',
-          isChildSelect: true,
           childSelect: ['backPipeOid'],
           childUrl: ['queryPipeFittingList'],
           required: true,
@@ -575,29 +598,30 @@ var FieldsConfig = (function () {
           name: '后管件编号',
           type: 'select',
           labelfield: 'backPipeCode',
-          requestParams: {
-            pipeSegmentOrCrossOid: "",
-          },
           required: true,
         },
         'constructDate': {
           name: '施工日期',
           type: 'date',
           required: true,
+          isAgain: true,
         },
         'collectionDate': {
           name: '采集日期',
           type: 'date',
           required: true,
+          isAgain: true,
         },
         'supervisionEngineer': {
           name: '监理工程师',
           type: 'text',
           required: true,
+          isAgain: true,
         },
         'collectionPerson': {
           name: '采集人员',
           type: 'text',
+          isAgain: true,
         },
         'relativeMileage': {
           name: '相对桩位置',
@@ -612,15 +636,18 @@ var FieldsConfig = (function () {
         'weldRodBatchNum': {
           name: '焊条批号',
           type: 'text',
+          isAgain: true,
         },
         'weldWireBatchNum': {
           name: '焊丝批号',
           type: 'text',
+          isAgain: true,
         },
         'weldProduce': {
           name: '焊接工艺规程',
           type: 'select',
           labelfield: 'weldProduceCode',
+          isAgain: true,
         },
         'surfaceCheck': {
           name: '外观质量检查',
@@ -705,6 +732,7 @@ var FieldsConfig = (function () {
           disabled: true,
           optionUrl: '/daq/privilege/getProjectList.do',
           childSelect: ['tendersOid', 'constructUnit', 'workUnitOid', 'weldProduce'],
+          isAgain: true,
           childUrl: ['/daq/privilege/getTendersList.do', '/daq/privilege/getCurrentUnitId.do', '/daq/workUnit/getWorkUnitList.do', '/daq/weldProduct/getListByCondition.do'],
         },
         'tendersOid': {
@@ -713,6 +741,7 @@ var FieldsConfig = (function () {
           labelfield: 'tendersName',
           required: true,
           childSelect: ['supervisionUnit', 'pipelineOid'],
+          isAgain: true,
           childUrl: ['/daq/privilege/getSupervisionUnitByTendersOid.do', '/daq/privilege/getPipelineListByTendersOid.do'],
         },
         'constructUnit': {
@@ -720,6 +749,7 @@ var FieldsConfig = (function () {
           type: 'select',
           labelfield: 'constructUnitName',
           required: true,
+          isAgain: true,
         },
         'pipelineOid': {
           name: '管线名称',
@@ -728,6 +758,7 @@ var FieldsConfig = (function () {
           childSelect: ['pipeSegmentOrCrossOid'],
           childUrl: ['/daq/privilege/getPipeSegmentOrCrossList.do'],
           required: true,
+          isAgain: true,
         },
         'pipeSegmentOrCrossOid': {
           name: '线路段/穿跨越',
@@ -736,6 +767,7 @@ var FieldsConfig = (function () {
           childSelect: ['weldOid'],
           childUrl: ['/daq/weld/getOnlyWeldList.do'],
           required: true,
+          isAgain: true,
         },
         'workUnitOid': {
           name: '施工机组代号',
@@ -747,24 +779,29 @@ var FieldsConfig = (function () {
             types: "work_unit_type_code_001,work_unit_type_code_010,work_unit_type_code_012",
           },
           required: true,
+          isAgain: true,
         },
         'coverOid': {
           name: '盖面人员',
           type: 'multiSelect',
+          isAgain: true,
         },
         'padderOid': {
           name: '填充人员',
           type: 'multiSelect',
+          isAgain: true,
         },
         'renderOid': {
           name: '打底人员',
           type: 'multiSelect',
+          isAgain: true,
         },
         'supervisionUnit': {
           name: '监理单位',
           type: 'select',
           labelfield: 'supervisionUnitName',
           required: true,
+          isAgain: true,
         },
         'weldOid': {
           name: '返修口编号',
@@ -786,34 +823,41 @@ var FieldsConfig = (function () {
           name: '采集日期',
           type: 'date',
           required: true,
+          isAgain: true,
         },
         'weldDate': {
           name: '焊接日期',
           type: 'date',
           required: true,
+          isAgain: true,
         },
         'supervisionEngineer': {
           name: '监理工程师',
           type: 'text',
           required: true,
+          isAgain: true,
         },
         'collectionPerson': {
           name: '采集人员',
           type: 'text',
+          isAgain: true,
         },
         'weldRodBatchNum': {
           name: '焊条批号',
           type: 'text',
+          isAgain: true,
         },
         'weldWireBatchNum': {
           name: '焊丝批号',
           type: 'text',
+          isAgain: true,
         },
         'weldProduce': {
           name: '焊接工艺规程',
           type: 'select',
           labelfield: 'weldProduceCode',
           required: true,
+          isAgain: true,
         },
         'remarks': {
           name: '备注',
@@ -886,6 +930,7 @@ var FieldsConfig = (function () {
           disabled: true,
           optionUrl: '/daq/privilege/getProjectList.do',
           childSelect: ['tendersOid', 'constructUnit', 'workUnitOid', ],
+          isAgain: true,
           childUrl: ['/daq/privilege/getTendersList.do', '/daq/privilege/getCurrentUnitId.do', '/daq/workUnit/getWorkUnitList.do'],
         },
         'tendersOid': {
@@ -894,6 +939,7 @@ var FieldsConfig = (function () {
           labelfield: 'tendersName',
           required: true,
           childSelect: ['supervisionUnit', 'pipelineOid'],
+          isAgain: true,
           childUrl: ['/daq/privilege/getSupervisionUnitByTendersOid.do', '/daq/privilege/getPipelineListByTendersOid.do'],
         },
         'constructUnit': {
@@ -901,6 +947,7 @@ var FieldsConfig = (function () {
           type: 'select',
           labelfield: 'constructUnitName',
           required: true,
+          isAgain: true,
         },
         'pipelineOid': {
           name: '管线名称',
@@ -909,6 +956,7 @@ var FieldsConfig = (function () {
           childSelect: ['pipeSegmentOrCrossOid'],
           childUrl: ['/daq/privilege/getPipeSegmentOrCrossList.do'],
           required: true,
+          isAgain: true,
         },
         'pipeSegmentOrCrossOid': {
           name: '线路段/穿跨越',
@@ -917,6 +965,7 @@ var FieldsConfig = (function () {
           childSelect: ['weldOid', 'medianStakeOid'],
           childUrl: ['/daq/weld/getWeldList.do', '/daq/privilege/getMedianStakeList.do'],
           required: true,
+          isAgain: true,
         },
         'weldOid': {
           name: '焊口编号',
@@ -934,26 +983,31 @@ var FieldsConfig = (function () {
             types: "work_unit_type_code_001,work_unit_type_code_010,work_unit_type_code_012",
           },
           required: true,
+          isAgain: true,
         },
         'supervisionUnit': {
           name: '监理单位',
           type: 'select',
           labelfield: 'supervisionUnitName',
           required: true,
+          isAgain: true,
         },
         'supervisionEngineer': {
           name: '监理工程师',
           type: 'text',
           required: true,
+          isAgain: true,
         },
         'collectionPerson': {
           name: '采集人员',
           type: 'text',
+          isAgain: true,
         },
         'collectionDate': {
           name: '采集日期',
           type: 'date',
           required: true,
+          isAgain: true,
         },
         'remarks': {
           name: '备注',
@@ -964,6 +1018,7 @@ var FieldsConfig = (function () {
           type: 'select',
           labelfield: 'medianStakeCode',
           required: true,
+          isAgain: true,
         },
         'relativeMileage': {
           name: '相对桩位置',
@@ -974,11 +1029,13 @@ var FieldsConfig = (function () {
           name: '测量人',
           type: 'text',
           required: true,
+          isAgain: true,
         },
         'surveyDate': {
           name: '测量日期',
           type: 'date',
           required: true,
+          isAgain: true,
         },
         'pointx': {
           name: '坐标X(m)',
@@ -1058,6 +1115,7 @@ var FieldsConfig = (function () {
           optionUrl: '/daq/privilege/getProjectList.do',
           childSelect: ['tenders_oid', 'construct_unit'],
           childUrl: ['/daq/privilege/getTendersList.do', '/daq/privilege/getCurrentUnitId.do'],
+          isAgain: true,
         },
         'tenders_oid': {
           name: '标段名称',
@@ -1065,6 +1123,7 @@ var FieldsConfig = (function () {
           labelfield: 'tenders_name',
           required: true,
           childSelect: ['supervision_unit', 'pipeline_oid'],
+          isAgain: true,
           childUrl: ['/daq/privilege/getSupervisionUnitByTendersOid.do', '/daq/privilege/getPipelineListByTendersOid.do'],
         },
         'pipeline_oid': {
@@ -1074,6 +1133,7 @@ var FieldsConfig = (function () {
           childSelect: ['pipe_segment_or_cross_oid'],
           childUrl: ['/daq/privilege/getPipeSegmentOrCrossList.do'],
           required: true,
+          isAgain: true,
         },
         'pipe_segment_or_cross_oid': {
           name: '线路段/穿跨越',
@@ -1083,34 +1143,40 @@ var FieldsConfig = (function () {
           childSelect: ['weld_oid'],
           childUrl: ['/daq/weld/getWeldList.do'],
           required: true,
+          isAgain: true,
         },
         'construct_unit': {
           name: '施工单位',
           type: 'select',
           labelfield: 'construct_unit_name',
           required: true,
-          options: []
+          options: [],
+          isAgain: true,
         },
         'supervision_unit': {
           name: '监理单位',
           type: 'select',
           labelfield: 'supervision_unit_name',
           required: true,
+          isAgain: true,
         },
         'supervision_engineer': {
           name: '监理工程师',
           type: 'text',
           required: true,
+          isAgain: true,
 
         },
         'collection_person': {
           name: '采集人员',
           type: 'text',
+          isAgain: true,
         },
         'collection_date': {
           name: '采集日期',
           type: 'date',
           required: true,
+          isAgain: true,
 
         },
         'weld_oid': {
@@ -1122,11 +1188,13 @@ var FieldsConfig = (function () {
         'buckle_material_batch_num': {
           name: '补口材料批号',
           type: 'text',
+          isAgain: true,
         },
         'buckle_date': {
           name: '补口日期',
           type: 'date',
           required: true,
+          isAgain: true,
         },
         'buckle_anticorrosive_type': {
           name: '补口防腐类型',
@@ -1134,6 +1202,7 @@ var FieldsConfig = (function () {
           labelfield: 'buckle_anticorrosive_type_name',
           domainName: 'buckle_anticorrosive_type_domain',
           required: true,
+          isAgain: true,
 
         },
         'buckle_anticorrosive_grade': {
@@ -1142,7 +1211,7 @@ var FieldsConfig = (function () {
           labelfield: 'buckle_anticorrosive_grade_name',
           domainName: 'anticorrosive_grade_domain',
           required: true,
-
+          isAgain: true,
         },
         'derusting_grade': {
           name: '除锈等级',
@@ -1150,7 +1219,7 @@ var FieldsConfig = (function () {
           labelfield: 'derusting_grade_name',
           domainName: 'derusting_grade_domain',
           required: true,
-
+          isAgain: true,
         },
         'pipe_mouth_clean': {
           name: '管口清理',
@@ -1209,6 +1278,7 @@ var FieldsConfig = (function () {
         'anticorrosion': {
           name: '防腐工',
           type: 'text',
+          isAgain: true,
         },
         'remarks': {
           name: '备注',
